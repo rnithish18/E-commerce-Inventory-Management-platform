@@ -5,10 +5,4 @@ CREATE TABLE categories (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO categories (name, description)
-VALUES
-('Electronics', 'Electronic devices and accessories'),
-('Clothing', 'Men and women clothing'),
-('Books', 'Books and educational materials'),
-('Home & Kitchen', 'Home and kitchen products'),
-('Sports', 'Sports equipment and accessories');
+I 
