@@ -14,9 +14,12 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCart } from '../../contexts/CartContext';
+import { formatPaise } from '../../lib/utils';
 
 export function Topbar() {
   const { user, logout } = useAuth();
+  const { cart, itemCount } = useCart();
   const [searchTerm, setSearchTerm] = useState('');
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -197,11 +200,11 @@ export function Topbar() {
             <div className="relative">
               <ShoppingCart className="w-5 h-5" />
               <span className="absolute -top-1.5 -right-2 bg-orange-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center ring-2 ring-navy-800">
-                0
+                {itemCount}
               </span>
             </div>
             <span className="hidden sm:inline text-xs font-bold text-white">
-              ₹0
+              {formatPaise(cart.totalPaise)}
             </span>
           </Link>
 

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Heart, Star, ShoppingCart, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatPaise, discountPercent } from '../../lib/utils';
+import { useCart } from '../../contexts/CartContext';
 
 export interface ProductData {
   id: string;
@@ -25,6 +26,7 @@ interface Props {
 }
 
 export function ProductCard({ product }: Props) {
+  const { addToCart } = useCart();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
 
@@ -40,12 +42,12 @@ export function ProductCard({ product }: Props) {
     toast.success(!isWishlisted ? 'Added to Wishlist' : 'Removed from Wishlist');
   };
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (!inStock) return;
     setIsAdded(true);
-    toast.success(`Added ${product.name} to Cart!`);
+    await addToCart(product.id, undefined, 1);
     setTimeout(() => setIsAdded(false), 2000);
   };
 
