@@ -4,6 +4,8 @@ uploads/
 dist/
 *.log
 .DS_Store
+.pgdata/
+backend/.pgdata/
 coverage/
 .nyc_output/
 playwright-report/

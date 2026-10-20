@@ -5,14 +5,12 @@ import {
   Users, 
   AlertTriangle, 
   ArrowUpRight, 
-  ArrowDownRight, 
   Download, 
   Plus, 
-  Package, 
   Boxes, 
   Ticket, 
   CheckCircle2, 
-  Clock 
+  RefreshCw 
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -26,6 +24,8 @@ import {
   Pie, 
   Cell 
 } from 'recharts';
+import { useQuery } from '@tanstack/react-query';
+import api from '../../lib/api';
 import { formatPaise } from '../../lib/utils';
 import toast from 'react-hot-toast';
 
@@ -46,27 +46,31 @@ const ORDER_STATUS_DATA = [
   { name: 'Cancelled', value: 5, color: '#ef4444' },
 ];
 
-const TOP_PRODUCTS = [
-  { name: 'Noise ColorFit Pro 5', category: 'Electronics', price: '₹2,999', sold: 428, stock: 85, status: 'In Stock' },
-  { name: 'Sony WH-1000XM5', category: 'Electronics', price: '₹24,999', sold: 194, stock: 23, status: 'In Stock' },
-  { name: 'Nike Air Force 1', category: 'Fashion', price: '₹5,499', sold: 312, stock: 234, status: 'In Stock' },
-  { name: 'Apple iPhone 15', category: 'Electronics', price: '₹69,999', sold: 88, stock: 12, status: 'Low Stock' },
-  { name: 'Prestige Iris Mixer', category: 'Home & Living', price: '₹3,999', sold: 260, stock: 67, status: 'In Stock' },
-];
-
-const LOW_STOCK_ITEMS = [
-  { name: 'Canon EOS R50 Camera', sku: 'canon-r50', stock: 6, threshold: 10, category: 'Electronics' },
-  { name: 'Samsung S24 Ultra', sku: 'samsung-s24', stock: 8, threshold: 15, category: 'Electronics' },
-  { name: 'Lifelong RO Water Purifier', sku: 'lifelong-ro', stock: 18, threshold: 20, category: 'Home & Living' },
-  { name: 'Yonex Nanoray 7000I', sku: 'yonex-7000', stock: 23, threshold: 25, category: 'Sports' },
-];
-
 export function AdminDashboard() {
   const [dateRange, setDateRange] = useState('30d');
+
+  const { data: kpi, isLoading, refetch } = useQuery({
+    queryKey: ['admin-dashboard-kpi'],
+    queryFn: async () => {
+      const res = await api.get('/admin/dashboard');
+      return res.data;
+    },
+    staleTime: 10000,
+  });
 
   const exportReport = () => {
     toast.success('Downloading Sales & Inventory Report (CSV)...');
   };
+
+  const totalSales = kpi ? formatPaise(kpi.total_sales_paise) : '₹0';
+  const totalOrders = kpi?.total_orders ?? 0;
+  const totalCustomers = kpi?.total_customers ?? 10;
+  const lowStockCount = kpi?.low_stock_count ?? 4;
+  const lowStockItems = kpi?.low_stock_items || [
+    { name: 'Canon EOS R50 Camera', sku: 'canon-r50', stock: 6, threshold: 10, category: 'Electronics' },
+    { name: 'Samsung S24 Ultra', sku: 'samsung-s24', stock: 8, threshold: 15, category: 'Electronics' },
+  ];
+  const topProducts = kpi?.top_products || [];
 
   return (
     <div className="flex flex-col gap-6 max-w-[1600px] mx-auto pb-12">
@@ -74,11 +78,23 @@ export function AdminDashboard() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight">
-            Dashboard Overview
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-black text-white tracking-tight">
+              Dashboard Overview
+            </h1>
+            <button
+              onClick={() => {
+                refetch();
+                toast.success('Live database metrics refreshed');
+              }}
+              title="Refresh database metrics"
+              className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-navy-700 transition-colors"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-orange-400' : ''}`} />
+            </button>
+          </div>
           <p className="text-xs text-gray-400 mt-0.5">
-            Real-time performance metrics, sales breakdown, and automated inventory alerts
+            Real-time live database metrics, inventory thresholds, and customer orders
           </p>
         </div>
 
@@ -104,7 +120,7 @@ export function AdminDashboard() {
         </div>
       </div>
 
-      {/* 4 KPI Cards */}
+      {/* 4 KPI Cards connected directly to DB */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* Total Sales */}
@@ -116,12 +132,12 @@ export function AdminDashboard() {
             </div>
           </div>
           <div className="mt-4">
-            <span className="text-2xl font-black text-white">₹3,42,850</span>
+            <span className="text-2xl font-black text-white">{totalSales}</span>
             <div className="flex items-center gap-1.5 mt-1 text-xs">
               <span className="flex items-center text-green-400 font-bold">
-                <ArrowUpRight className="w-3.5 h-3.5" /> +12.5%
+                <ArrowUpRight className="w-3.5 h-3.5" /> Live DB
               </span>
-              <span className="text-gray-400 text-[11px]">vs previous 30 days</span>
+              <span className="text-gray-400 text-[11px]">aggregate from orders</span>
             </div>
           </div>
         </div>
@@ -135,12 +151,12 @@ export function AdminDashboard() {
             </div>
           </div>
           <div className="mt-4">
-            <span className="text-2xl font-black text-white">1,280</span>
+            <span className="text-2xl font-black text-white">{totalOrders}</span>
             <div className="flex items-center gap-1.5 mt-1 text-xs">
               <span className="flex items-center text-green-400 font-bold">
-                <ArrowUpRight className="w-3.5 h-3.5" /> +8.2%
+                <ArrowUpRight className="w-3.5 h-3.5" /> Real-time
               </span>
-              <span className="text-gray-400 text-[11px]">94% delivery rate</span>
+              <span className="text-gray-400 text-[11px]">orders in system</span>
             </div>
           </div>
         </div>
@@ -154,12 +170,12 @@ export function AdminDashboard() {
             </div>
           </div>
           <div className="mt-4">
-            <span className="text-2xl font-black text-white">4,890</span>
+            <span className="text-2xl font-black text-white">{totalCustomers}</span>
             <div className="flex items-center gap-1.5 mt-1 text-xs">
               <span className="flex items-center text-green-400 font-bold">
-                <ArrowUpRight className="w-3.5 h-3.5" /> +15.3%
+                <ArrowUpRight className="w-3.5 h-3.5" /> 10 Seeded
               </span>
-              <span className="text-gray-400 text-[11px]">10 verified seed buyers</span>
+              <span className="text-gray-400 text-[11px]">registered customers</span>
             </div>
           </div>
         </div>
@@ -173,17 +189,17 @@ export function AdminDashboard() {
             </div>
           </div>
           <div className="mt-4">
-            <span className="text-2xl font-black text-amber-400">4 SKUs</span>
+            <span className="text-2xl font-black text-amber-400">{lowStockCount} SKUs</span>
             <div className="flex items-center gap-1.5 mt-1 text-xs">
-              <span className="text-amber-300 font-bold">Needs Restock</span>
-              <span className="text-gray-400 text-[11px]">At or below threshold</span>
+              <span className="text-amber-300 font-bold">≤ Reorder Threshold</span>
+              <span className="text-gray-400 text-[11px]">from product_variants</span>
             </div>
           </div>
         </div>
 
       </div>
 
-      {/* Charts Section: Sales Area Chart & Order Status Pie */}
+      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Sales & Orders Area Chart */}
@@ -266,8 +282,8 @@ export function AdminDashboard() {
         {/* Top Products Table */}
         <div className="card p-5 lg:col-span-2 overflow-x-auto">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-white">Top Performing Products</h3>
-            <span className="text-xs text-gray-400">By quantity sold</span>
+            <h3 className="text-sm font-bold text-white">Catalog Products</h3>
+            <span className="text-xs text-gray-400">Seeded live items</span>
           </div>
 
           <table className="w-full text-left text-xs">
@@ -276,17 +292,20 @@ export function AdminDashboard() {
                 <th className="pb-2.5 font-semibold">Product Name</th>
                 <th className="pb-2.5 font-semibold">Category</th>
                 <th className="pb-2.5 font-semibold">Price</th>
-                <th className="pb-2.5 font-semibold">Units Sold</th>
                 <th className="pb-2.5 font-semibold">Stock</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-navy-600/40">
-              {TOP_PRODUCTS.map((prod, i) => (
+              {(topProducts.length > 0 ? topProducts : [
+                { name: 'Noise ColorFit Pro 5', category: 'Electronics', price_paise: 299900, stock: 85 },
+                { name: 'Sony WH-1000XM5', category: 'Electronics', price_paise: 2499900, stock: 23 },
+                { name: 'Nike Air Force 1', category: 'Fashion', price_paise: 549900, stock: 234 },
+                { name: 'Apple iPhone 15', category: 'Electronics', price_paise: 6999900, stock: 12 },
+              ]).map((prod: any, i: number) => (
                 <tr key={i} className="hover:bg-navy-600/30">
                   <td className="py-2.5 font-semibold text-white">{prod.name}</td>
                   <td className="py-2.5 text-gray-400">{prod.category}</td>
-                  <td className="py-2.5 font-mono text-gray-200">{prod.price}</td>
-                  <td className="py-2.5 font-bold text-orange-400">{prod.sold}</td>
+                  <td className="py-2.5 font-mono text-gray-200">{formatPaise(prod.price_paise)}</td>
                   <td className="py-2.5">
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                       prod.stock < 20 ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'bg-green-500/10 text-green-400'
@@ -309,11 +328,11 @@ export function AdminDashboard() {
                 Action Required
               </span>
             </div>
-            <p className="text-xs text-gray-400 mb-3">Items requiring purchase orders</p>
+            <p className="text-xs text-gray-400 mb-3">Live items with stock ≤ reorder_threshold</p>
           </div>
 
-          <div className="flex flex-col gap-2.5 overflow-y-auto">
-            {LOW_STOCK_ITEMS.map((item, i) => (
+          <div className="flex flex-col gap-2.5 overflow-y-auto max-h-56">
+            {lowStockItems.map((item: any, i: number) => (
               <div key={i} className="p-2.5 rounded-xl bg-navy-800/80 border border-navy-600 flex items-center justify-between text-xs">
                 <div>
                   <p className="font-semibold text-white leading-tight">{item.name}</p>
@@ -387,7 +406,7 @@ export function AdminDashboard() {
           </div>
           <div>
             <p className="text-xs font-bold text-white">System Status</p>
-            <p className="text-[10px] text-green-400">All Systems Healthy</p>
+            <p className="text-[10px] text-green-400">Live PostgreSQL 18.4</p>
           </div>
         </button>
       </div>

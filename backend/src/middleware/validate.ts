@@ -15,7 +15,13 @@ export function validate(schema: ZodSchema) {
 export function validateQuery(schema: ZodSchema) {
   return (req: Request, _res: Response, next: NextFunction): void => {
     try {
-      req.query = schema.parse(req.query) as any;
+      const parsed = schema.parse(req.query);
+      Object.defineProperty(req, 'query', {
+        value: parsed,
+        writable: true,
+        enumerable: true,
+        configurable: true,
+      });
       next();
     } catch (err) {
       next(err);
