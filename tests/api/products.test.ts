@@ -50,6 +50,18 @@ describe('Products API', () => {
       });
     });
 
+    it('filters by min_price and max_price in paise', async () => {
+      const min = 50000; // ₹500
+      const max = 300000; // ₹3000
+      const res = await request(app).get(`/api/v1/products?min_price=${min}&max_price=${max}`);
+      expect(res.status).toBe(200);
+      expect(res.body.products.length).toBeGreaterThan(0);
+      res.body.products.forEach((p: any) => {
+        expect(p.price_paise).toBeGreaterThanOrEqual(min);
+        expect(p.price_paise).toBeLessThanOrEqual(max);
+      });
+    });
+
     it('returns 400 for invalid sort value', async () => {
       const res = await request(app).get('/api/v1/products?sort=invalid_sort');
       expect(res.status).toBe(400);

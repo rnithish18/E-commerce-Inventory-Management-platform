@@ -162,5 +162,28 @@ describe('Auth API', () => {
       const res = await request(app).get('/api/v1/admin/dashboard');
       expect(res.status).toBe(401);
     });
+
+    it('returns 200 for ADMIN role on admin dashboard and products routes', async () => {
+      const loginRes = await request(app)
+        .post('/api/v1/auth/login')
+        .send({ email: 'admin@shopnest.com', password: 'Admin@123!' });
+      expect(loginRes.status).toBe(200);
+      const adminCookie = loginRes.headers['set-cookie'][0];
+
+      const dashRes = await request(app)
+        .get('/api/v1/admin/dashboard')
+        .set('Cookie', adminCookie);
+      expect(dashRes.status).toBe(200);
+      expect(dashRes.body).toHaveProperty('total_orders');
+      expect(dashRes.body).toHaveProperty('total_sales_paise');
+      expect(dashRes.body).toHaveProperty('total_customers');
+      expect(dashRes.body).toHaveProperty('low_stock_count');
+
+      const prodRes = await request(app)
+        .get('/api/v1/admin/products')
+        .set('Cookie', adminCookie);
+      expect(prodRes.status).toBe(200);
+      expect(Array.isArray(prodRes.body.products)).toBe(true);
+    });
   });
 });
