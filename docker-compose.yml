@@ -1,0 +1,21 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: shopnest_postgres
+    environment:
+      POSTGRES_USER: shopnest
+      POSTGRES_PASSWORD: shopnest123
+      POSTGRES_DB: shopnest_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - shopnest_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U shopnest -d shopnest_db']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  shopnest_pgdata:
