@@ -1,0 +1,51 @@
+import axios from 'axios'
+
+const api = axios.create({
+  baseURL: '/api/v1',
+  withCredentials: true,
+  headers: { 'Content-Type': 'application/json' },
+})
+
+api.interceptors.response.use(
+  (r) => r,
+  (err) => {
+    if (err.response?.status === 401) {
+      // Redirect to login if session expired (except on login/register pages)
+      const path = window.location.pathname
+      if (path !== '/login' && path !== '/register') {
+        window.location.href = `/login?returnUrl=${encodeURIComponent(path)}`
+      }
+    }
+    return Promise.reject(err)
+  }
+)
+
+export default api
+
+// ── Auth ──
+export const authApi = {
+  register: (data: { email: string; password: string; full_name: string; phone?: string }) =>
+    api.post('/auth/register', data),
+  login: (data: { email: string; password: string }) =>
+    api.post('/auth/login', data),
+  logout: () => api.post('/auth/logout'),
+  me: () => api.get('/auth/me'),
+}
+
+// ── Products ──
+export interface ProductListParams {
+  page?: number; limit?: number; search?: string; category?: string;
+  min_price?: number; max_price?: number;
+  sort?: 'price_asc' | 'price_desc' | 'rating_desc' | 'newest' | 'discount_desc';
+  in_stock?: 'true' | 'false';
+}
+export const productsApi = {
+  list: (params?: ProductListParams) => api.get('/products', { params }),
+  featured: () => api.get('/products/featured'),
+  detail: (slug: string) => api.get(`/products/${slug}`),
+}
+
+// ── Categories ──
+export const categoriesApi = {
+  list: () => api.get('/categories'),
+}
