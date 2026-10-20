@@ -1,7 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { requireAuth } from '../middleware/auth';
 import { processCheckout, getUserOrders, getOrderDetail } from '../services/order';
-import { handlePaymentFailure } from '../services/payment';
+import { cancelOrderWithRestock } from '../services/orderStateMachine';
+import { requestRefund } from '../services/refund';
 import { query } from '../db/query';
 import { AppError } from '../middleware/errorHandler';
 
@@ -77,26 +78,31 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
 // POST /api/v1/orders/:id/cancel
 router.post('/:id/cancel', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const orderRes = await query<{ id: string; status: string; user_id: string }>(
-      'SELECT id, status, user_id FROM orders WHERE id = $1',
+    // Verify order belongs to this user (unless admin)
+    const orderRes = await query<{ user_id: string }>(
+      'SELECT user_id FROM orders WHERE id = $1',
       [req.params.id]
     );
-
     if (orderRes.rows.length === 0) {
       throw new AppError(404, 'Order not found', 'NOT_FOUND');
     }
-
-    const order = orderRes.rows[0];
-    if (order.user_id !== req.user!.userId && req.user!.role !== 'ADMIN') {
+    if (orderRes.rows[0].user_id !== req.user!.userId && req.user!.role !== 'ADMIN') {
       throw new AppError(403, 'Permission denied', 'FORBIDDEN');
     }
 
-    if (!['PENDING_PAYMENT', 'PAID', 'PROCESSING'].includes(order.status)) {
-      throw new AppError(400, `Cannot cancel order in ${order.status} state`, 'INVALID_STATE');
-    }
+    await cancelOrderWithRestock(req.params.id, req.user!.userId, 'Customer requested cancellation');
+    res.json({ message: 'Order cancelled successfully' });
+  } catch (err) {
+    next(err);
+  }
+});
 
-    await handlePaymentFailure(order.id, 'Order cancelled by customer');
-    res.json({ message: 'Order cancelled and stock reservations released successfully' });
+// POST /api/v1/orders/:id/refund-request
+router.post('/:id/refund-request', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { reason } = req.body;
+    await requestRefund(req.params.id, req.user!.userId, reason || 'Customer requested refund');
+    res.json({ message: 'Refund request submitted successfully' });
   } catch (err) {
     next(err);
   }

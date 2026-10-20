@@ -106,20 +106,65 @@ export async function processCheckout(input: CheckoutInput): Promise<CheckoutRes
       );
     }
 
-    // B. Insert Order
+    // B. Insert Order — with coupon usage race-condition protection (FOR UPDATE lock)
     let couponId: string | null = null;
     if (pricing.couponCode) {
-      const cpRes = await client.query('SELECT id FROM coupons WHERE code = $1', [pricing.couponCode]);
+      const normalizedCode = pricing.couponCode.toUpperCase();
+      const cpRes = await client.query<{
+        id: string; usage_limit: number | null; per_user_limit: number | null;
+      }>(
+        'SELECT id, usage_limit, per_user_limit FROM coupons WHERE code = $1 FOR UPDATE',
+        [normalizedCode]
+      );
       if (cpRes.rows.length > 0) {
-        couponId = cpRes.rows[0].id;
+        const coupon = cpRes.rows[0];
+        couponId = coupon.id;
+
+        // Check global usage limit
+        if (coupon.usage_limit !== null) {
+          const usageCount = await client.query<{ cnt: number }>(
+            'SELECT COUNT(*)::int as cnt FROM coupon_redemptions WHERE coupon_id = $1',
+            [couponId]
+          );
+          if (usageCount.rows[0].cnt >= coupon.usage_limit) {
+            throw new AppError(400, 'Coupon usage limit has been reached', 'COUPON_EXHAUSTED');
+          }
+        }
+
+        // Check per-user limit
+        if (coupon.per_user_limit !== null) {
+          const userUsage = await client.query<{ cnt: number }>(
+            'SELECT COUNT(*)::int as cnt FROM coupon_redemptions WHERE coupon_id = $1 AND user_id = $2',
+            [couponId, userId]
+          );
+          if (userUsage.rows[0].cnt >= coupon.per_user_limit) {
+            throw new AppError(400, 'You have already used this coupon the maximum number of times', 'COUPON_USER_LIMIT');
+          }
+        }
+      }
+    } else if (couponCode && couponCode.trim()) {
+      // Check if coupon failed due to per-user limit
+      const normalizedCode = couponCode.trim().toUpperCase();
+      const cpCheck = await client.query<{ id: string; per_user_limit: number | null }>(
+        'SELECT id, per_user_limit FROM coupons WHERE code = $1',
+        [normalizedCode]
+      );
+      if (cpCheck.rows.length > 0 && cpCheck.rows[0].per_user_limit) {
+        const userUsage = await client.query<{ cnt: number }>(
+          'SELECT COUNT(*)::int as cnt FROM coupon_redemptions WHERE coupon_id = $1 AND user_id = $2',
+          [cpCheck.rows[0].id, userId]
+        );
+        if (userUsage.rows[0].cnt >= cpCheck.rows[0].per_user_limit) {
+          throw new AppError(400, 'You have already used this coupon the maximum number of times', 'COUPON_USER_LIMIT');
+        }
       }
     }
 
     await client.query(
       `INSERT INTO orders (
          id, user_id, address_id, status, subtotal_paise, discount_paise, tax_paise, shipping_paise,
-         total_paise, coupon_id, coupon_code, notes, created_at, updated_at
-       ) VALUES ($1, $2, $3, 'PENDING_PAYMENT', $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW())`,
+         total_paise, coupon_id, coupon_code, notes, reservation_expires_at, created_at, updated_at
+       ) VALUES ($1, $2, $3, 'PENDING_PAYMENT', $4, $5, $6, $7, $8, $9, $10, $11, NOW() + INTERVAL '30 minutes', NOW(), NOW())`,
       [
         orderId,
         userId,

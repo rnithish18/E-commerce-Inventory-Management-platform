@@ -14,6 +14,11 @@ import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
 import { AdminLayout } from './pages/admin/AdminLayout';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
+import { AdminProducts } from './pages/admin/AdminProducts';
+import { AdminOrders } from './pages/admin/AdminOrders';
+import { AdminInventory } from './pages/admin/AdminInventory';
+import { AdminCoupons } from './pages/admin/AdminCoupons';
+import { AdminReviews } from './pages/admin/AdminReviews';
 import { AdminPlaceholder } from './pages/admin/AdminPlaceholder';
 import { CustomerPlaceholder } from './pages/CustomerPlaceholder';
 import { ProtectedRoute } from './components/routing/ProtectedRoute';
@@ -80,33 +85,9 @@ export default function App() {
             }
           >
             <Route index element={<AdminDashboard />} />
-            <Route 
-              path="products" 
-              element={
-                <AdminPlaceholder 
-                  title="Product Catalog Management" 
-                  description="Manage products, pricing, categories, and images." 
-                />
-              } 
-            />
-            <Route 
-              path="orders" 
-              element={
-                <AdminPlaceholder 
-                  title="Order Processing & Fulfillment" 
-                  description="Update order states, tracking numbers, and refunds." 
-                />
-              } 
-            />
-            <Route 
-              path="inventory" 
-              element={
-                <AdminPlaceholder 
-                  title="Inventory & Stock Movement" 
-                  description="View inventory movements, stock levels, and set thresholds." 
-                />
-              } 
-            />
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="inventory" element={<AdminInventory />} />
             <Route 
               path="customers" 
               element={
@@ -116,24 +97,8 @@ export default function App() {
                 />
               } 
             />
-            <Route 
-              path="coupons" 
-              element={
-                <AdminPlaceholder 
-                  title="Coupon & Promotion Engine" 
-                  description="Create and manage coupon codes like WELCOME10." 
-                />
-              } 
-            />
-            <Route 
-              path="reviews" 
-              element={
-                <AdminPlaceholder 
-                  title="Review Moderation" 
-                  description="Approve, reject, or hide customer product reviews." 
-                />
-              } 
-            />
+            <Route path="coupons" element={<AdminCoupons />} />
+            <Route path="reviews" element={<AdminReviews />} />
             <Route 
               path="analytics" 
               element={
