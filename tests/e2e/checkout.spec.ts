@@ -21,6 +21,8 @@ test.describe('End-to-End Customer Checkout & Payment Workflow', () => {
     const addToCartBtn = page.locator('button:has-text("Add to Cart")').first();
     await expect(addToCartBtn).toBeVisible();
     await addToCartBtn.click();
+    await page.waitForSelector('button:has-text("Added!")', { timeout: 10000 });
+    await page.waitForTimeout(1000);
 
     // 5. Navigate to Checkout
     await page.goto('/checkout');

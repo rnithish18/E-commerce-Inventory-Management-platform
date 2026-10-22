@@ -15,6 +15,7 @@ import {
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { formatPaise } from '../lib/utils';
+import { FullPageSpinner } from '../components/ui/Spinner';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
 
@@ -31,8 +32,8 @@ interface Address {
 }
 
 export function CheckoutPage() {
-  const { cart, clearCart } = useCart();
-  const { user } = useAuth();
+  const { cart, loading: cartLoading, clearCart } = useCart();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -142,6 +143,10 @@ export function CheckoutPage() {
       setSubmitting(false);
     }
   };
+
+  if (authLoading || cartLoading) {
+    return <FullPageSpinner />;
+  }
 
   if (cart.items.length === 0) {
     return (

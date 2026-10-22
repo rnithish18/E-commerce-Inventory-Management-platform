@@ -19,6 +19,7 @@ import { AdminOrders } from './pages/admin/AdminOrders';
 import { AdminInventory } from './pages/admin/AdminInventory';
 import { AdminCoupons } from './pages/admin/AdminCoupons';
 import { AdminReviews } from './pages/admin/AdminReviews';
+import { AdminAnalytics } from './pages/admin/AdminAnalytics';
 import { AdminPlaceholder } from './pages/admin/AdminPlaceholder';
 import { CustomerPlaceholder } from './pages/CustomerPlaceholder';
 import { ProtectedRoute } from './components/routing/ProtectedRoute';
@@ -99,15 +100,7 @@ export default function App() {
             />
             <Route path="coupons" element={<AdminCoupons />} />
             <Route path="reviews" element={<AdminReviews />} />
-            <Route 
-              path="analytics" 
-              element={
-                <AdminPlaceholder 
-                  title="Sales & Business Analytics" 
-                  description="Gross turnover, conversion rates, and inventory exposure." 
-                />
-              } 
-            />
+            <Route path="analytics" element={<AdminAnalytics />} />
             <Route 
               path="settings" 
               element={

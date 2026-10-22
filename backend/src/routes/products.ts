@@ -35,7 +35,7 @@ router.get('/featured', async (_req: Request, res: Response, next: NextFunction)
        FROM products p
        LEFT JOIN categories c ON p.category_id = c.id
        LEFT JOIN (
-         SELECT product_id, SUM(stock_qty) as total_stock FROM product_variants GROUP BY product_id
+         SELECT product_id, SUM(GREATEST(0, stock_qty - reserved_qty)) as total_stock FROM product_variants GROUP BY product_id
        ) pv ON p.id = pv.product_id
        LEFT JOIN (
          SELECT DISTINCT ON (product_id) product_id, url
@@ -102,7 +102,7 @@ router.get('/', validateQuery(ProductQuerySchema), async (req: Request, res: Res
       `SELECT COUNT(DISTINCT p.id) as total
        FROM products p
        LEFT JOIN categories c ON p.category_id = c.id
-       LEFT JOIN (SELECT product_id, SUM(stock_qty) as total_stock FROM product_variants GROUP BY product_id) pv ON p.id = pv.product_id
+       LEFT JOIN (SELECT product_id, SUM(GREATEST(0, stock_qty - reserved_qty)) as total_stock FROM product_variants GROUP BY product_id) pv ON p.id = pv.product_id
        ${whereClause}`,
       params
     );
@@ -117,7 +117,7 @@ router.get('/', validateQuery(ProductQuerySchema), async (req: Request, res: Res
               pi.url as image_url
        FROM products p
        LEFT JOIN categories c ON p.category_id = c.id
-       LEFT JOIN (SELECT product_id, SUM(stock_qty) as total_stock FROM product_variants GROUP BY product_id) pv ON p.id = pv.product_id
+       LEFT JOIN (SELECT product_id, SUM(GREATEST(0, stock_qty - reserved_qty)) as total_stock FROM product_variants GROUP BY product_id) pv ON p.id = pv.product_id
        LEFT JOIN (SELECT DISTINCT ON (product_id) product_id, url FROM product_images ORDER BY product_id, sort_order ASC) pi ON p.id = pi.product_id
        ${whereClause}
        ORDER BY ${orderBy}

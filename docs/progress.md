@@ -207,24 +207,86 @@ Running 2 tests using 1 worker
 
 ---
 
-## 7. Week 4: Analytics, Security & Deployment Roadmap
-1. **Sales & Inventory Analytics Dashboard (`/admin/analytics`)**:
-   - Executive KPIs: Total Sales, Total Orders, Total Customers, Low Stock Items with % change vs prior period.
-   - Combo chart (Revenue bars + Order count line) bucketed by Day/Week in `Asia/Kolkata`.
-   - Order Status breakdown donut chart (`PAID`, `PROCESSING`, `SHIPPED`, `DELIVERED`, `CANCELLED`).
-   - Top 5 Selling Products table and Low Stock alert ledger.
-   - Date range selector: Today, Last 7 Days, Last 30 Days, Custom Range.
-2. **Security Hardening**:
-   - Rate limiting on Auth (`/auth/login`, `/auth/register`) and Coupons (`/coupons/apply`).
-   - Helmet security headers and CORS origin lockdown.
-   - Anti-CSRF validation on state-modifying requests.
-   - Parameterized queries across all routes (SQL injection immunity).
-   - Security Audit documentation in `docs/security-report.md`.
-3. **Containerization & Production Deployment**:
-   - Production multi-stage `Dockerfile` for Backend and Frontend.
-   - Root `docker-compose.yml` orchestrating PostgreSQL, Backend API, and Frontend web server.
-   - Comprehensive `/api/v1/health` and `/health` probe endpoints.
-   - Full setup and runbook in `docs/deployment.md`.
-4. **Final Verification & Visual Evidence**:
-   - Capture automated high-res screenshots of customer and admin journeys in `docs/screenshots/`.
-   - Final review and sign-off report.
+## 7. Week 4: Analytics, Security & Deployment (100% Completed & Verified)
+
+### A. Architectural Deliverables Completed
+1. **Sales & Business Analytics Engine (`backend/src/routes/admin/analytics.ts`, `frontend/src/pages/admin/AdminAnalytics.tsx`)**:
+   - Live SQL aggregates computed exclusively over verified, non-cancelled orders (`status IN ('PAID', 'PROCESSING', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED')`).
+   - Executive KPIs: Total Gross Sales (paise -> ₹), Total Orders, Total Active Customers, and Low Stock SKU exposure with automated percentage changes ($\Delta\%$) versus the prior period.
+   - Interactive Recharts Combo Chart: Daily Turnover bars in accent orange (`#f97316`) paired with order volume line in sky blue (`#38bdf8`), bucketed in `Asia/Kolkata` (UTC+5:30).
+   - Order Status fulfillment breakdown donut chart with status color palette.
+   - Top 5 Selling Products table and Low Stock Alert ledger with direct one-click restock links.
+   - Filterable by date periods: `Today`, `Last 7 Days`, `Last 30 Days`, and `Custom Range`.
+   - Built-in CSV report export generator (`ShopNest_Analytics_*.csv`).
+   - Full KPI definitions, formulas, and timezone logic documented in `docs/kpis.md`.
+
+2. **Enterprise Security Hardening**:
+   - **Rate Limiting (`backend/src/middleware/security.ts`)**: `express-rate-limit` active on auth routes (`/api/v1/auth/login`, `/api/v1/auth/register` - 30 req/15 min) and coupon validation (`/api/v1/coupons` - 40 req/10 min).
+   - **Anti-CSRF Origin Guard**: State-modifying requests (`POST`, `PUT`, `DELETE`, `PATCH`) verify `Origin` and `Referer` headers against whitelisted origins.
+   - **SQL Injection Immunity**: 100% parameterized queries (`$1, $2, ...`) and Zod schema validations. PostgreSQL syntax errors (`22P02`) gracefully caught with `400 BAD_REQUEST`.
+   - Comprehensive security audit record documented in `docs/security-report.md`.
+
+3. **Containerization & Deployment Architecture**:
+   - Production multi-stage `backend/Dockerfile` compiling TypeScript to `dist/index.js` and running on Node.js 20 Alpine.
+   - Production multi-stage `frontend/Dockerfile` and `frontend/nginx.conf` compiling Vite and serving via high-performance Nginx with reverse proxy for `/api` and `/uploads`.
+   - Root `docker-compose.yml` orchestrating `postgres` (with healthcheck and volume persistence), `backend`, and `frontend`.
+   - Production health probes: `/health` and `/api/v1/health` with database ping, uptime, and status reporting.
+   - Step-by-step setup and operations runbook documented in `docs/deployment.md`.
+
+4. **Visual Documentation & Evidence**:
+   - 12 full-page desktop screenshots automatically captured and verified via Playwright in `docs/screenshots/`:
+     1. `01_storefront_home.png`
+     2. `02_catalog_search_filter.png`
+     3. `03_product_detail.png`
+     4. `04_cart_summary.png`
+     5. `05_checkout_form.png`
+     6. `06_order_tracking.png`
+     7. `07_admin_dashboard.png`
+     8. `08_admin_inventory.png`
+     9. `09_admin_orders.png`
+     10. `10_admin_analytics.png`
+     11. `11_admin_coupons.png`
+     12. `12_admin_reviews.png`
+
+---
+
+## 8. Complete Test Suite Execution Record
+
+### A. Vitest Suite (100% Pass — 131 Tests across 11 Files)
+```
+ ✓ tests/unit/slug.test.ts (8 tests)
+ ✓ tests/unit/money.test.ts (24 tests)
+ ✓ tests/unit/jwt.test.ts (6 tests)
+ ✓ tests/unit/pricing.test.ts (3 tests)
+ ✓ tests/api/products.test.ts (17 tests)
+ ✓ tests/api/reservation_expiry.test.ts (1 test)
+ ✓ tests/api/checkout_payment.test.ts (11 tests)
+ ✓ tests/api/week4_security_analytics.test.ts (10 tests)
+ ✓ tests/api/week3.test.ts (31 tests)
+ ✓ tests/api/auth.test.ts (19 tests)
+ ✓ tests/api/race_condition.test.ts (1 test)
+
+ Test Files  11 passed (11)
+      Tests  131 passed (131)
+   Duration  14.03s
+```
+
+### B. Playwright End-to-End Suite (100% Pass — 3 Browser Tests)
+```
+Running 3 tests using 1 worker
+
+  ok 1 tests\e2e\capture_screenshots.spec.ts:14:7 › Automated Visual Documentation & Evidence Capture › Captures all 12 platform views across customer and admin journeys (45.4s)
+  ok 2 tests\e2e\checkout.spec.ts:4:7 › End-to-End Customer Checkout & Payment Workflow › Customer logs in, adds product to cart, completes sandbox checkout, and views confirmed order (12.9s)
+  ok 3 tests\e2e\week3_admin.spec.ts:4:7 › Week 3 Admin E2E: Stock Adjustment, State Machine & Order Tracking › Admin adjusts stock, advances order from PAID to SHIPPED, and customer tracking stepper reflects updates (23.7s)
+
+  3 passed (1.4m)
+```
+
+---
+
+## 9. Final Sign-off & Completion Status
+- **Phase 1 (Week 1)**: Core Platform & Catalog — **COMPLETE**
+- **Phase 2 (Week 2)**: Cart, Checkout & Payment Workflow — **COMPLETE**
+- **Phase 3 (Week 3)**: Inventory, Orders & Store Features — **COMPLETE**
+- **Phase 4 (Week 4)**: Analytics, Security & Deployment — **COMPLETE**
+- **All non-negotiable rules adhered to**: Integer paise currency everywhere, server-side pricing and payment verification, atomic row-locking on inventory, central order state machine, zero floats, and 100% tests passing.

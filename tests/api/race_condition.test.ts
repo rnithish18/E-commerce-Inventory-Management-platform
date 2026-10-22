@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import request from 'supertest';
 import app from '../../backend/src/app';
 import { query } from '../../backend/src/db/query';
@@ -9,6 +9,12 @@ describe('Stock Race Condition: 10 Concurrent Checkouts for Stock=1 Product', ()
   let testProductId: string;
   const customerCookies: string[] = [];
   const addressIds: string[] = [];
+
+  afterAll(async () => {
+    if (testProductId) {
+      await query('DELETE FROM products WHERE id = $1', [testProductId]);
+    }
+  });
 
   beforeAll(async () => {
     // Create a fresh product with stock=1 just for this test

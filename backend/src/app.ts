@@ -23,13 +23,24 @@ import adminInventoryRoutes from './routes/admin/inventory';
 import adminCouponRoutes from './routes/admin/coupons';
 import adminReviewRoutes from './routes/admin/reviews';
 import adminDashboardRoutes from './routes/admin/dashboard';
+import adminAnalyticsRoutes from './routes/admin/analytics';
 import webhookRoutes from './routes/webhooks';
+import { authLimiter, couponLimiter, csrfProtection } from './middleware/security';
+import { query } from './db/query';
 
 const app = express();
 
 // Security middleware
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", 'data:', 'https:', 'http:'],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+    },
+  },
 }));
 
 app.use(cors({
@@ -44,6 +55,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Anti-CSRF Origin Guard
+app.use(csrfProtection);
+
 // Logging
 if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
@@ -52,13 +66,32 @@ if (process.env.NODE_ENV !== 'test') {
 // Static uploads
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-// Health check
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '1.0.0' });
-});
+// Health check handler
+const healthHandler = async (_req: express.Request, res: express.Response) => {
+  try {
+    await query('SELECT 1');
+    res.json({
+      status: 'ok',
+      database: 'connected',
+      uptime_seconds: Math.floor(process.uptime()),
+      timestamp: new Date().toISOString(),
+      version: '1.0.0',
+    });
+  } catch (err: any) {
+    res.status(503).json({
+      status: 'degraded',
+      database: 'disconnected',
+      error: err.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
+};
 
-// API routes
-app.use('/api/v1/auth', authRoutes);
+app.get('/health', healthHandler);
+app.get('/api/v1/health', healthHandler);
+
+// API routes with rate limiters
+app.use('/api/v1/auth', authLimiter, authRoutes);
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/cart', cartRoutes);
@@ -67,7 +100,7 @@ app.use('/api/v1/addresses', addressRoutes);
 app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/wishlists', wishlistRoutes);
-app.use('/api/v1/coupons', couponRoutes);
+app.use('/api/v1/coupons', couponLimiter, couponRoutes);
 app.use('/api/v1/uploads', uploadRoutes);
 app.use('/api/v1/admin/products', adminProductRoutes);
 app.use('/api/v1/admin/orders', adminOrderRoutes);
@@ -75,6 +108,7 @@ app.use('/api/v1/admin/inventory', adminInventoryRoutes);
 app.use('/api/v1/admin/coupons', adminCouponRoutes);
 app.use('/api/v1/admin/reviews', adminReviewRoutes);
 app.use('/api/v1/admin/dashboard', adminDashboardRoutes);
+app.use('/api/v1/admin/analytics', adminAnalyticsRoutes);
 app.use('/api/v1/webhooks', webhookRoutes);
 
 // 404

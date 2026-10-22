@@ -1,12 +1,14 @@
 version: '3.9'
+
 services:
   postgres:
     image: postgres:15-alpine
     container_name: shopnest_postgres
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: shopnest
-      POSTGRES_PASSWORD: shopnest123
-      POSTGRES_DB: shopnest_db
+      POSTGRES_USER: ${POSTGRES_USER:-shopnest}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-shopnest123}
+      POSTGRES_DB: ${POSTGRES_DB:-shopnest_db}
     ports:
       - '5432:5432'
     volumes:
@@ -17,5 +19,42 @@ services:
       timeout: 5s
       retries: 5
 
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: shopnest_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://shopnest:shopnest123@postgres:5432/shopnest_db
+      JWT_SECRET: ${JWT_SECRET:-production-grade-jwt-secret-at-least-64-characters-long-shopnest}
+      JWT_EXPIRES_IN: 7d
+      FRONTEND_URL: http://localhost:5173
+      MOCK_GATEWAY: 'true'
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-rzp_test_MOCK}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-rzp_mock_secret}
+      RAZORPAY_WEBHOOK_SECRET: ${RAZORPAY_WEBHOOK_SECRET:-rzp_webhook_secret}
+    ports:
+      - '4000:4000'
+    volumes:
+      - shopnest_uploads:/app/uploads
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: shopnest_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - '5173:80'
+
 volumes:
   shopnest_pgdata:
+  shopnest_uploads:

@@ -16,12 +16,14 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useProduct } from '../hooks/useProducts';
+import { useCart } from '../contexts/CartContext';
 import { formatPaise, discountPercent, formatDate } from '../lib/utils';
 import { FullPageSpinner } from '../components/ui/Spinner';
 
 export function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
   const { data, isLoading } = useProduct(slug || '');
   const [qty, setQty] = useState(1);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -45,15 +47,15 @@ export function ProductDetailPage() {
   const totalStock = product.variants?.reduce((sum: number, v: any) => sum + (v.stock_qty || 0), 0) ?? 15;
   const inStock = totalStock > 0;
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!inStock) return;
-    toast.success(`Added ${qty} item(s) to Cart!`);
+    await addToCart(product.id, product.variants?.[0]?.id, qty);
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (!inStock) return;
-    toast.success('Redirecting to Checkout...');
-    navigate('/cart');
+    await addToCart(product.id, product.variants?.[0]?.id, qty);
+    navigate('/checkout');
   };
 
   return (

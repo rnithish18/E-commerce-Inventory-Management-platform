@@ -10,10 +10,11 @@ api.interceptors.response.use(
   (r) => r,
   (err) => {
     if (err.response?.status === 401) {
-      // Redirect to login if session expired (except on login/register pages)
-      const path = window.location.pathname
-      if (path !== '/login' && path !== '/register') {
-        window.location.href = `/login?returnUrl=${encodeURIComponent(path)}`
+      // Do not redirect on /auth/me checks (which just detects guest status)
+      const isMeCheck = err.config?.url?.includes('/auth/me');
+      const path = window.location.pathname;
+      if (!isMeCheck && path !== '/login' && path !== '/register') {
+        window.location.href = `/login?returnUrl=${encodeURIComponent(path)}`;
       }
     }
     return Promise.reject(err)

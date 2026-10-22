@@ -53,6 +53,15 @@ export function errorHandler(
     return;
   }
 
+  // PostgreSQL invalid UUID / syntax error
+  if ((err as any).code === '22P02') {
+    res.status(400).json({
+      error: 'INVALID_IDENTIFIER',
+      message: 'Invalid parameter or identifier format',
+    });
+    return;
+  }
+
   console.error('Unhandled error:', err);
 
   res.status(500).json({

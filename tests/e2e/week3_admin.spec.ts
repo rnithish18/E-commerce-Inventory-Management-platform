@@ -12,6 +12,8 @@ test.describe('Week 3 Admin E2E: Stock Adjustment, State Machine & Order Trackin
     await page.goto('/shop');
     await page.waitForSelector('button:has-text("Add to Cart")', { timeout: 15000 });
     await page.locator('button:has-text("Add to Cart")').first().click();
+    await page.waitForSelector('button:has-text("Added!")', { timeout: 10000 });
+    await page.waitForTimeout(1000);
 
     await page.goto('/checkout');
     await page.waitForSelector('text=Checkout & Order Confirmation', { timeout: 15000 });
