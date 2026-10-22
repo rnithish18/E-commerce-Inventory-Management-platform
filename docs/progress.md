@@ -130,18 +130,101 @@ Running 1 test using 1 worker
 
 ---
 
-## 5. Upcoming: Week 3 Milestones
-- **Inventory Management Dashboard**:
-  - Stock adjustment interface (PURCHASE_IN, ADJUSTMENT, RETURN_IN) with audit trail.
-  - Low-stock threshold alerts (`pv.stock_qty <= pv.reorder_threshold`) and filter tabs.
-- **Order Management & Fulfillment**:
-  - Admin order transition controls (`PAID` -> `PROCESSING` -> `SHIPPED` -> `OUT_FOR_DELIVERY` -> `DELIVERED`).
-  - Shipment tracking event updates (carrier, tracking number, milestone notes).
-  - Cancellation and refund workflow (`REFUND_REQUESTED` -> `REFUNDED` with `RETURN_IN` stock adjustment).
-- **Coupons Management**:
-  - Admin coupon CRUD (type percent/flat, min order, usage limits, active date ranges).
-  - Customer redemption validation and usage tracking.
-- **Product Reviews & Moderation**:
-  - Customer review submission for verified purchased items (`order_item_id` check).
-  - Admin review moderation workflow (`pending` -> `approved` / `hidden`).
-  - Product average rating and rating count updates.
+## 5. Week 3: Inventory, Orders & Store Features (100% Completed & Verified)
+
+### A. Architectural Deliverables Completed
+1. **Central Order State Machine (`backend/src/services/orderStateMachine.ts`)**:
+   - Statuses: `PENDING_PAYMENT`, `PAID`, `PROCESSING`, `SHIPPED`, `OUT_FOR_DELIVERY`, `DELIVERED`, `CANCELLED`, `REFUND_REQUESTED`, `REFUNDED`.
+   - Strict transition table enforcing valid forward progress.
+   - Rejects illegal transitions and post-`SHIPPED` cancellations with `409 CONFLICT`.
+   - Restocks inventory on cancellation (`RESERVATION_RELEASE`) and on refund approval (`RETURN_IN`).
+   - Writes immutable `audit_log` records with actor, old status, and new status for every state transition.
+
+2. **Refund Workflow & Idempotency Guard (`backend/src/services/refund.ts`)**:
+   - Customers can request refunds only for `DELIVERED` or `PAID` orders.
+   - Admin approval invokes payment provider refund, writes `refunds` row, restocks items via `RETURN_IN`, and sets order to `REFUNDED`.
+   - Enforces database idempotency: repeated refund attempts on already refunded or pending records are rejected.
+
+3. **SKU Stock Management & Audit Trail (`backend/src/routes/admin/inventory.ts`, `frontend/src/pages/admin/AdminInventory.tsx`)**:
+   - Real-time inventory table with stock count, reserved count, and low-stock filter (`stock_qty <= reorder_threshold`).
+   - Stock adjustments with mandatory reason and movement types: `PURCHASE_IN`, `ADJUSTMENT`, `RETURN_IN`.
+   - Row-locking (`SELECT ... FOR UPDATE`) guarantees thread-safe stock arithmetic and emits `inventory_movements` log.
+   - Dynamic threshold updates (`PUT /api/v1/admin/inventory/:variantId/threshold`).
+   - Movement history ledger modal per variant.
+
+4. **Shipment Tracking & Customer Steppers (`backend/src/routes/admin/orders.ts`, `frontend/src/pages/OrderConfirmationPage.tsx`, `frontend/src/components/layout/RightPanel.tsx`)**:
+   - `shipment_tracking_events` audit table with location, description, timestamp, and operator ID.
+   - Admin order drawer with tracking publisher form.
+   - Customer Order Confirmation page renders live 4-stage stepper: **Ordered → Shipped → Out for Delivery → Delivered**, along with live **Courier Tracking Timeline**.
+
+5. **Coupon Administration & Concurrency Limits (`backend/src/routes/admin/coupons.ts`, `frontend/src/pages/admin/AdminCoupons.tsx`)**:
+   - Full CRUD for coupons: type (`percent` or `flat`), value, min order requirement, max discount cap, global usage limit, per-user limit, and expiry dates.
+   - Checkout engine locks coupon row with `FOR UPDATE` to prevent race conditions during redemptions.
+
+6. **Verified Product Reviews with HTML Sanitization (`backend/src/routes/reviews.ts`, `backend/src/routes/admin/reviews.ts`, `frontend/src/pages/admin/AdminReviews.tsx`)**:
+   - Customers can only review products they purchased in an order with status `DELIVERED`.
+   - Enforces unique constraint: 1 review per product per user.
+   - Sanitizes text inputs against XSS attacks using `sanitize-html`.
+   - Admin moderation queue: `pending` → `approved` or `hidden`.
+   - Recalculates product `average_rating` and `rating_count` on approval/rejection.
+
+7. **Multer Secure File Uploads (`backend/src/routes/uploads.ts`)**:
+   - Private storage directory (`uploads/`, git-ignored).
+   - Strict MIME validation (JPEG, PNG, WebP) and 5MB size limit.
+   - Admin role protection on upload endpoints.
+
+---
+
+## 6. Test Suite Execution & Verification Record
+
+### A. Vitest Suite (100% Pass — 121 Tests across 10 Files)
+```
+ ✓ tests/unit/slug.test.ts (8 tests)
+ ✓ tests/unit/money.test.ts (24 tests)
+ ✓ tests/unit/pricing.test.ts (3 tests)
+ ✓ tests/unit/jwt.test.ts (6 tests)
+ ✓ tests/api/products.test.ts (17 tests)
+ ✓ tests/api/reservation_expiry.test.ts (1 test)
+ ✓ tests/api/checkout_payment.test.ts (11 tests)
+ ✓ tests/api/week3.test.ts (31 tests)
+ ✓ tests/api/auth.test.ts (19 tests)
+ ✓ tests/api/race_condition.test.ts (1 test)
+
+ Test Files  10 passed (10)
+      Tests  121 passed (121)
+   Duration  24.31s
+```
+
+### B. Playwright End-to-End Suite (100% Pass — 2 Browser Tests)
+```
+Running 2 tests using 1 worker
+
+  ok 1 tests\e2e\checkout.spec.ts:4:7 › End-to-End Customer Checkout & Payment Workflow › Customer logs in, adds product to cart, completes sandbox checkout, and views confirmed order (4.3s)
+  ok 2 tests\e2e\week3_admin.spec.ts:4:7 › Week 3 Admin E2E: Stock Adjustment, State Machine & Order Tracking › Admin adjusts stock, advances order from PAID to SHIPPED, and customer tracking stepper reflects updates (15.2s)
+
+  2 passed (21.9s)
+```
+
+---
+
+## 7. Week 4: Analytics, Security & Deployment Roadmap
+1. **Sales & Inventory Analytics Dashboard (`/admin/analytics`)**:
+   - Executive KPIs: Total Sales, Total Orders, Total Customers, Low Stock Items with % change vs prior period.
+   - Combo chart (Revenue bars + Order count line) bucketed by Day/Week in `Asia/Kolkata`.
+   - Order Status breakdown donut chart (`PAID`, `PROCESSING`, `SHIPPED`, `DELIVERED`, `CANCELLED`).
+   - Top 5 Selling Products table and Low Stock alert ledger.
+   - Date range selector: Today, Last 7 Days, Last 30 Days, Custom Range.
+2. **Security Hardening**:
+   - Rate limiting on Auth (`/auth/login`, `/auth/register`) and Coupons (`/coupons/apply`).
+   - Helmet security headers and CORS origin lockdown.
+   - Anti-CSRF validation on state-modifying requests.
+   - Parameterized queries across all routes (SQL injection immunity).
+   - Security Audit documentation in `docs/security-report.md`.
+3. **Containerization & Production Deployment**:
+   - Production multi-stage `Dockerfile` for Backend and Frontend.
+   - Root `docker-compose.yml` orchestrating PostgreSQL, Backend API, and Frontend web server.
+   - Comprehensive `/api/v1/health` and `/health` probe endpoints.
+   - Full setup and runbook in `docs/deployment.md`.
+4. **Final Verification & Visual Evidence**:
+   - Capture automated high-res screenshots of customer and admin journeys in `docs/screenshots/`.
+   - Final review and sign-off report.
