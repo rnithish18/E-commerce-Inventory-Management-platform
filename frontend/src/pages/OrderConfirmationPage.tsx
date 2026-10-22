@@ -43,6 +43,13 @@ export function OrderConfirmationPage() {
   const items = order.items || [];
   const tracking = order.tracking || [];
 
+  const stepperStages = [
+    { label: 'Ordered', active: ['PENDING_PAYMENT', 'PAID', 'PROCESSING', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(order.status) },
+    { label: 'Shipped', active: ['SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(order.status) },
+    { label: 'Out for Delivery', active: ['OUT_FOR_DELIVERY', 'DELIVERED'].includes(order.status) },
+    { label: 'Delivered', active: order.status === 'DELIVERED' },
+  ];
+
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 flex flex-col gap-6">
       
@@ -79,6 +86,78 @@ export function OrderConfirmationPage() {
             <span className="text-orange-400 font-bold uppercase">{order.status}</span>
           </div>
         </div>
+      </div>
+
+      {/* Track Your Order Stepper */}
+      <div className="card p-5 sm:p-6">
+        <div className="flex items-center justify-between pb-3 border-b border-navy-600/60 mb-5">
+          <h3 className="font-bold text-white text-sm flex items-center gap-2">
+            <Truck className="w-4 h-4 text-orange-400" />
+            <span>Track Your Order</span>
+          </h3>
+          <span className="text-xs font-mono font-bold uppercase text-orange-400 bg-orange-500/10 px-3 py-0.5 rounded-full border border-orange-500/20">
+            Current Status: {order.status}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-4 gap-2 relative">
+          {stepperStages.map((stage, idx) => (
+            <div key={stage.label} className="flex flex-col items-center text-center relative z-10">
+              <div
+                className={`w-9 h-9 rounded-2xl flex items-center justify-center font-bold text-xs mb-2 transition-all shadow-md ${
+                  stage.active
+                    ? 'bg-orange-500 text-white shadow-orange-500/30 ring-2 ring-orange-400/40'
+                    : 'bg-navy-700 text-gray-400 border border-navy-600'
+                }`}
+              >
+                {stage.active ? <CheckCircle2 className="w-5 h-5 text-white" /> : idx + 1}
+              </div>
+              <span className={`text-xs font-bold leading-tight ${stage.active ? 'text-white' : 'text-gray-400'}`}>
+                {stage.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Courier Tracking Timeline */}
+      <div className="card p-5">
+        <div className="flex items-center justify-between pb-3 border-b border-navy-600/60 mb-4">
+          <h3 className="font-bold text-white text-sm flex items-center gap-2">
+            <Clock className="w-4 h-4 text-orange-400" />
+            <span>Courier Tracking Timeline</span>
+          </h3>
+          <span className="text-[10px] text-gray-400 font-mono">Live Carrier Feed</span>
+        </div>
+
+        {tracking.length === 0 ? (
+          <div className="text-xs text-gray-400 py-3 flex items-center gap-2">
+            <Clock className="w-4 h-4 text-orange-400" />
+            <span>Order confirmed and verified. Shipment manifest created and awaiting courier pickup.</span>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4 relative pl-6 border-l-2 border-orange-500/30 ml-2 py-1">
+            {tracking.map((event: any, idx: number) => (
+              <div key={event.id || idx} className="relative">
+                <div className="absolute -left-[31px] top-0.5 w-3.5 h-3.5 rounded-full bg-orange-500 ring-4 ring-navy-800 flex items-center justify-center">
+                  <CheckCircle2 className="w-2.5 h-2.5 text-white" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-white uppercase">{event.status}</span>
+                  {event.location && (
+                    <span className="text-[11px] text-gray-400">({event.location})</span>
+                  )}
+                  <span className="text-[10px] text-gray-500 font-mono ml-auto">
+                    {formatDateTime(event.created_at)}
+                  </span>
+                </div>
+                {event.description && (
+                  <p className="text-xs text-gray-300 mt-0.5">{event.description}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Grid: Items Snapshot & Delivery / Payment Info */}
