@@ -326,3 +326,31 @@ Running 3 tests using 1 worker
 7. **Verification Evidence**:
    - **Vitest**: 12/12 test files passed, **158 / 158 tests passed** (41.5s).
    - **Playwright**: 5/5 test suites passed, **5 / 5 suites passed** (1.1m).
+
+---
+
+## 7. Phase A: Animated Split-Screen Auth, Runaway Button & Password Reset
+
+### Completed Deliverables
+1. **Unified Split-Screen Experience (`AuthContainer.tsx`)**:
+   - Left showcase panel: Deep navy brand aesthetic featuring rotating showcase of real products (`/products/*.svg`), pricing, ratings, value pillars (Express Delivery, 100% Genuine, Instant Refunds), and social proof.
+   - Right panel: High-contrast auth card with Customer / Store Admin role switch pill and Google OAuth check (`/api/v1/auth/providers`).
+   - Smooth transitions between `/login` and `/register` with full URL synchronization and state retention.
+2. **Interactive "Runaway" Submit Button (`RunawayButton.tsx`)**:
+   - Playfully dodges cursor on hover when email/password are empty or invalid (`translate3d(±65px, 10px, 0)`), never obscuring inputs.
+   - Witty rotating hints: e.g. "Fill in your email first! 📝", "Password is required! 🔒".
+   - **Escape Hatch**: After 3 dodges, stops dodging and shows "Okay, fine! Fill the fields below 😊".
+   - **Accessibility & Escape Hatch**: Full keyboard Tab navigation locks evasion (`onFocus`), allowing direct Enter key submission. Completely disabled on touch screens and `prefers-reduced-motion`.
+3. **Password Reset Flow**:
+   - Database migration `007_create_password_resets.js` with indexed token hash and expiration.
+   - Backend endpoints `POST /api/v1/auth/forgot-password` (SHA-256 token hashing, 1-hour expiry, dev mailer) and `POST /api/v1/auth/reset-password`.
+   - Modal with instant dev link in local environment.
+   - Dedicated `/reset-password?token=...` page with `PasswordStrengthMeter` and live validation.
+4. **Form Features & Security Polish**:
+   - Show/hide password visibility toggle with accessible `aria-pressed`.
+   - "Remember me for 30 days" extending session cookie `maxAge`.
+   - Subtle teal focus glow on inputs (`focus:shadow-[0_0_12px_rgba(45,212,191,0.25)]`).
+   - Live password strength meter on registration with criteria checks.
+5. **Verification & Test Evidence**:
+   - **Vitest**: 13/13 test files passed, **164 / 164 tests passed** (including `tests/api/password_reset.test.ts`).
+   - **Playwright**: 7/7 tests passed in `tests/e2e/auth_runaway.spec.ts` + all 4 core suites passed with zero regressions.

@@ -28,10 +28,16 @@ export default api
 export const authApi = {
   register: (data: { email: string; password: string; full_name: string; phone?: string }) =>
     api.post('/auth/register', data),
-  login: (data: { email: string; password: string }) =>
+  login: (data: { email: string; password: string; rememberMe?: boolean }) =>
     api.post('/auth/login', data),
   logout: () => api.post('/auth/logout'),
   me: () => api.get('/auth/me'),
+  forgotPassword: (data: { email: string }) =>
+    api.post('/auth/forgot-password', data),
+  resetPassword: (data: { token: string; password: string }) =>
+    api.post('/auth/reset-password', data),
+  getProviders: () =>
+    api.get<{ providers: { google: boolean } }>('/auth/providers'),
 }
 
 // ── Products ──

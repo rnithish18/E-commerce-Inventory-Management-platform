@@ -12,6 +12,7 @@ import { OrderConfirmationPage } from './pages/OrderConfirmationPage';
 import { MyOrdersPage } from './pages/MyOrdersPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
+import { ResetPasswordPage } from './pages/auth/ResetPasswordPage';
 import { AdminLayout } from './pages/admin/AdminLayout';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminProducts } from './pages/admin/AdminProducts';
@@ -75,6 +76,7 @@ export default function App() {
           {/* Authentication Pages (Standalone) */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
 
           {/* Admin Dashboard Protected Routes */}
           <Route
