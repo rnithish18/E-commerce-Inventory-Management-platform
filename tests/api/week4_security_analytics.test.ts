@@ -57,9 +57,15 @@ describe('Week 4: Analytics Endpoint (/api/v1/admin/analytics)', () => {
     expect(res.status).toBe(200);
     expect(res.body.kpis).toBeDefined();
     expect(res.body.kpis.total_sales_paise).toBeTypeOf('number');
+    expect(res.body.kpis.gross_sales_paise).toBeTypeOf('number');
+    expect(res.body.kpis.net_revenue_paise).toBeTypeOf('number');
+    expect(res.body.kpis.aov_paise).toBeTypeOf('number');
+    expect(res.body.kpis.inventory_availability_percent).toBeTypeOf('number');
     expect(res.body.kpis.total_orders).toBeTypeOf('number');
     expect(res.body.kpis.total_customers).toBeTypeOf('number');
     expect(res.body.kpis.low_stock_items).toBeTypeOf('number');
+    expect(res.body.kpis.fulfilment_rate_percent).toBeTypeOf('number');
+    expect(res.body.kpis.cancellation_rate_percent).toBeTypeOf('number');
     expect(res.body.time_series).toBeInstanceOf(Array);
     expect(res.body.status_distribution).toBeInstanceOf(Array);
     expect(res.body.top_products).toBeInstanceOf(Array);
@@ -113,5 +119,42 @@ describe('Week 4: Security & SQL Injection Protection', () => {
       .set('Cookie', adminCookie);
     // Should return 404 or 400, not 500 crash
     expect([400, 404]).toContain(res.status);
+  });
+});
+
+describe('Week 4: Coupon Validation Endpoint (/api/v1/coupons/validate)', () => {
+  it('validates active coupon WELCOME10 successfully', async () => {
+    const res = await request(app)
+      .post('/api/v1/coupons/validate')
+      .send({ code: 'WELCOME10', subtotalPaise: 60000 });
+    expect(res.status).toBe(200);
+    expect(res.body.valid).toBe(true);
+    expect(res.body.coupon.code).toBe('WELCOME10');
+    expect(res.body.coupon.discount_paise).toBe(6000);
+  });
+
+  it('rejects coupon when subtotal does not meet min_order_paise', async () => {
+    const res = await request(app)
+      .post('/api/v1/coupons/validate')
+      .send({ code: 'WELCOME10', subtotalPaise: 1000 });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('MIN_ORDER_NOT_MET');
+  });
+
+  it('rejects nonexistent coupon with 404', async () => {
+    const res = await request(app)
+      .post('/api/v1/coupons/validate')
+      .send({ code: 'NONEXISTENT99', subtotalPaise: 50000 });
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe('COUPON_NOT_FOUND');
+  });
+});
+
+describe('Week 4: Payment Endpoint Protection & Rate Limiting', () => {
+  it('protects /api/v1/payments endpoints with authentication', async () => {
+    const res = await request(app)
+      .post('/api/v1/payments/create-intent')
+      .send({ orderId: '00000000-0000-0000-0000-000000000000' });
+    expect(res.status).toBe(401);
   });
 });

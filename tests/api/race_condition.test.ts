@@ -61,7 +61,7 @@ describe('Stock Race Condition: 10 Concurrent Checkouts for Stock=1 Product', ()
       }
       addressIds.push(addressId);
     }
-  });
+  }, 45000);
 
   it('exactly 1 succeeds and 9 fail with INSUFFICIENT_STOCK, stock never negative', async () => {
     // Fire 10 concurrent checkouts

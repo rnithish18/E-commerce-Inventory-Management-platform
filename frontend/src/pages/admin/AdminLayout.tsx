@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -14,9 +14,13 @@ import {
   LogOut, 
   Search, 
   Bell, 
-  ExternalLink 
+  ExternalLink,
+  AlertTriangle,
+  ArrowRight
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useQuery } from '@tanstack/react-query';
+import api from '../../lib/api';
 
 const NAV_ITEMS = [
   { to: '/admin', end: true, label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
@@ -33,6 +37,30 @@ const NAV_ITEMS = [
 export function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [bellOpen, setBellOpen] = useState(false);
+  const bellRef = useRef<HTMLDivElement>(null);
+
+  const { data: dashboardData } = useQuery({
+    queryKey: ['admin-dashboard-kpi'],
+    queryFn: async () => {
+      const res = await api.get('/admin/dashboard');
+      return res.data;
+    },
+    staleTime: 30000,
+  });
+
+  const lowStockCount = dashboardData?.low_stock_count ?? 0;
+  const lowStockItems = dashboardData?.low_stock_items || [];
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (bellRef.current && !bellRef.current.contains(event.target as Node)) {
+        setBellOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -141,10 +169,70 @@ export function AdminLayout() {
               <span>Database Connected</span>
             </span>
 
-            <button className="relative p-2 rounded-xl text-gray-300 hover:text-white hover:bg-navy-700">
-              <Bell className="w-4 h-4" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full" />
-            </button>
+            <div className="relative" ref={bellRef}>
+              <button
+                onClick={() => setBellOpen(!bellOpen)}
+                className="relative p-2 rounded-xl text-gray-300 hover:text-white hover:bg-navy-700 transition-colors"
+                title="Low Stock Alerts"
+              >
+                <Bell className="w-4 h-4" />
+                {lowStockCount > 0 ? (
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-orange-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-navy-800 animate-pulse">
+                    {lowStockCount}
+                  </span>
+                ) : (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-green-500 rounded-full" />
+                )}
+              </button>
+
+              {bellOpen && (
+                <div className="absolute right-0 top-full mt-2 w-80 bg-navy-800 border border-navy-700 rounded-2xl shadow-2xl py-3 z-50">
+                  <div className="px-4 pb-2 border-b border-navy-700 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-400" />
+                      <span className="text-xs font-bold text-white">Low Stock Alerts</span>
+                    </div>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      {lowStockCount} items
+                    </span>
+                  </div>
+
+                  <div className="max-h-64 overflow-y-auto divide-y divide-navy-700/50">
+                    {lowStockItems.length === 0 ? (
+                      <div className="p-4 text-center text-xs text-gray-400">
+                        All SKUs are above reorder threshold!
+                      </div>
+                    ) : (
+                      lowStockItems.map((item: any, i: number) => (
+                        <div key={i} className="p-3 hover:bg-navy-700/50 transition-colors flex items-center justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-white truncate">{item.name}</p>
+                            <p className="text-[10px] font-mono text-gray-400">{item.sku} • {item.category}</p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <span className="text-xs font-mono font-bold text-red-400">
+                              {item.stock} left
+                            </span>
+                            <p className="text-[9px] text-gray-400">reorder ≤ {item.threshold}</p>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="pt-2 px-3 border-t border-navy-700">
+                    <Link
+                      to="/admin/inventory"
+                      onClick={() => setBellOpen(false)}
+                      className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-xl bg-orange-500/10 hover:bg-orange-500 text-orange-400 hover:text-white text-xs font-bold transition-all border border-orange-500/30"
+                    >
+                      <span>Manage All Inventory</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 

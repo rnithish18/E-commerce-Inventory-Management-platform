@@ -118,15 +118,26 @@ export async function calculateOrderPricing(
 
       // Check per-user redemption limit if userId is provided
       let userLimitReached = false;
+      let firstOrderConditionFailed = false;
       if (userId) {
         const redemptionRes = await query(
           'SELECT COUNT(*)::int as count FROM coupon_redemptions WHERE coupon_id = $1 AND user_id = $2',
           [coupon.id, userId]
         );
         userLimitReached = redemptionRes.rows[0].count >= coupon.per_user_limit;
+
+        if (code === 'WELCOME10') {
+          const orderCountRes = await query<{ count: number }>(
+            `SELECT COUNT(*)::int as count FROM orders WHERE user_id = $1 AND status != 'CANCELLED'`,
+            [userId]
+          );
+          if (orderCountRes.rows[0].count > 0) {
+            firstOrderConditionFailed = true;
+          }
+        }
       }
 
-      if (!isExpired && meetsMinOrder && !userLimitReached) {
+      if (!isExpired && meetsMinOrder && !userLimitReached && !firstOrderConditionFailed) {
         validCouponCode = coupon.code;
         if (coupon.type === 'percent') {
           // value_paise in basis points: 1000 = 10%

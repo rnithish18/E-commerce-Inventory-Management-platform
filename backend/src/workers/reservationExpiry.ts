@@ -59,6 +59,12 @@ export async function expireStaleReservations(): Promise<void> {
         [order.id]
       );
 
+      // Release coupon redemption if present
+      await client.query(
+        `DELETE FROM coupon_redemptions WHERE order_id = $1`,
+        [order.id]
+      );
+
       // Write audit_log
       await client.query(
         `INSERT INTO audit_log (id, entity_type, entity_id, action, old_values, new_values, created_at)

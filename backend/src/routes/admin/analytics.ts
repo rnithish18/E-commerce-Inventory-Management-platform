@@ -43,40 +43,99 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 
     const endDate = req.query.to ? new Date(req.query.to as string) : now;
 
-    // 1. Current Period KPIs
-    const [currentKpiRes, priorKpiRes, lowStockCountRes, customersRes] = await Promise.all([
-      query<{ total_sales_paise: string; total_orders: string }>(
+    // 1. Current Period KPIs & Comparisons
+    const [
+      currentKpiRes,
+      priorKpiRes,
+      inventoryStatsRes,
+      customersRes,
+      currentRefundsRes,
+      priorRefundsRes,
+    ] = await Promise.all([
+      query<{
+        gross_sales_paise: string;
+        total_orders: string;
+        paid_orders: string;
+        delivered_orders: string;
+        cancelled_orders: string;
+      }>(
         `SELECT 
-           COALESCE(SUM(CASE WHEN status IN ('PAID', 'PROCESSING', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED') THEN total_paise ELSE 0 END), 0)::bigint as total_sales_paise,
-           COUNT(CASE WHEN status != 'PENDING_PAYMENT' THEN 1 END)::int as total_orders
+           COALESCE(SUM(CASE WHEN status IN ('PAID', 'PROCESSING', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED') THEN total_paise ELSE 0 END), 0)::bigint as gross_sales_paise,
+           COUNT(*)::int as total_orders,
+           COUNT(CASE WHEN status IN ('PAID', 'PROCESSING', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED') THEN 1 END)::int as paid_orders,
+           COUNT(CASE WHEN status = 'DELIVERED' THEN 1 END)::int as delivered_orders,
+           COUNT(CASE WHEN status = 'CANCELLED' THEN 1 END)::int as cancelled_orders
          FROM orders
          WHERE created_at >= $1 AND created_at <= $2`,
         [startDate.toISOString(), endDate.toISOString()]
       ),
-      query<{ total_sales_paise: string; total_orders: string }>(
+      query<{
+        gross_sales_paise: string;
+        total_orders: string;
+        paid_orders: string;
+        delivered_orders: string;
+        cancelled_orders: string;
+      }>(
         `SELECT 
-           COALESCE(SUM(CASE WHEN status IN ('PAID', 'PROCESSING', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED') THEN total_paise ELSE 0 END), 0)::bigint as total_sales_paise,
-           COUNT(CASE WHEN status != 'PENDING_PAYMENT' THEN 1 END)::int as total_orders
+           COALESCE(SUM(CASE WHEN status IN ('PAID', 'PROCESSING', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED') THEN total_paise ELSE 0 END), 0)::bigint as gross_sales_paise,
+           COUNT(*)::int as total_orders,
+           COUNT(CASE WHEN status IN ('PAID', 'PROCESSING', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED') THEN 1 END)::int as paid_orders,
+           COUNT(CASE WHEN status = 'DELIVERED' THEN 1 END)::int as delivered_orders,
+           COUNT(CASE WHEN status = 'CANCELLED' THEN 1 END)::int as cancelled_orders
          FROM orders
          WHERE created_at >= $1 AND created_at <= $2`,
         [priorStartDate.toISOString(), priorEndDate.toISOString()]
       ),
-      query<{ count: string }>(
-        `SELECT COUNT(*)::int as count 
-         FROM product_variants 
-         WHERE stock_qty <= reorder_threshold AND stock_qty >= 0`
+      query<{ count: string; total_skus: string; in_stock_skus: string }>(
+        `SELECT 
+           COUNT(CASE WHEN stock_qty <= reorder_threshold AND stock_qty >= 0 THEN 1 END)::int as count,
+           COUNT(*)::int as total_skus,
+           COUNT(CASE WHEN stock_qty > 0 THEN 1 END)::int as in_stock_skus
+         FROM product_variants`
       ),
       query<{ total_customers: string }>(
         `SELECT COUNT(*)::int as total_customers FROM users WHERE role = 'CUSTOMER'`
       ),
+      query<{ total_refunds_paise: string }>(
+        `SELECT COALESCE(SUM(amount_paise), 0)::bigint as total_refunds_paise
+         FROM refunds
+         WHERE status IN ('APPROVED', 'PROCESSED')
+           AND created_at >= $1 AND created_at <= $2`,
+        [startDate.toISOString(), endDate.toISOString()]
+      ),
+      query<{ total_refunds_paise: string }>(
+        `SELECT COALESCE(SUM(amount_paise), 0)::bigint as total_refunds_paise
+         FROM refunds
+         WHERE status IN ('APPROVED', 'PROCESSED')
+           AND created_at >= $1 AND created_at <= $2`,
+        [priorStartDate.toISOString(), priorEndDate.toISOString()]
+      ),
     ]);
 
-    const curSales = parseInt(currentKpiRes.rows[0]?.total_sales_paise || '0', 10);
-    const priorSales = parseInt(priorKpiRes.rows[0]?.total_sales_paise || '0', 10);
-    const curOrders = parseInt(currentKpiRes.rows[0]?.total_orders || '0', 10);
-    const priorOrders = parseInt(priorKpiRes.rows[0]?.total_orders || '0', 10);
+    const curGrossSales = parseInt(currentKpiRes.rows[0]?.gross_sales_paise || '0', 10);
+    const priorGrossSales = parseInt(priorKpiRes.rows[0]?.gross_sales_paise || '0', 10);
+    const curRefunds = parseInt(currentRefundsRes.rows[0]?.total_refunds_paise || '0', 10);
+    const priorRefunds = parseInt(priorRefundsRes.rows[0]?.total_refunds_paise || '0', 10);
+
+    const curNetRevenue = Math.max(0, curGrossSales - curRefunds);
+    const priorNetRevenue = Math.max(0, priorGrossSales - priorRefunds);
+
+    const curTotalOrders = parseInt(currentKpiRes.rows[0]?.total_orders || '0', 10);
+    const priorTotalOrders = parseInt(priorKpiRes.rows[0]?.total_orders || '0', 10);
+    const curPaidOrders = parseInt(currentKpiRes.rows[0]?.paid_orders || '0', 10);
+    const curDelivered = parseInt(currentKpiRes.rows[0]?.delivered_orders || '0', 10);
+    const curCancelled = parseInt(currentKpiRes.rows[0]?.cancelled_orders || '0', 10);
+
+    const curAov = curPaidOrders > 0 ? Math.round(curGrossSales / curPaidOrders) : 0;
+    const curFulfilmentRate = curPaidOrders > 0 ? Math.round((curDelivered / curPaidOrders) * 100) : 0;
+    const curCancellationRate = curTotalOrders > 0 ? Math.round((curCancelled / curTotalOrders) * 100) : 0;
+
+    const totalSkus = parseInt(inventoryStatsRes.rows[0]?.total_skus || '0', 10);
+    const inStockSkus = parseInt(inventoryStatsRes.rows[0]?.in_stock_skus || '0', 10);
+    const inventoryAvailability = totalSkus > 0 ? Math.round((inStockSkus / totalSkus) * 100) : 100;
+
     const totalCustomers = parseInt(customersRes.rows[0]?.total_customers || '0', 10);
-    const lowStockCount = parseInt(lowStockCountRes.rows[0]?.count || '0', 10);
+    const lowStockCount = parseInt(inventoryStatsRes.rows[0]?.count || '0', 10);
 
     // 2. Sales & Orders Daily Time Series (Asia/Kolkata timezone)
     const timeSeriesRes = await query<{
@@ -174,14 +233,25 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     res.json({
       period,
       kpis: {
-        total_sales_paise: curSales,
-        sales_change_percent: calculatePercentChange(curSales, priorSales),
-        total_orders: curOrders,
-        orders_change_percent: calculatePercentChange(curOrders, priorOrders),
+        total_sales_paise: curGrossSales,
+        sales_change_percent: calculatePercentChange(curGrossSales, priorGrossSales),
+        gross_sales_paise: curGrossSales,
+        gross_sales_change_percent: calculatePercentChange(curGrossSales, priorGrossSales),
+        net_revenue_paise: curNetRevenue,
+        net_revenue_change_percent: calculatePercentChange(curNetRevenue, priorNetRevenue),
+        refunds_paise: curRefunds,
+        total_orders: curTotalOrders,
+        orders_change_percent: calculatePercentChange(curTotalOrders, priorTotalOrders),
+        paid_orders: curPaidOrders,
+        aov_paise: curAov,
+        inventory_availability_percent: inventoryAvailability,
         total_customers: totalCustomers,
         customers_change_percent: 12,
         low_stock_items: lowStockCount,
         low_stock_change_percent: lowStockCount > 5 ? 8 : -4,
+        fulfilment_rate_percent: curFulfilmentRate,
+        cancellation_rate_percent: curCancellationRate,
+        conversion_rate_percent: curTotalOrders > 0 ? Math.round((curPaidOrders / curTotalOrders) * 100) : 0,
       },
       time_series: timeSeriesRes.rows.map(r => ({
         ...r,

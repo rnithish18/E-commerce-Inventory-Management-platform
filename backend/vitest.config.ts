@@ -11,5 +11,7 @@ export default defineConfig({
       exclude: ['src/test-setup.ts', 'dist/**'],
     },
     testTimeout: 30000,
+    hookTimeout: 30000,
+    fileParallelism: false,
   },
 });

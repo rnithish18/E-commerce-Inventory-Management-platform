@@ -25,7 +25,7 @@ import adminReviewRoutes from './routes/admin/reviews';
 import adminDashboardRoutes from './routes/admin/dashboard';
 import adminAnalyticsRoutes from './routes/admin/analytics';
 import webhookRoutes from './routes/webhooks';
-import { authLimiter, couponLimiter, csrfProtection } from './middleware/security';
+import { authLimiter, couponLimiter, paymentLimiter, csrfProtection } from './middleware/security';
 import { query } from './db/query';
 
 const app = express();
@@ -97,7 +97,7 @@ app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/cart', cartRoutes);
 app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/addresses', addressRoutes);
-app.use('/api/v1/payments', paymentRoutes);
+app.use('/api/v1/payments', paymentLimiter, paymentRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/wishlists', wishlistRoutes);
 app.use('/api/v1/coupons', couponLimiter, couponRoutes);

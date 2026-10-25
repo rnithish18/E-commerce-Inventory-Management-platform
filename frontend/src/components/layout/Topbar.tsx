@@ -16,13 +16,26 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { formatPaise } from '../../lib/utils';
+import { useRef, useEffect } from 'react';
 
 export function Topbar() {
   const { user, logout } = useAuth();
   const { cart, itemCount } = useCart();
   const [searchTerm, setSearchTerm] = useState('');
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [bellOpen, setBellOpen] = useState(false);
+  const bellRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (bellRef.current && !bellRef.current.contains(event.target as Node)) {
+        setBellOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,15 +100,70 @@ export function Topbar() {
             </Link>
           )}
 
-          {/* Notifications */}
-          <button 
-            type="button" 
-            title="Notifications" 
-            className="relative p-2 rounded-xl text-gray-300 hover:text-white hover:bg-navy-700 transition-colors"
-          >
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-orange-500 ring-2 ring-navy-800 animate-pulse" />
-          </button>
+          {/* Notifications Dropdown */}
+          <div className="relative" ref={bellRef}>
+            <button 
+              type="button" 
+              onClick={() => setBellOpen(!bellOpen)}
+              title="Notifications" 
+              className="relative p-2 rounded-xl text-gray-300 hover:text-white hover:bg-navy-700 transition-colors"
+            >
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-orange-500 ring-2 ring-navy-800 animate-pulse" />
+            </button>
+
+            {bellOpen && (
+              <div className="absolute right-0 top-full mt-2 w-80 bg-navy-800 border border-navy-700 rounded-2xl shadow-2xl py-3 z-50">
+                <div className="px-4 pb-2 border-b border-navy-700 flex items-center justify-between">
+                  <span className="text-xs font-bold text-white">Notifications & Deals</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                    Live
+                  </span>
+                </div>
+
+                <div className="p-2 space-y-1.5 text-xs">
+                  <div className="p-2.5 rounded-xl bg-navy-700/50 hover:bg-navy-700 transition-colors">
+                    <div className="flex items-center gap-2 text-orange-400 font-bold mb-0.5">
+                      <span>🎁</span>
+                      <span>WELCOME10 Active</span>
+                    </div>
+                    <p className="text-[11px] text-gray-300">
+                      Get 10% off your first order with coupon code <span className="font-mono font-bold text-white">WELCOME10</span>.
+                    </p>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-navy-700/50 hover:bg-navy-700 transition-colors">
+                    <div className="flex items-center gap-2 text-green-400 font-bold mb-0.5">
+                      <span>🚚</span>
+                      <span>Free Express Shipping</span>
+                    </div>
+                    <p className="text-[11px] text-gray-300">
+                      Orders above ₹500 qualify for zero delivery fee anywhere in India.
+                    </p>
+                  </div>
+
+                  {user?.role === 'ADMIN' && (
+                    <div className="p-2.5 rounded-xl bg-orange-500/10 border border-orange-500/30 hover:bg-orange-500/20 transition-colors">
+                      <div className="flex items-center gap-2 text-orange-400 font-bold mb-0.5">
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        <span>Admin Alert</span>
+                      </div>
+                      <p className="text-[11px] text-gray-300 mb-1.5">
+                        Check low-stock SKU inventory in the admin dashboard.
+                      </p>
+                      <Link
+                        to="/admin/inventory"
+                        onClick={() => setBellOpen(false)}
+                        className="text-[10px] font-bold text-orange-400 hover:text-orange-300 flex items-center gap-1"
+                      >
+                        <span>Open Inventory Control →</span>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* User Account Menu */}
           {user ? (

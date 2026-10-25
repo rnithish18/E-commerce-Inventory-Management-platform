@@ -28,7 +28,20 @@ export const couponLimiter = rateLimit({
   },
 });
 
-// 3. CSRF / Origin Verification Middleware for state-mutating requests
+// 3. Rate limiter for payment processing & verification
+export const paymentLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 30, // 30 requests per window
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => process.env.NODE_ENV !== 'production',
+  message: {
+    error: 'TOO_MANY_REQUESTS',
+    message: 'Too many payment attempts. Please try again shortly.',
+  },
+});
+
+// 4. CSRF / Origin Verification Middleware for state-mutating requests
 export function csrfProtection(req: Request, _res: Response, next: NextFunction): void {
   // Safe HTTP methods do not require origin validation
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {

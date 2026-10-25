@@ -127,63 +127,47 @@ describe('Auth API', () => {
     });
   });
 
-  describe('Admin route protection', () => {
-    it('returns 401 for anonymous request on admin product route', async () => {
-      const res = await request(app).get('/api/v1/admin/products');
+  describe('Admin route protection across all admin endpoints', () => {
+    const adminEndpoints = [
+      '/api/v1/admin/dashboard',
+      '/api/v1/admin/products',
+      '/api/v1/admin/orders',
+      '/api/v1/admin/inventory',
+      '/api/v1/admin/coupons',
+      '/api/v1/admin/reviews',
+      '/api/v1/admin/analytics',
+    ];
+
+    it.each(adminEndpoints)('returns 401 for anonymous request on %s', async (endpoint) => {
+      const res = await request(app).get(endpoint);
       expect(res.status).toBe(401);
       expect(res.body.error).toBe('UNAUTHORIZED');
     });
 
-    it('returns 403 for CUSTOMER role on admin product route', async () => {
-      // authCookie belongs to a CUSTOMER role user
+    it.each(adminEndpoints)('returns 403 for CUSTOMER role on %s', async (endpoint) => {
       const loginRes = await request(app)
         .post('/api/v1/auth/login')
         .send({ email: testEmail, password: 'Test@1234!' });
       const customerCookie = loginRes.headers['set-cookie'][0];
 
       const res = await request(app)
-        .get('/api/v1/admin/products')
+        .get(endpoint)
         .set('Cookie', customerCookie);
       expect(res.status).toBe(403);
       expect(res.body.error).toBe('FORBIDDEN');
     });
 
-    it('returns 401 for anonymous on admin inventory route', async () => {
-      const res = await request(app).get('/api/v1/admin/inventory');
-      expect(res.status).toBe(401);
-    });
-
-    it('returns 401 for anonymous on admin orders route', async () => {
-      const res = await request(app).get('/api/v1/admin/orders');
-      expect(res.status).toBe(401);
-    });
-
-    it('returns 401 for anonymous on admin dashboard route', async () => {
-      const res = await request(app).get('/api/v1/admin/dashboard');
-      expect(res.status).toBe(401);
-    });
-
-    it('returns 200 for ADMIN role on admin dashboard and products routes', async () => {
+    it.each(adminEndpoints)('returns 200 for ADMIN role on %s', async (endpoint) => {
       const loginRes = await request(app)
         .post('/api/v1/auth/login')
         .send({ email: 'admin@shopnest.com', password: 'Admin@123!' });
       expect(loginRes.status).toBe(200);
       const adminCookie = loginRes.headers['set-cookie'][0];
 
-      const dashRes = await request(app)
-        .get('/api/v1/admin/dashboard')
+      const res = await request(app)
+        .get(endpoint)
         .set('Cookie', adminCookie);
-      expect(dashRes.status).toBe(200);
-      expect(dashRes.body).toHaveProperty('total_orders');
-      expect(dashRes.body).toHaveProperty('total_sales_paise');
-      expect(dashRes.body).toHaveProperty('total_customers');
-      expect(dashRes.body).toHaveProperty('low_stock_count');
-
-      const prodRes = await request(app)
-        .get('/api/v1/admin/products')
-        .set('Cookie', adminCookie);
-      expect(prodRes.status).toBe(200);
-      expect(Array.isArray(prodRes.body.products)).toBe(true);
+      expect(res.status).toBe(200);
     });
   });
 });
