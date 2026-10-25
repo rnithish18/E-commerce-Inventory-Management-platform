@@ -14,14 +14,19 @@ describe('Week 2: Cart, Checkout & Payment Workflow API Tests', () => {
   let providerOrderId: string;
 
   beforeAll(async () => {
-    // Login as seeded customer1
-    const loginRes = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: 'customer1@shopnest.com', password: 'Customer@123!' });
+    // Register a fresh customer for complete test isolation
+    const uniqueEmail = `test_checkout_${Date.now()}@shopnest.com`;
+    const regRes = await request(app)
+      .post('/api/v1/auth/register')
+      .send({
+        email: uniqueEmail,
+        password: 'Password@123!',
+        full_name: 'Checkout Test Customer',
+      });
 
-    expect(loginRes.status).toBe(200);
-    customerCookie = loginRes.headers['set-cookie'][0];
-    testUserId = loginRes.body.user.id;
+    expect(regRes.status).toBe(201);
+    customerCookie = regRes.headers['set-cookie'][0];
+    testUserId = regRes.body.user.id;
 
     // Fetch an in-stock product from DB
     const prodRes = await query<{ id: string }>(

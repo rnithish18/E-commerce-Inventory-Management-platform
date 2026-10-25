@@ -35,7 +35,13 @@ test.describe('Automated Visual Documentation & Evidence Capture', () => {
     await page.screenshot({ path: path.join(screenshotDir, '02_catalog_search_filter.png'), fullPage: true });
 
     // 4. Product Detail Page (In-stock popular item)
-    await page.goto('/product/classmate-6-subject-spiral-notebook-ec0fc87a');
+    const firstProduct = page.locator('a[href^="/product/"]').first();
+    if (await firstProduct.count() > 0) {
+      await firstProduct.click();
+    } else {
+      await page.goto('/shop');
+      await page.locator('a[href^="/product/"]').first().click();
+    }
     await page.waitForSelector('button:has-text("Add to Cart")', { timeout: 15000 });
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(screenshotDir, '03_product_detail.png'), fullPage: true });
