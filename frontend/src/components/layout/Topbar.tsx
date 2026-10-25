@@ -74,7 +74,7 @@ export function Topbar() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search 1,000+ products, categories, brands..."
+              placeholder="Search products, brands and categories..."
               className="w-full bg-navy-700/80 hover:bg-navy-700 focus:bg-navy-700 text-gray-100 placeholder-gray-400 text-sm rounded-xl pl-10 pr-24 py-2 border border-navy-600 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
             />
             <button 

@@ -9,15 +9,37 @@ import {
   Minus, 
   Trash2, 
   Tag, 
-  RotateCcw 
+  RotateCcw,
+  Package,
+  Clock
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useCart } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { api } from '../../lib/api';
 import { formatPaise } from '../../lib/utils';
 import toast from 'react-hot-toast';
 
 export function RightPanel() {
   const { cart, updateQuantity, removeFromCart, applyCoupon, itemCount } = useCart();
+  const { user } = useAuth();
   const [couponInput, setCouponInput] = useState('');
+
+  // Fetch real latest order and tracking events for the authenticated user
+  const { data: latestOrder, isLoading: isOrderLoading } = useQuery({
+    queryKey: ['latest-order-tracking', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      try {
+        const res = await api.get('/orders/latest-tracking');
+        return res.data.order;
+      } catch {
+        return null;
+      }
+    },
+    enabled: !!user,
+    staleTime: 30000,
+  });
 
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
@@ -177,52 +199,128 @@ export function RightPanel() {
             <Truck className="w-4 h-4 text-orange-500" />
             <span>Track Order</span>
           </div>
-          <span className="text-[10px] text-gray-400 font-mono">
-            #ORD-9021
-          </span>
+          {latestOrder && (
+            <span className="text-[10px] text-gray-400 font-mono">
+              #{latestOrder.order_number || latestOrder.id.slice(0, 8).toUpperCase()}
+            </span>
+          )}
         </div>
 
-        <p className="text-xs font-semibold text-white mb-3">
-          Sony WH-1000XM5 Wireless
-        </p>
-
-        {/* Stepper */}
-        <div className="flex flex-col gap-3 relative pl-6 border-l-2 border-navy-600 ml-2">
-          <div className="relative">
-            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-orange-500 ring-4 ring-navy-700 flex items-center justify-center">
-              <CheckCircle2 className="w-3 h-3 text-white" />
+        {isOrderLoading ? (
+          <div className="py-6 text-center text-xs text-gray-400 animate-pulse">
+            Loading order details...
+          </div>
+        ) : !latestOrder ? (
+          <div className="py-5 text-center flex flex-col items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-navy-800 flex items-center justify-center text-gray-500 mb-2 border border-navy-600">
+              <Package className="w-5 h-5 text-gray-400" />
             </div>
-            <p className="text-xs font-semibold text-white leading-tight">Order Confirmed</p>
-            <p className="text-[10px] text-gray-400">Oct 19, 02:40 PM</p>
+            <p className="text-xs font-semibold text-gray-300">No orders yet</p>
+            <p className="text-[11px] text-gray-400 mt-0.5 max-w-[200px]">
+              {user ? 'Place an order to track live delivery progress here.' : 'Sign in to view and track your orders.'}
+            </p>
+            <Link
+              to={user ? '/shop' : '/login'}
+              className="mt-3 text-xs font-bold text-orange-400 hover:text-orange-300 transition-colors"
+            >
+              {user ? 'Start Shopping →' : 'Sign In →'}
+            </Link>
           </div>
+        ) : latestOrder.status === 'CANCELLED' ? (
+          <div className="py-4 text-center">
+            <p className="text-xs font-semibold text-red-400">Order Cancelled</p>
+            <p className="text-[11px] text-gray-400 mt-1">
+              {latestOrder.items?.[0]?.product_name || 'Item'}
+            </p>
+            <Link
+              to="/orders"
+              className="mt-3 inline-block text-xs font-bold text-orange-400 hover:text-orange-300 transition-colors"
+            >
+              View Order History →
+            </Link>
+          </div>
+        ) : (
+          <div>
+            <p className="text-xs font-semibold text-white mb-3 truncate" title={latestOrder.items?.[0]?.product_name}>
+              {latestOrder.items?.[0]?.product_name || 'ShopNest Order'}
+              {latestOrder.items?.length > 1 && ` (+${latestOrder.items.length - 1} more)`}
+            </p>
 
-          <div className="relative">
-            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-orange-500 ring-4 ring-navy-700 flex items-center justify-center">
-              <CheckCircle2 className="w-3 h-3 text-white" />
+            {/* Stepper */}
+            <div className="flex flex-col gap-3 relative pl-6 border-l-2 border-navy-600 ml-2">
+              {/* Step 1: Ordered */}
+              <div className="relative">
+                <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-orange-500 ring-4 ring-navy-700 flex items-center justify-center">
+                  <CheckCircle2 className="w-3 h-3 text-white" />
+                </div>
+                <p className="text-xs font-semibold text-white leading-tight">Order Confirmed</p>
+                <p className="text-[10px] text-gray-400">
+                  {new Date(latestOrder.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </p>
+              </div>
+
+              {/* Step 2: Shipped */}
+              <div className="relative">
+                {['SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED', 'REFUND_REQUESTED', 'REFUNDED'].includes(latestOrder.status) ? (
+                  <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-orange-500 ring-4 ring-navy-700 flex items-center justify-center">
+                    <CheckCircle2 className="w-3 h-3 text-white" />
+                  </div>
+                ) : (
+                  <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-navy-600 ring-4 ring-navy-700" />
+                )}
+                <p className={`text-xs leading-tight ${['SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(latestOrder.status) ? 'font-semibold text-white' : 'font-medium text-gray-400'}`}>
+                  Shipped
+                </p>
+                <p className="text-[10px] text-gray-400">
+                  {latestOrder.status === 'PROCESSING' ? 'Processing at hub' : ['SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(latestOrder.status) ? 'Carrier in transit' : 'Pending dispatch'}
+                </p>
+              </div>
+
+              {/* Step 3: Out for Delivery */}
+              <div className="relative">
+                {['OUT_FOR_DELIVERY', 'DELIVERED', 'REFUND_REQUESTED', 'REFUNDED'].includes(latestOrder.status) ? (
+                  <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-orange-500 ring-4 ring-navy-700 flex items-center justify-center">
+                    <CheckCircle2 className="w-3 h-3 text-white" />
+                  </div>
+                ) : latestOrder.status === 'SHIPPED' ? (
+                  <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-orange-400 animate-pulse ring-4 ring-navy-700" />
+                ) : (
+                  <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-navy-600 ring-4 ring-navy-700" />
+                )}
+                <p className={`text-xs leading-tight ${['OUT_FOR_DELIVERY', 'DELIVERED'].includes(latestOrder.status) ? 'font-semibold text-orange-400' : 'font-medium text-gray-400'}`}>
+                  Out for Delivery
+                </p>
+                <p className="text-[10px] text-gray-400">
+                  {latestOrder.status === 'OUT_FOR_DELIVERY' ? 'Courier out on delivery route' : 'Pending dispatch'}
+                </p>
+              </div>
+
+              {/* Step 4: Delivered */}
+              <div className="relative">
+                {['DELIVERED', 'REFUND_REQUESTED', 'REFUNDED'].includes(latestOrder.status) ? (
+                  <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-green-500 ring-4 ring-navy-700 flex items-center justify-center">
+                    <CheckCircle2 className="w-3 h-3 text-white" />
+                  </div>
+                ) : (
+                  <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-navy-600 ring-4 ring-navy-700" />
+                )}
+                <p className={`text-xs leading-tight ${['DELIVERED', 'REFUND_REQUESTED', 'REFUNDED'].includes(latestOrder.status) ? 'font-bold text-green-400' : 'font-medium text-gray-400'}`}>
+                  {latestOrder.status === 'DELIVERED' ? 'Delivered' : 'Delivery'}
+                </p>
+                <p className="text-[10px] text-gray-500">
+                  {latestOrder.status === 'DELIVERED' ? 'Package received' : 'Pending arrival'}
+                </p>
+              </div>
             </div>
-            <p className="text-xs font-semibold text-white leading-tight">Shipped (Bluedart)</p>
-            <p className="text-[10px] text-gray-400">In transit from Mumbai Hub</p>
-          </div>
 
-          <div className="relative">
-            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-orange-400 animate-pulse ring-4 ring-navy-700" />
-            <p className="text-xs font-semibold text-orange-400 leading-tight">Out for Delivery</p>
-            <p className="text-[10px] text-gray-300">Expected by 04:00 PM today</p>
+            <Link
+              to="/orders"
+              className="mt-4 block text-center text-xs font-semibold text-orange-400 hover:text-orange-300 transition-colors"
+            >
+              View live tracking details →
+            </Link>
           </div>
-
-          <div className="relative">
-            <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-navy-600 ring-4 ring-navy-700" />
-            <p className="text-xs font-medium text-gray-400 leading-tight">Delivered</p>
-            <p className="text-[10px] text-gray-500">Pending arrival</p>
-          </div>
-        </div>
-
-        <Link
-          to="/orders"
-          className="mt-4 block text-center text-xs font-semibold text-orange-400 hover:text-orange-300 transition-colors"
-        >
-          View live tracking details →
-        </Link>
+        )}
       </div>
 
       {/* 3. Fast Assistance card */}

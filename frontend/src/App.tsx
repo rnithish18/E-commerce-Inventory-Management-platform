@@ -21,56 +21,56 @@ import { AdminCoupons } from './pages/admin/AdminCoupons';
 import { AdminReviews } from './pages/admin/AdminReviews';
 import { AdminAnalytics } from './pages/admin/AdminAnalytics';
 import { AdminPlaceholder } from './pages/admin/AdminPlaceholder';
-import { CustomerPlaceholder } from './pages/CustomerPlaceholder';
 import { ProtectedRoute } from './components/routing/ProtectedRoute';
+import { WishlistProvider } from './contexts/WishlistContext';
+import { WishlistPage } from './pages/customer/WishlistPage';
 
 export default function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <Routes>
-          
-          {/* Customer Storefront Layout */}
-          <Route element={<StorefrontLayout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/shop" element={<ShopPage />} />
-            <Route path="/product/:slug" element={<ProductDetailPage />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route 
-              path="/checkout" 
-              element={
-                <ProtectedRoute>
-                  <CheckoutPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/order-confirmation/:id" 
-              element={
-                <ProtectedRoute>
-                  <OrderConfirmationPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/orders" 
-              element={
-                <ProtectedRoute>
-                  <MyOrdersPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/wishlist" 
-              element={
-                <CustomerPlaceholder 
-                  title="Your Wishlist" 
-                  subtitle="Save your favorite products for future purchases." 
-                  phase="Week 3" 
-                />
-              } 
-            />
-          </Route>
+        <WishlistProvider>
+          <Routes>
+            
+            {/* Customer Storefront Layout */}
+            <Route element={<StorefrontLayout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/shop" element={<ShopPage />} />
+              <Route path="/product/:slug" element={<ProductDetailPage />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route 
+                path="/checkout" 
+                element={
+                  <ProtectedRoute>
+                    <CheckoutPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/order-confirmation/:id" 
+                element={
+                  <ProtectedRoute>
+                    <OrderConfirmationPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/orders" 
+                element={
+                  <ProtectedRoute>
+                    <MyOrdersPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/wishlist" 
+                element={
+                  <ProtectedRoute>
+                    <WishlistPage />
+                  </ProtectedRoute>
+                } 
+              />
+            </Route>
 
           {/* Authentication Pages (Standalone) */}
           <Route path="/login" element={<LoginPage />} />
@@ -116,6 +116,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
 
         </Routes>
+        </WishlistProvider>
       </CartProvider>
     </AuthProvider>
   );

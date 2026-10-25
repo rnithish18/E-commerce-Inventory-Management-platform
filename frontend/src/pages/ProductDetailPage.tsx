@@ -17,6 +17,7 @@ import {
 import toast from 'react-hot-toast';
 import { useProduct } from '../hooks/useProducts';
 import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
 import { formatPaise, discountPercent, formatDate } from '../lib/utils';
 import { FullPageSpinner } from '../components/ui/Spinner';
 
@@ -24,6 +25,7 @@ export function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { isWishlisted, toggleWishlist } = useWishlist();
   const { data, isLoading } = useProduct(slug || '');
   const [qty, setQty] = useState(1);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -41,11 +43,17 @@ export function ProductDetailPage() {
     );
   }
 
+  const wishlisted = isWishlisted(product.id);
   const discount = discountPercent(product.price_paise, product.mrp_paise);
   const images = product.images || [];
   const primaryImage = selectedImage || (images[0]?.url) || `https://placehold.co/600x600/0f172a/f97316?text=${encodeURIComponent(product.brand || 'ShopNest')}`;
   const totalStock = product.variants?.reduce((sum: number, v: any) => sum + (v.stock_qty || 0), 0) ?? 15;
   const inStock = totalStock > 0;
+
+  // Real review counts
+  const reviewCount = Number(product.rating_count || 0);
+  const hasReviews = reviewCount > 0 && product.average_rating != null;
+  const rating = hasReviews ? Number(product.average_rating).toFixed(1) : null;
 
   const handleAddToCart = async () => {
     if (!inStock) return;
@@ -127,10 +135,16 @@ export function ProductDetailPage() {
 
           {/* Rating & Stock row */}
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-lg text-xs font-bold">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <span>{product.average_rating ? Number(product.average_rating).toFixed(1) : '4.7'}</span>
-              <span className="text-gray-400 ml-1">({product.rating_count || 128} reviews)</span>
+            <div className="flex items-center gap-1.5 min-h-[24px]">
+              {hasReviews ? (
+                <div className="flex items-center gap-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-lg text-xs font-bold">
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  <span>{rating}</span>
+                  <span className="text-gray-400 ml-1">({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})</span>
+                </div>
+              ) : (
+                <span className="text-xs text-gray-400 italic">No reviews yet</span>
+              )}
             </div>
 
             <div className="flex items-center gap-1.5 text-xs font-semibold">
@@ -185,7 +199,7 @@ export function ProductDetailPage() {
             </div>
           )}
 
-          {/* Action CTAs */}
+          {/* Action CTAs & Wishlist Button */}
           <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
             <button
               type="button"
@@ -205,6 +219,19 @@ export function ProductDetailPage() {
             >
               <Zap className="w-4 h-4" />
               <span>Buy Now</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => toggleWishlist(product)}
+              title={wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+              className={`p-3.5 rounded-xl border transition-all shrink-0 ${
+                wishlisted
+                  ? 'bg-red-500/20 text-red-500 border-red-500/40'
+                  : 'bg-navy-800 hover:bg-navy-700 text-gray-400 hover:text-white border-navy-600'
+              }`}
+            >
+              <Heart className={`w-4 h-4 ${wishlisted ? 'fill-red-500 text-red-500' : ''}`} />
             </button>
           </div>
 

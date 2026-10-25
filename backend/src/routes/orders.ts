@@ -65,6 +65,25 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+// GET /api/v1/orders/latest-tracking — Fetch real recent order and tracking events for the right panel
+router.get('/latest-tracking', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const latestRes = await query<{ id: string }>(
+      'SELECT id FROM orders WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1',
+      [req.user!.userId]
+    );
+
+    if (latestRes.rows.length === 0) {
+      return res.json({ order: null });
+    }
+
+    const order = await getOrderDetail(latestRes.rows[0].id, req.user!.userId);
+    res.json({ order });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // GET /api/v1/orders/:id
 router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {

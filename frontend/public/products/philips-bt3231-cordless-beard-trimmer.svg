@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0b1120"/>
+    </radialGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#334155" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="400" height="400" rx="24" fill="url(#bgGrad)"/>
+  <circle cx="200" cy="200" r="140" fill="#334155" opacity="0.06"/>
+  <circle cx="200" cy="200" r="100" fill="#334155" opacity="0.08"/>
+
+  <!-- Product Silhouette / Art -->
+  <g filter="url(#glow)">
+    
+        <circle cx="200" cy="200" r="70" fill="#1e293b" stroke="#334155" stroke-width="6"/>
+        <path d="M170 200 L230 200 M200 170 L200 230" stroke="#334155" stroke-width="8" stroke-linecap="round"/>
+      
+  </g>
+
+  <!-- Category & Label Ribbon -->
+  <rect x="24" y="24" width="100" height="26" rx="13" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+  <text x="74" y="41" fill="#f8fafc" font-size="11" font-weight="bold" font-family="system-ui, sans-serif" text-anchor="middle" letter-spacing="0.5">Beauty</text>
+
+  <!-- Product Name Preview at bottom -->
+  <text x="200" y="360" fill="#f8fafc" font-size="13" font-weight="bold" font-family="system-ui, sans-serif" text-anchor="middle">
+    Philips BT3231 Cordless Beard …
+  </text>
+</svg>

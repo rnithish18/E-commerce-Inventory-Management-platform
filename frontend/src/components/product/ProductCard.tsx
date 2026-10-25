@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Star, ShoppingCart, Check } from 'lucide-react';
-import toast from 'react-hot-toast';
 import { formatPaise, discountPercent } from '../../lib/utils';
 import { useCart } from '../../contexts/CartContext';
+import { useWishlist } from '../../contexts/WishlistContext';
 
 export interface ProductData {
   id: string;
@@ -27,19 +27,22 @@ interface Props {
 
 export function ProductCard({ product }: Props) {
   const { addToCart } = useCart();
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { isWishlisted, toggleWishlist } = useWishlist();
   const [isAdded, setIsAdded] = useState(false);
 
+  const wishlisted = isWishlisted(product.id);
   const discount = discountPercent(product.price_paise, product.mrp_paise);
-  const rating = product.average_rating ? Number(product.average_rating).toFixed(1) : '4.6';
-  const reviewsCount = product.rating_count || Math.floor((product.price_paise % 100) + 24);
+  
+  // Real rating calculation: show "No reviews yet" if 0 reviews
+  const reviewCount = Number(product.rating_count || 0);
+  const hasReviews = reviewCount > 0 && product.average_rating != null;
+  const rating = hasReviews ? Number(product.average_rating).toFixed(1) : null;
   const inStock = (product.total_stock ?? 1) > 0;
 
-  const toggleWishlist = (e: React.MouseEvent) => {
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsWishlisted(!isWishlisted);
-    toast.success(!isWishlisted ? 'Added to Wishlist' : 'Removed from Wishlist');
+    await toggleWishlist(product);
   };
 
   const handleAddToCart = async (e: React.MouseEvent) => {
@@ -73,15 +76,15 @@ export function ProductCard({ product }: Props) {
 
         <button
           type="button"
-          onClick={toggleWishlist}
-          title={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+          onClick={handleToggleWishlist}
+          title={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
           className={`pointer-events-auto p-2 rounded-xl backdrop-blur-md transition-all ${
-            isWishlisted 
+            wishlisted 
               ? 'bg-red-500/20 text-red-500 border border-red-500/40' 
               : 'bg-navy-900/70 text-gray-400 hover:text-white border border-white/10 hover:bg-navy-900'
           }`}
         >
-          <Heart className={`w-3.5 h-3.5 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
+          <Heart className={`w-3.5 h-3.5 ${wishlisted ? 'fill-red-500 text-red-500' : ''}`} />
         </button>
       </div>
 
@@ -126,19 +129,27 @@ export function ProductCard({ product }: Props) {
         {product.name}
       </Link>
 
-      {/* Rating & reviews */}
-      <div className="flex items-center gap-1.5 mb-2.5">
-        <div className="flex items-center gap-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-1.5 py-0.5 rounded-md text-[11px] font-bold">
-          <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-          <span>{rating}</span>
-        </div>
-        <span className="text-[11px] text-gray-400">
-          ({reviewsCount})
-        </span>
+      {/* Real Rating & Reviews */}
+      <div className="flex items-center gap-1.5 mb-2.5 min-h-[22px]">
+        {hasReviews ? (
+          <>
+            <div className="flex items-center gap-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-1.5 py-0.5 rounded-md text-[11px] font-bold">
+              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+              <span>{rating}</span>
+            </div>
+            <span className="text-[11px] text-gray-400">
+              ({reviewCount})
+            </span>
+          </>
+        ) : (
+          <span className="text-[11px] text-gray-500 italic">
+            No reviews yet
+          </span>
+        )}
       </div>
 
-      {/* Price row */}
-      <div className="flex items-baseline gap-2 mb-3">
+      {/* Price row — unclipped layout */}
+      <div className="flex items-center flex-wrap gap-1.5 mb-3">
         <span className="text-base font-extrabold text-white">
           {formatPaise(product.price_paise)}
         </span>
@@ -147,7 +158,7 @@ export function ProductCard({ product }: Props) {
             <span className="text-xs text-gray-500 line-through">
               {formatPaise(product.mrp_paise)}
             </span>
-            <span className="text-[10px] font-bold text-green-400 bg-green-500/10 px-1.5 py-0.2 rounded">
+            <span className="text-[10px] font-bold text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded whitespace-nowrap shrink-0">
               {discount}% OFF
             </span>
           </>

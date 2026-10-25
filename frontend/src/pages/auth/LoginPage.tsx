@@ -65,25 +65,27 @@ export function LoginPage() {
           <p className="text-xs text-gray-400 mt-1">Sign in to your account to manage orders and checkout</p>
         </div>
 
-        {/* Demo buttons */}
-        <div className="grid grid-cols-2 gap-2 mb-6 p-1.5 rounded-2xl bg-navy-900/80 border border-navy-700">
-          <button
-            type="button"
-            onClick={fillDemoAdmin}
-            className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs font-bold transition-colors"
-          >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Demo Admin</span>
-          </button>
-          <button
-            type="button"
-            onClick={fillDemoCustomer}
-            className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-navy-700 hover:bg-navy-600 text-gray-200 text-xs font-bold transition-colors"
-          >
-            <User className="w-3.5 h-3.5" />
-            <span>Demo Customer</span>
-          </button>
-        </div>
+        {/* Demo buttons (shown only if VITE_SHOW_DEMO_LOGINS=true) */}
+        {import.meta.env.VITE_SHOW_DEMO_LOGINS === 'true' && (
+          <div className="grid grid-cols-2 gap-2 mb-6 p-1.5 rounded-2xl bg-navy-900/80 border border-navy-700">
+            <button
+              type="button"
+              onClick={fillDemoAdmin}
+              className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs font-bold transition-colors"
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Demo Admin</span>
+            </button>
+            <button
+              type="button"
+              onClick={fillDemoCustomer}
+              className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-navy-700 hover:bg-navy-600 text-gray-200 text-xs font-bold transition-colors"
+            >
+              <User className="w-3.5 h-3.5" />
+              <span>Demo Customer</span>
+            </button>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>

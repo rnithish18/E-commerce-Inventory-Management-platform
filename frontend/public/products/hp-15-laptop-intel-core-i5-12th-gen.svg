@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0b1120"/>
+    </radialGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#06b6d4" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="400" height="400" rx="24" fill="url(#bgGrad)"/>
+  <circle cx="200" cy="200" r="140" fill="#06b6d4" opacity="0.06"/>
+  <circle cx="200" cy="200" r="100" fill="#06b6d4" opacity="0.08"/>
+
+  <!-- Product Silhouette / Art -->
+  <g filter="url(#glow)">
+    
+        <rect x="110" y="130" width="180" height="120" rx="10" fill="#0f172a" stroke="#06b6d4" stroke-width="5"/>
+        <polygon points="80,260 320,260 300,275 100,275" fill="#334155"/>
+        <circle cx="200" cy="190" r="24" fill="#06b6d4" opacity="0.5"/>
+      
+  </g>
+
+  <!-- Category & Label Ribbon -->
+  <rect x="24" y="24" width="100" height="26" rx="13" fill="#0f172a" stroke="#06b6d4" stroke-width="1.5"/>
+  <text x="74" y="41" fill="#f8fafc" font-size="11" font-weight="bold" font-family="system-ui, sans-serif" text-anchor="middle" letter-spacing="0.5">Electronics</text>
+
+  <!-- Product Name Preview at bottom -->
+  <text x="200" y="360" fill="#f8fafc" font-size="13" font-weight="bold" font-family="system-ui, sans-serif" text-anchor="middle">
+    HP 15 Laptop Intel Core i5 12t…
+  </text>
+</svg>

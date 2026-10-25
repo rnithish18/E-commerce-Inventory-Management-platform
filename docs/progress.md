@@ -290,3 +290,39 @@ Running 3 tests using 1 worker
 - **Phase 3 (Week 3)**: Inventory, Orders & Store Features — **COMPLETE**
 - **Phase 4 (Week 4)**: Analytics, Security & Deployment — **COMPLETE**
 - **All non-negotiable rules adhered to**: Integer paise currency everywhere, server-side pricing and payment verification, atomic row-locking on inventory, central order state machine, zero floats, and 100% tests passing.
+
+
+---
+
+## 6. Phase 0: Real-Time Hardening & Demo Behavior Removal
+
+### Completed Deliverables
+1. **Dynamic Track Order Card**:
+   - Replaced hardcoded `#ORD-9021` card in `RightPanel.tsx`.
+   - Built `GET /api/v1/orders/latest-tracking` endpoint to fetch the authenticated user's latest real order and `shipment_tracking_events`.
+   - Rendered a clean empty state with shopping prompt for guests or users without orders.
+2. **Real Product Ratings & Review Counts**:
+   - Eliminated hardcoded `'4.6 (24)'` defaults in `ProductCard.tsx` and `ProductDetailPage.tsx`.
+   - Real `average_rating` and `rating_count` from approved database reviews are displayed.
+   - Products with 0 reviews display *"No reviews yet"* and no stars.
+3. **Persistent Database-Backed Wishlist**:
+   - Implemented `backend/src/routes/wishlists.ts` (`GET /api/v1/wishlists`, `GET /ids`, `POST /:productId`, `DELETE /:productId`).
+   - Built `WishlistContext.tsx` with instant optimistic mutations and TanStack Query cache synchronization.
+   - Created full `WishlistPage.tsx` with saved product grid and empty state.
+   - Added 8 integration tests in `tests/api/wishlist.test.ts` (all 8 passing).
+4. **Storefront Counters & Copy**:
+   - Neutral search placeholder: *"Search products, brands and categories..."*.
+   - Dynamic category tile counts in `CategoryTiles.tsx` populated via `useCategories()` from real database `product_count`.
+5. **Real Product Imagery & Hero Showcase**:
+   - Generated 42 dedicated product SVG graphics under `frontend/public/products/` with zero external dependencies or hotlinking.
+   - Updated `backend/src/db/seed.ts` to seed `/products/[slug].svg`.
+   - Re-seeded database (`npm run seed`).
+   - Integrated floating hero headphone artwork in `HeroBanner.tsx`.
+   - Added complete attribution and licensing in `docs/image-credits.md`.
+6. **Card Layout & Loading State**:
+   - Fixed discount badge layout in `ProductCard.tsx` using `flex-wrap` and `whitespace-nowrap shrink-0` to eliminate clipping.
+   - Enforced `VITE_SHOW_DEMO_LOGINS=true` feature flag on `LoginPage.tsx` demo buttons (defaulted to `false` in `.env.example`).
+   - Set dark background styles on `<body>` in `frontend/index.html` to eliminate white flash during initial page load.
+7. **Verification Evidence**:
+   - **Vitest**: 12/12 test files passed, **158 / 158 tests passed** (41.5s).
+   - **Playwright**: 5/5 test suites passed, **5 / 5 suites passed** (1.1m).

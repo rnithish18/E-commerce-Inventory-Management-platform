@@ -1,5 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
-import { productsApi, ProductListParams } from '../lib/api'
+import { productsApi, categoriesApi, ProductListParams } from '../lib/api'
+
+export function useCategories() {
+  return useQuery({
+    queryKey: ['categories'],
+    queryFn: () => categoriesApi.list().then(r => r.data.categories),
+    staleTime: 60_000,
+  })
+}
 
 export function useProducts(params?: ProductListParams) {
   return useQuery({

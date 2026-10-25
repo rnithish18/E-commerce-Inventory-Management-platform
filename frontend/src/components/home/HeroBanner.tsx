@@ -93,6 +93,18 @@ export function HeroBanner() {
         </div>
       </div>
 
+      {/* Featured Real Product Showcase Image */}
+      <div className="hidden md:flex absolute right-8 lg:right-16 top-1/2 -translate-y-1/2 w-64 lg:w-80 aspect-square items-center justify-center pointer-events-none z-10">
+        <div className="relative w-full h-full flex items-center justify-center">
+          <div className="absolute inset-0 bg-orange-500/20 rounded-full blur-3xl animate-pulse" />
+          <img
+            src="/products/hero-headphones.svg"
+            alt="Next-Gen Audio & Smart Tech"
+            className="w-full h-full object-contain filter drop-shadow-2xl transition-transform duration-700 hover:scale-105"
+          />
+        </div>
+      </div>
+
       {/* Carousel navigation buttons */}
       <div className="absolute right-4 bottom-4 z-20 flex items-center gap-2">
         <button

@@ -154,10 +154,11 @@ async function seed() {
         [pid, catId, p.name, slug, p.desc, p.brand, p.price, p.mrp, p.badge]
       );
 
-      // Product image (placeholder for demo)
+      // Real product image stored locally under frontend/public/products/
+      const productImgUrl = `/products/${slugify(p.name)}.svg`;
       await client.query(
         'INSERT INTO product_images (id, product_id, url, alt_text, sort_order) VALUES ($1, $2, $3, $4, 0)',
-        [uuidv4(), pid, `https://placehold.co/400x400/1e293b/f97316?text=${encodeURIComponent(p.brand.substring(0, 12))}`, p.name]
+        [uuidv4(), pid, productImgUrl, p.name]
       );
 
       // Default variant

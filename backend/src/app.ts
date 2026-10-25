@@ -100,6 +100,7 @@ app.use('/api/v1/addresses', addressRoutes);
 app.use('/api/v1/payments', paymentLimiter, paymentRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/wishlists', wishlistRoutes);
+app.use('/api/v1/wishlist', wishlistRoutes);
 app.use('/api/v1/coupons', couponLimiter, couponRoutes);
 app.use('/api/v1/uploads', uploadRoutes);
 app.use('/api/v1/admin/products', adminProductRoutes);
