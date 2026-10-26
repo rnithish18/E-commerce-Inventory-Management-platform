@@ -22,6 +22,8 @@ export const CreateProductSchema = z.object({
   is_active: z.boolean().default(true),
   stock_qty: z.number().int().min(0).default(0),
   reorder_threshold: z.number().int().min(0).default(10),
+  image_url: z.string().optional(),
+  images: z.array(z.string()).optional(),
 });
 
 export type ProductQuery = z.infer<typeof ProductQuerySchema>;

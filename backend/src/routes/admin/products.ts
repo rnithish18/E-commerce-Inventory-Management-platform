@@ -74,6 +74,19 @@ router.post('/', validate(CreateProductSchema), async (req: Request, res: Respon
         );
       }
 
+      // Associate uploaded images
+      const imagesToInsert: string[] = data.images && data.images.length > 0
+        ? data.images
+        : data.image_url ? [data.image_url] : [];
+
+      for (let i = 0; i < imagesToInsert.length; i++) {
+        await client.query(
+          `INSERT INTO product_images (id, product_id, url, alt_text, sort_order)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [uuidv4(), id, imagesToInsert[i], data.name, i]
+        );
+      }
+
       await client.query('COMMIT');
       res.status(201).json({ product: productResult.rows[0] });
     } catch (e) {

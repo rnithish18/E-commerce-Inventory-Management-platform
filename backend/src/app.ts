@@ -17,6 +17,7 @@ import couponRoutes from './routes/coupons';
 import addressRoutes from './routes/addresses';
 import paymentRoutes from './routes/payments';
 import uploadRoutes from './routes/uploads';
+import aiRoutes from './routes/ai';
 import adminProductRoutes from './routes/admin/products';
 import adminOrderRoutes from './routes/admin/orders';
 import adminInventoryRoutes from './routes/admin/inventory';
@@ -25,7 +26,14 @@ import adminReviewRoutes from './routes/admin/reviews';
 import adminDashboardRoutes from './routes/admin/dashboard';
 import adminAnalyticsRoutes from './routes/admin/analytics';
 import webhookRoutes from './routes/webhooks';
-import { authLimiter, couponLimiter, paymentLimiter, csrfProtection } from './middleware/security';
+import {
+  authLimiter,
+  couponLimiter,
+  paymentLimiter,
+  uploadLimiter,
+  aiLimiter,
+  csrfProtection,
+} from './middleware/security';
 import { query } from './db/query';
 
 const app = express();
@@ -63,8 +71,16 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
 
-// Static uploads
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+// Static uploads with client caching headers
+app.use(
+  '/uploads',
+  express.static(path.join(process.cwd(), 'uploads'), {
+    maxAge: 86400000,
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+    },
+  })
+);
 
 // Health check handler
 const healthHandler = async (_req: express.Request, res: express.Response) => {
@@ -102,7 +118,8 @@ app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/wishlists', wishlistRoutes);
 app.use('/api/v1/wishlist', wishlistRoutes);
 app.use('/api/v1/coupons', couponLimiter, couponRoutes);
-app.use('/api/v1/uploads', uploadRoutes);
+app.use('/api/v1/uploads', uploadLimiter, uploadRoutes);
+app.use('/api/v1/ai', aiLimiter, aiRoutes);
 app.use('/api/v1/admin/products', adminProductRoutes);
 app.use('/api/v1/admin/orders', adminOrderRoutes);
 app.use('/api/v1/admin/inventory', adminInventoryRoutes);

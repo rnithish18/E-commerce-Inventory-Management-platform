@@ -41,7 +41,33 @@ export const paymentLimiter = rateLimit({
   },
 });
 
-// 4. CSRF / Origin Verification Middleware for state-mutating requests
+// 4. Rate limiter for image uploads (20 requests per minute)
+export const uploadLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 20, // 20 requests per minute
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => process.env.NODE_ENV === 'test',
+  message: {
+    error: 'TOO_MANY_REQUESTS',
+    message: 'Too many image upload attempts. Please slow down.',
+  },
+});
+
+// 5. Rate limiter for AI image analysis & search (20 requests per minute)
+export const aiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 20, // 20 requests per minute
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => process.env.NODE_ENV === 'test',
+  message: {
+    error: 'TOO_MANY_REQUESTS',
+    message: 'Too many AI analysis requests. Please try again shortly.',
+  },
+});
+
+// 6. CSRF / Origin Verification Middleware for state-mutating requests
 export function csrfProtection(req: Request, _res: Response, next: NextFunction): void {
   // Safe HTTP methods do not require origin validation
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {

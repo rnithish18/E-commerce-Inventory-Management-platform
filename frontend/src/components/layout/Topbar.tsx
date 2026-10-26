@@ -11,8 +11,10 @@ import {
   Package, 
   Heart, 
   LayoutDashboard,
-  ShieldCheck
+  ShieldCheck,
+  Camera,
 } from 'lucide-react';
+import { VisualSearchModal } from '../search/VisualSearchModal';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { formatPaise } from '../../lib/utils';
@@ -24,6 +26,7 @@ export function Topbar() {
   const [searchTerm, setSearchTerm] = useState('');
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
+  const [visualSearchOpen, setVisualSearchOpen] = useState(false);
   const bellRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
@@ -75,8 +78,17 @@ export function Topbar() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search products, brands and categories..."
-              className="w-full bg-navy-700/80 hover:bg-navy-700 focus:bg-navy-700 text-gray-100 placeholder-gray-400 text-sm rounded-xl pl-10 pr-24 py-2 border border-navy-600 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
+              className="w-full bg-navy-700/80 hover:bg-navy-700 focus:bg-navy-700 text-gray-100 placeholder-gray-400 text-sm rounded-xl pl-10 pr-28 py-2 border border-navy-600 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 transition-all duration-200"
             />
+            <button
+              type="button"
+              onClick={() => setVisualSearchOpen(true)}
+              title="Search by image (AI Vision)"
+              aria-label="Search by image (AI Vision)"
+              className="absolute right-20 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-400 p-1.5 rounded-lg hover:bg-navy-600 transition-colors"
+            >
+              <Camera className="w-4 h-4" />
+            </button>
             <button 
               type="submit"
               className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
@@ -278,6 +290,12 @@ export function Topbar() {
 
         </div>
       </div>
+
+      {/* AI Visual Search Modal */}
+      <VisualSearchModal
+        isOpen={visualSearchOpen}
+        onClose={() => setVisualSearchOpen(false)}
+      />
     </header>
   );
 }

@@ -354,3 +354,34 @@ Running 3 tests using 1 worker
 5. **Verification & Test Evidence**:
    - **Vitest**: 13/13 test files passed, **164 / 164 tests passed** (including `tests/api/password_reset.test.ts`).
    - **Playwright**: 7/7 tests passed in `tests/e2e/auth_runaway.spec.ts` + all 4 core suites passed with zero regressions.
+
+---
+
+## 8. Phase B: AI Image Upload, Vision Analysis & Visual Catalog Search
+
+### Completed Deliverables
+1. **First-Class Image Uploader Component (`ImageUploader.tsx`)**:
+   - Drag-and-drop zone with animated feedback, clipboard paste (`Ctrl+V`) listener, and mobile/webcam capture integration.
+   - Instant client-side object URL previews with progress indicator.
+   - Multi-image handling (up to 5 images) with re-ordering (`<` / `>`) and primary cover badge.
+   - Client and server-side magic byte inspection and 5MB size limits with informative error chips.
+2. **AI Vision Analysis Service (`aiVision.ts`, `/api/v1/ai/analyze-image`)**:
+   - Abstract vision provider architecture supporting Google Gemini, Anthropic Claude, and high-fidelity mock fallback.
+   - Strict Zod validation on output schemas: `suggestedTitle`, `suggestedCategory`, `suggestedDescription`, `detectedTags`, `dominantColors`, `estimatedPriceRange`, `imageQualityScore`, and `recommendations`.
+   - Automated quality scoring (1-100) and dominant color extraction via `sharp` stats.
+   - **SHA-256 Hash Caching**: Persistent caching in table `product_image_analysis` (migration `008_create_product_image_analysis.js`) preventing redundant API usage.
+   - Admin UI suggestion card with one-click "Apply all suggestions" and individual cherry-pick controls.
+3. **Storefront Visual Catalog Search (`VisualSearchModal.tsx`, `/api/v1/ai/image-search`)**:
+   - Camera icon integrated into storefront search bar.
+   - "Search by Image" modal supporting file drop, browse, or photo capture.
+   - Extracts semantic visual features and executes multi-term catalog search against PostgreSQL with relevance ranking (`% match`).
+   - Clean navigation to matched product detail pages.
+4. **Image Optimization & Security Hardening**:
+   - Magic bytes verification (`validateMagicBytes`) rejecting disguised executables and non-image files with `400 INVALID_FILE_TYPE`.
+   - Automatic EXIF metadata stripping protecting user privacy.
+   - Sharp resizing to standard 1200x1200 max main image and 300x300 thumbnail (`_thumb.webp`).
+   - Static `/uploads` route served with `Cache-Control: public, max-age=86400`.
+   - Rate limiting on image uploads (`uploadLimiter`) and AI vision endpoints (`aiLimiter`).
+5. **Verification & Test Evidence**:
+   - **Vitest**: 14/14 test files passed, **174 / 174 tests passed** (including 10 tests in `tests/api/uploads_ai.test.ts`).
+   - **Playwright**: 13/13 tests passed across all 5 test suites (including `tests/e2e/ai_vision.spec.ts` and `tests/e2e/auth_runaway.spec.ts`).

@@ -11,9 +11,10 @@ import {
   Check, 
   AlertCircle 
 } from 'lucide-react';
-import api from '../../lib/api';
+import api, { AiAnalysisData } from '../../lib/api';
 import { formatPaise } from '../../lib/utils';
 import { FullPageSpinner } from '../../components/ui/Spinner';
+import { ImageUploader, UploadedImageItem } from '../../components/ImageUploader/ImageUploader';
 import toast from 'react-hot-toast';
 
 interface ProductItem {
@@ -55,8 +56,26 @@ export function AdminProducts() {
   const [stockQty, setStockQty] = useState('25');
   const [reorderThreshold, setReorderThreshold] = useState('5');
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
+  const [uploadedImages, setUploadedImages] = useState<UploadedImageItem[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  const handleApplySuggestions = (suggestions: Partial<AiAnalysisData>) => {
+    if (suggestions.suggestedTitle) setName(suggestions.suggestedTitle);
+    if (suggestions.suggestedDescription) setDescription(suggestions.suggestedDescription);
+    if (suggestions.suggestedCategory) {
+      const matched = categories.find(
+        (c) =>
+          c.name.toLowerCase().includes(suggestions.suggestedCategory!.toLowerCase()) ||
+          suggestions.suggestedCategory!.toLowerCase().includes(c.name.toLowerCase())
+      );
+      if (matched) setCategoryId(matched.id);
+    }
+    if (suggestions.estimatedPriceRange) {
+      setPriceRupees((suggestions.estimatedPriceRange.minPaise / 100).toFixed(2));
+      setMrpRupees((suggestions.estimatedPriceRange.maxPaise / 100).toFixed(2));
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -135,6 +154,9 @@ export function AdminProducts() {
 
     try {
       setSubmitting(true);
+      const finalImageUrl = uploadedImages[0]?.url || uploadedImageUrl || undefined;
+      const allImageUrls = uploadedImages.map((img) => img.url).filter(Boolean);
+
       await api.post('/admin/products', {
         category_id: categoryId,
         name: name.trim(),
@@ -146,6 +168,8 @@ export function AdminProducts() {
         is_active: true,
         stock_qty: parseInt(stockQty, 10) || 0,
         reorder_threshold: parseInt(reorderThreshold, 10) || 5,
+        image_url: finalImageUrl,
+        images: allImageUrls.length > 0 ? allImageUrls : undefined,
       });
 
       toast.success(`Product "${name}" created with inventory movement!`);
@@ -156,6 +180,7 @@ export function AdminProducts() {
       setPriceRupees('');
       setMrpRupees('');
       setUploadedImageUrl(null);
+      setUploadedImages([]);
       fetchProducts();
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to create product');
@@ -470,25 +495,22 @@ export function AdminProducts() {
                 />
               </div>
 
-              {/* Image Upload Input */}
-              <div className="p-3 bg-navy-900/60 rounded-xl border border-navy-700">
-                <label className="block text-xs font-semibold text-gray-300 mb-1 flex items-center justify-between">
-                  <span>Product Image Upload (Multer Controlled Storage)</span>
-                  <span className="text-[10px] text-gray-500">JPG, PNG, WebP &lt; 5MB</span>
+              {/* AI-Powered Image Uploader */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1.5 flex items-center justify-between">
+                  <span>Product Images & AI Vision Analysis</span>
+                  <span className="text-[10px] text-teal-400 font-bold">✨ AI Suggestion Ready</span>
                 </label>
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={handleImageUpload}
-                  disabled={uploadingImage}
-                  className="text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-orange-500 file:text-white hover:file:bg-orange-600 cursor-pointer"
+                <ImageUploader
+                  images={uploadedImages}
+                  onChange={(imgs) => {
+                    setUploadedImages(imgs);
+                    if (imgs.length > 0 && imgs[0].url) {
+                      setUploadedImageUrl(imgs[0].url);
+                    }
+                  }}
+                  onApplySuggestions={handleApplySuggestions}
                 />
-                {uploadingImage && <span className="text-[11px] text-orange-400 block mt-1">Uploading image...</span>}
-                {uploadedImageUrl && (
-                  <span className="text-[11px] text-green-400 block mt-1 font-mono">
-                    ✓ Uploaded: {uploadedImageUrl}
-                  </span>
-                )}
               </div>
 
               <div className="flex items-center justify-end gap-2.5 pt-2">
