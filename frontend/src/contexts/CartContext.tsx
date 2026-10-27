@@ -82,6 +82,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     try {
       setLoading(true);
+
+      // Merge guest cart if items existed prior to login
+      const local = localStorage.getItem('shopnest_guest_cart');
+      if (local) {
+        try {
+          const guestItems = JSON.parse(local);
+          if (Array.isArray(guestItems) && guestItems.length > 0) {
+            await api.post('/cart/merge', { items: guestItems });
+          }
+        } catch {
+          // ignore
+        } finally {
+          localStorage.removeItem('shopnest_guest_cart');
+        }
+      }
+
       const queryParam = coupon || appliedCoupon ? `?coupon=${encodeURIComponent(coupon || appliedCoupon || '')}` : '';
       const res = await api.get(`/cart${queryParam}`);
       setCart(res.data.pricing);

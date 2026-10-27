@@ -420,3 +420,36 @@ Running 3 tests using 1 worker
    - **Vitest**: 14/14 test files passed, **174 / 174 tests passed** (55.21s).
    - **Playwright**: 14/14 tests passed (1.6m) across all journeys.
    - Total catalog count: 42 verified seeded products in PostgreSQL.
+
+---
+
+## 10. Phase 2: Google OAuth 2.0 PKCE Flow & Account Linking
+
+### Completed Deliverables
+1. **Additive Schema Migration (`010_add_google_oauth_fields.js`)**:
+   - Added `google_sub` (`VARCHAR(255) UNIQUE NULLABLE`) and `auth_provider` (`VARCHAR(50) DEFAULT 'local' NOT NULL`) to table `users`.
+   - Relaxed `password_hash` column from `NOT NULL` to nullable so OAuth-created accounts function without dummy hashes while preserving password auth for local users.
+2. **Server-Side OAuth 2.0 PKCE Flow (`googleAuth.ts`, `backend/src/routes/auth.ts`)**:
+   - Implemented `GET /api/v1/auth/google`: checks configuration, generates cryptographic `state` and PKCE `code_verifier` with `code_challenge` (S256), stores them in a short-lived httpOnly `sameSite: 'lax'` cookie `oauth_state`, and redirects to `https://accounts.google.com/o/oauth2/v2/auth`.
+   - Implemented `GET /api/v1/auth/google/callback`:
+     - Strictly validates `state` matching between query parameter and cookie (rejecting missing/mismatched states with `?error=invalid_state`).
+     - Detects user cancellation (`?error=access_denied`).
+     - Exchanges authorization code + `code_verifier` using `OAuth2Client` and verifies Google ID token.
+     - Requires `email_verified = true` (rejects unverified Google accounts with `?error=email_not_verified`).
+     - Account resolution: looks up by `google_sub`, then by verified `email`. Automatically links existing customer accounts while preserving their password hash.
+     - **Admin Role Guard**: Enforces rule that Google sign-in must NEVER grant or log in an `ADMIN`. Admin accounts are rejected with `?error=admin_google_blocked`.
+     - Issues standard JWT session token via httpOnly cookie.
+     - Automatically merges guest cart (`shopnest_guest_cart`) upon successful login.
+     - Sanitizes `returnUrl` (preventing open redirect vulnerabilities) and redirects to `${FRONTEND_URL}${returnUrl}`.
+   - `GET /api/v1/auth/providers`: Returns `{ google: boolean, providers: { google: boolean } }`.
+3. **Frontend Integration (`AuthContainer.tsx`, `CartContext.tsx`)**:
+   - Shows "Continue with Google" button and separator ONLY when Google is configured on the server.
+   - Prominently displays friendly, actionable inline alerts on the Login card for any OAuth error (`admin_google_blocked`, `email_not_verified`, `invalid_state`, `access_denied`).
+   - `CartContext.tsx` automatically calls `POST /api/v1/cart/merge` on login and empties guest `localStorage`.
+4. **Documentation**:
+   - Complete guide created in `docs/google-oauth.md` covering Google Cloud Console project setup, Authorized redirect URIs (`http://localhost:4000/api/v1/auth/google/callback`), scopes (`openid`, `email`, `profile`), and environment variables.
+   - Updated `.env.example` and `README.md`.
+5. **Verification & Test Evidence**:
+   - **Vitest**: 15/15 test files passed, **183 / 183 tests passed** (including 9 new tests in `tests/api/google_oauth.test.ts`).
+   - **Playwright**: 16/16 tests passed (including 2 new tests in `tests/e2e/google_oauth.spec.ts`).
+   - Clean state: 42 verified products in database.

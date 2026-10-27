@@ -76,6 +76,11 @@ PORT=4000
 NODE_ENV=development
 FRONTEND_URL=http://localhost:5173
 MOCK_GATEWAY=true
+
+# Optional: Google OAuth 2.0 PKCE Flow (see docs/google-oauth.md)
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_CALLBACK_URL=http://localhost:4000/api/v1/auth/google/callback
 ```
 
 ### 3. Database Initialization (Migrations & Seed)
