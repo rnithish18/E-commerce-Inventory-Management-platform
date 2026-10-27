@@ -1,0 +1,1042 @@
+[
+  {
+    "slug": "adidas-originals-classic-track-jacket",
+    "name": "Adidas Originals Classic Track Jacket",
+    "brand": "Adidas",
+    "category": "Fashion",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Adidas Originals Classic Track Jacket (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "allen-solly-formal-shirt-regular-fit",
+    "name": "Allen Solly Formal Shirt Regular Fit",
+    "brand": "Allen Solly",
+    "category": "Fashion",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Allen Solly Formal Shirt Regular Fit (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "amazon-basics-king-bedsheet-set-1000-tc",
+    "name": "Amazon Basics King Bedsheet Set 1000 TC",
+    "brand": "Amazon Basics",
+    "category": "Home & Living",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Amazon Basics King Bedsheet Set 1000 TC (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "apple-iphone-15-128gb-blue",
+    "name": "Apple iPhone 15 128GB Blue",
+    "brand": "Apple",
+    "category": "Electronics",
+    "verified": true,
+    "needs_image": false,
+    "primary_url": "/products/apple-iphone-15-128gb-blue/image-0-640.webp",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/apple-iphone-15-128gb-blue/image-0-640.webp",
+        "srcset": "/products/apple-iphone-15-128gb-blue/image-0-320.webp 320w, /products/apple-iphone-15-128gb-blue/image-0-640.webp 640w, /products/apple-iphone-15-128gb-blue/image-0-960.webp 960w, /products/apple-iphone-15-128gb-blue/image-0-1280.webp 1280w",
+        "placeholder": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAABwBACdASoSABgAPxF8s1GsKCSysBgIAlAiCWMAnTLMAbfzWCtgfBDW9n2wAAD+w9J7I1kahZ5Fp9ea+YN9d9z5Jiejiux/jdpDkFGHO67/fS/0DnxJHNaDxQ+QdRlKbRZjIvEpeVoAAA==",
+        "alt": "Apple iPhone 15 Blue rear dual-camera and matte glass finish",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Back_of_iPhone_15.jpg",
+        "license": "CC-BY-SA 4.0",
+        "attribution": "Wikimedia Commons / TechRef",
+        "verified": true
+      }
+    ],
+    "license": "CC-BY-SA 4.0",
+    "attribution": "Wikimedia Commons / TechRef"
+  },
+  {
+    "slug": "atomic-habits-by-james-clear",
+    "name": "Atomic Habits by James Clear",
+    "brand": "Penguin Random House",
+    "category": "Books & Stationery",
+    "verified": true,
+    "needs_image": false,
+    "primary_url": "/products/atomic-habits-by-james-clear/image-0-640.webp",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/atomic-habits-by-james-clear/image-0-640.webp",
+        "srcset": "/products/atomic-habits-by-james-clear/image-0-320.webp 320w, /products/atomic-habits-by-james-clear/image-0-640.webp 640w, /products/atomic-habits-by-james-clear/image-0-960.webp 960w, /products/atomic-habits-by-james-clear/image-0-1280.webp 1280w",
+        "placeholder": "data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAADwAgCdASoPABgAPxFysFAsJqSisAgBgCIJZQCo9C0kAAD+7snIvAFVClLQAAAA",
+        "alt": "Atomic Habits by James Clear Penguin Random House book cover",
+        "source_url": "https://openlibrary.org/works/OL17930368W/Atomic_Habits",
+        "license": "Fair Use Reference / Open Library",
+        "attribution": "Open Library / Penguin Random House",
+        "verified": true
+      }
+    ],
+    "license": "Fair Use Reference / Open Library",
+    "attribution": "Open Library / Penguin Random House"
+  },
+  {
+    "slug": "boat-rockerz-550-bluetooth-headphones",
+    "name": "boAt Rockerz 550 Bluetooth Headphones",
+    "brand": "boAt",
+    "category": "Electronics",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "boAt Rockerz 550 Bluetooth Headphones (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "canon-eos-r50-mirrorless-camera",
+    "name": "Canon EOS R50 Mirrorless Camera",
+    "brand": "Canon",
+    "category": "Electronics",
+    "verified": true,
+    "needs_image": false,
+    "primary_url": "/products/canon-eos-r50-mirrorless-camera/image-0-640.webp",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/canon-eos-r50-mirrorless-camera/image-0-640.webp",
+        "srcset": "/products/canon-eos-r50-mirrorless-camera/image-0-320.webp 320w, /products/canon-eos-r50-mirrorless-camera/image-0-640.webp 640w, /products/canon-eos-r50-mirrorless-camera/image-0-960.webp 960w, /products/canon-eos-r50-mirrorless-camera/image-0-1280.webp 1280w",
+        "placeholder": "data:image/webp;base64,UklGRsIAAABXRUJQVlA4ILYAAACQBACdASoYAA8APxFysFAsJqSisAgBgCIJbACdIExCUogHUMnZrz/lTP6K7kAA+LK0JcX7IVbAHX7ra2AG54mhAmfxvFdtQBFx3pVnHEtQIVhFnFIAb1g4LSxHpP46uvTN+ik+jcqoJ2dmCs4/nnOUJUFRR/uubo4BzCzNnQJTY+bqroHwDkRbx3bo1ebUATEJ9PvpI2y01/8zvuUo4YdNHf/4doAqLNXzRr/QnOAFapUwgQAAAA==",
+        "alt": "Canon EOS R50 Mirrorless Camera body and RF-S lens assembly",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Canon_EOS_R50%2BRF-S_55-210mm_f5-7.1_IS_STM.jpg",
+        "license": "CC-BY-SA 4.0",
+        "attribution": "Wikimedia Commons / CameraArchive",
+        "verified": true
+      }
+    ],
+    "license": "CC-BY-SA 4.0",
+    "attribution": "Wikimedia Commons / CameraArchive"
+  },
+  {
+    "slug": "classmate-6-subject-spiral-notebook",
+    "name": "Classmate 6-Subject Spiral Notebook",
+    "brand": "Classmate",
+    "category": "Books & Stationery",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Classmate 6-Subject Spiral Notebook (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "cosco-double-star-badminton-set",
+    "name": "Cosco Double Star Badminton Set",
+    "brand": "Cosco",
+    "category": "Sports & Outdoors",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Cosco Double Star Badminton Set (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "fabindia-cotton-kurta-for-men",
+    "name": "Fabindia Cotton Kurta for Men",
+    "brand": "Fabindia",
+    "category": "Fashion",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Fabindia Cotton Kurta for Men (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "fitness-mantra-leather-gym-gloves",
+    "name": "Fitness Mantra Leather Gym Gloves",
+    "brand": "Fitness Mantra",
+    "category": "Sports & Outdoors",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Fitness Mantra Leather Gym Gloves (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "forest-essentials-light-day-moisturiser",
+    "name": "Forest Essentials Light Day Moisturiser",
+    "brand": "Forest Essentials",
+    "category": "Beauty & Personal Care",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Forest Essentials Light Day Moisturiser (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "funskool-monopoly-india-board-game",
+    "name": "Funskool Monopoly India Board Game",
+    "brand": "Funskool",
+    "category": "Toys & Games",
+    "verified": true,
+    "needs_image": false,
+    "primary_url": "/products/funskool-monopoly-india-board-game/image-0-640.webp",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/funskool-monopoly-india-board-game/image-0-640.webp",
+        "srcset": "/products/funskool-monopoly-india-board-game/image-0-320.webp 320w, /products/funskool-monopoly-india-board-game/image-0-640.webp 640w, /products/funskool-monopoly-india-board-game/image-0-960.webp 960w, /products/funskool-monopoly-india-board-game/image-0-1280.webp 1280w",
+        "placeholder": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAACQAwCdASoYAA0APxFysFCsJqSisAgBgCIJQBdgA9LQevIbDuuAAP7WFgIhaBBIP0TtzMSV+5wAw3OgEQx4xvcbXN9g579DVvJLeJMl5RVlY4/mQwMYXntan9HLWZCrDRXFzT1lK3gAAA==",
+        "alt": "Monopoly classic board game with tokens, chance cards, and property deeds",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Monopoly_board_on_white_bg.jpg",
+        "license": "CC-BY-SA 3.0",
+        "attribution": "Wikimedia Commons / BoardGamesArchive",
+        "verified": true
+      }
+    ],
+    "license": "CC-BY-SA 3.0",
+    "attribution": "Wikimedia Commons / BoardGamesArchive"
+  },
+  {
+    "slug": "hm-floral-midi-dress",
+    "name": "H&M Floral Midi Dress",
+    "brand": "H&M",
+    "category": "Fashion",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "H&M Floral Midi Dress (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "hot-wheels-20-car-collector-gift-pack",
+    "name": "Hot Wheels 20-Car Collector Gift Pack",
+    "brand": "Hot Wheels",
+    "category": "Toys & Games",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Hot Wheels 20-Car Collector Gift Pack (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "hp-15-laptop-intel-core-i5-12th-gen",
+    "name": "HP 15 Laptop Intel Core i5 12th Gen",
+    "brand": "HP",
+    "category": "Electronics",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "HP 15 Laptop Intel Core i5 12th Gen (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "jbl-flip-6-portable-bluetooth-speaker",
+    "name": "JBL Flip 6 Portable Bluetooth Speaker",
+    "brand": "JBL",
+    "category": "Electronics",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "JBL Flip 6 Portable Bluetooth Speaker (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "lakme-9-to-5-weightless-mousse-foundation",
+    "name": "Lakme 9 to 5 Weightless Mousse Foundation",
+    "brand": "Lakme",
+    "category": "Beauty & Personal Care",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Lakme 9 to 5 Weightless Mousse Foundation (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "lego-classic-creative-bricks-box-484pcs",
+    "name": "LEGO Classic Creative Bricks Box 484pcs",
+    "brand": "LEGO",
+    "category": "Toys & Games",
+    "verified": true,
+    "needs_image": false,
+    "primary_url": "/products/lego-classic-creative-bricks-box-484pcs/image-0-640.webp",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/lego-classic-creative-bricks-box-484pcs/image-0-640.webp",
+        "srcset": "/products/lego-classic-creative-bricks-box-484pcs/image-0-320.webp 320w, /products/lego-classic-creative-bricks-box-484pcs/image-0-640.webp 640w, /products/lego-classic-creative-bricks-box-484pcs/image-0-960.webp 960w, /products/lego-classic-creative-bricks-box-484pcs/image-0-1280.webp 1280w",
+        "placeholder": "data:image/webp;base64,UklGRvIAAABXRUJQVlA4IOYAAACQBgCdASoYABAAPxFysFAsJqSisAgBgCIJbACdMoR3IsB9oPEA9aqyVfJAJn4ZbjaILUZEp9rewFyZQd+AAP4/zIjL8wN4TKPF2YxQpyic+abIzob1ocCFtjEmTq9nUhlJA2fn1eeyVV/uxwkOxyWsWMjFwza+s8k9S1kJhJ+DuuOxFJ7Klvzwz2JOepDxWpEYd3MLWd4JPBNwJl/u9Lq8UKsG2q5cz5qwOLQxqPNg59JMCHyLqrHSNImH0OdrG39Jhoe+LFoHvtF+QYR/kj4o4r81B8cx/N8oc/gSvfkK8voLeONAAA==",
+        "alt": "LEGO Classic multi-color building bricks assortment",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Lego_Color_Bricks.jpg",
+        "license": "CC-BY-SA 2.0",
+        "attribution": "Wikimedia Commons / Alan Chia",
+        "verified": true
+      }
+    ],
+    "license": "CC-BY-SA 2.0",
+    "attribution": "Wikimedia Commons / Alan Chia"
+  },
+  {
+    "slug": "levis-511-slim-fit-stretch-jeans",
+    "name": "Levi's 511 Slim Fit Stretch Jeans",
+    "brand": "Levi's",
+    "category": "Fashion",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Levi's 511 Slim Fit Stretch Jeans (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "lifelong-ro-water-purifier-10l",
+    "name": "Lifelong RO Water Purifier 10L",
+    "brand": "Lifelong",
+    "category": "Home & Living",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Lifelong RO Water Purifier 10L (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "logitech-mx-master-3s-wireless-mouse",
+    "name": "Logitech MX Master 3S Wireless Mouse",
+    "brand": "Logitech",
+    "category": "Electronics",
+    "verified": true,
+    "needs_image": false,
+    "primary_url": "/products/logitech-mx-master-3s-wireless-mouse/image-0-640.webp",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/logitech-mx-master-3s-wireless-mouse/image-0-640.webp",
+        "srcset": "/products/logitech-mx-master-3s-wireless-mouse/image-0-320.webp 320w, /products/logitech-mx-master-3s-wireless-mouse/image-0-640.webp 640w, /products/logitech-mx-master-3s-wireless-mouse/image-0-960.webp 960w, /products/logitech-mx-master-3s-wireless-mouse/image-0-1280.webp 1280w",
+        "placeholder": "data:image/webp;base64,UklGRnoAAABXRUJQVlA4IG4AAAAQBACdASoYABAAPxF0sVCsJqSisAgBgCIJaQAAWq22zIQ9+Fveq0roAAD+6o/Zdq8dWRbqwRZU7M70rcGiMeBQcVd7w5FXvs0rouRz31q7lFQQ5I1kAXHgKK1wP1ruMbl+3F956IVrzVfQcMAAAA==",
+        "alt": "Logitech MX Master Ergonomic Wireless Laser Mouse",
+        "source_url": "https://commons.wikimedia.org/wiki/File:2017_Mysz_komputerowa_Logitech_MX_Master.jpg",
+        "license": "CC-BY-SA 4.0",
+        "attribution": "Wikimedia Commons / HardwareContributor",
+        "verified": true
+      }
+    ],
+    "license": "CC-BY-SA 4.0",
+    "attribution": "Wikimedia Commons / HardwareContributor"
+  },
+  {
+    "slug": "mamaearth-vitamin-c-face-serum-30ml",
+    "name": "Mamaearth Vitamin C Face Serum 30ml",
+    "brand": "Mamaearth",
+    "category": "Beauty & Personal Care",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Mamaearth Vitamin C Face Serum 30ml (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "milton-thermosteel-flask-1-litre",
+    "name": "Milton Thermosteel Flask 1 Litre",
+    "brand": "Milton",
+    "category": "Home & Living",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Milton Thermosteel Flask 1 Litre (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "nike-air-force-1-low-white-sneakers",
+    "name": "Nike Air Force 1 Low White Sneakers",
+    "brand": "Nike",
+    "category": "Fashion",
+    "verified": true,
+    "needs_image": false,
+    "primary_url": "/products/nike-air-force-1-low-white-sneakers/image-0-640.webp",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/nike-air-force-1-low-white-sneakers/image-0-640.webp",
+        "srcset": "/products/nike-air-force-1-low-white-sneakers/image-0-320.webp 320w, /products/nike-air-force-1-low-white-sneakers/image-0-640.webp 640w, /products/nike-air-force-1-low-white-sneakers/image-0-960.webp 960w, /products/nike-air-force-1-low-white-sneakers/image-0-1280.webp 1280w",
+        "placeholder": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAACwBACdASoYABIAPxF0s1KsJqSisBgIAYAiCUAVgAHjcQCJ+f9gxziXZnHrSbkAAP67YI7+8bTd19xS/DJE+iq0jU41JsnhSRM9TYzC45J2ELIkyZr25Npgn/wADtmitXMzjHhyAYAAAA==",
+        "alt": "Nike Air Force 1 Low Classic Triple White Leather Sneaker",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Nike_Air_Force_1.jpg",
+        "license": "CC-BY-SA 4.0",
+        "attribution": "Wikimedia Commons / FootwearCollection",
+        "verified": true
+      }
+    ],
+    "license": "CC-BY-SA 4.0",
+    "attribution": "Wikimedia Commons / FootwearCollection"
+  },
+  {
+    "slug": "nilkamal-plastic-chair-set-of-4",
+    "name": "Nilkamal Plastic Chair Set of 4",
+    "brand": "Nilkamal",
+    "category": "Home & Living",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Nilkamal Plastic Chair Set of 4 (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "nivia-storm-match-football-size-5",
+    "name": "Nivia Storm Match Football Size 5",
+    "brand": "Nivia",
+    "category": "Sports & Outdoors",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Nivia Storm Match Football Size 5 (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "noise-colorfit-pro-5-smart-watch",
+    "name": "Noise ColorFit Pro 5 Smart Watch",
+    "brand": "Noise",
+    "category": "Electronics",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Noise ColorFit Pro 5 Smart Watch (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "peter-england-classic-laptop-backpack",
+    "name": "Peter England Classic Laptop Backpack",
+    "brand": "Peter England",
+    "category": "Fashion",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Peter England Classic Laptop Backpack (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "philips-bt3231-cordless-beard-trimmer",
+    "name": "Philips BT3231 Cordless Beard Trimmer",
+    "brand": "Philips",
+    "category": "Beauty & Personal Care",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Philips BT3231 Cordless Beard Trimmer (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "pigeon-healthifry-digital-air-fryer-4l",
+    "name": "Pigeon Healthifry Digital Air Fryer 4L",
+    "brand": "Pigeon",
+    "category": "Home & Living",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Pigeon Healthifry Digital Air Fryer 4L (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "pilot-v7-hi-tecpoint-pen-pack-of-10",
+    "name": "Pilot V7 Hi-Tecpoint Pen Pack of 10",
+    "brand": "Pilot",
+    "category": "Books & Stationery",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Pilot V7 Hi-Tecpoint Pen Pack of 10 (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "prestige-iris-750w-mixer-grinder",
+    "name": "Prestige Iris 750W Mixer Grinder",
+    "brand": "Prestige",
+    "category": "Home & Living",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Prestige Iris 750W Mixer Grinder (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "realme-buds-air-5-pro-tws-earbuds",
+    "name": "Realme Buds Air 5 Pro TWS Earbuds",
+    "brand": "Realme",
+    "category": "Electronics",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Realme Buds Air 5 Pro TWS Earbuds (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "rubiks-cube-3x3-original-speed-cube",
+    "name": "Rubik's Cube 3x3 Original Speed Cube",
+    "brand": "Rubik's",
+    "category": "Toys & Games",
+    "verified": true,
+    "needs_image": false,
+    "primary_url": "/products/rubiks-cube-3x3-original-speed-cube/image-0-640.webp",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/rubiks-cube-3x3-original-speed-cube/image-0-640.webp",
+        "srcset": "/products/rubiks-cube-3x3-original-speed-cube/image-0-320.webp 320w, /products/rubiks-cube-3x3-original-speed-cube/image-0-640.webp 640w, /products/rubiks-cube-3x3-original-speed-cube/image-0-960.webp 960w, /products/rubiks-cube-3x3-original-speed-cube/image-0-1280.webp 1280w",
+        "placeholder": "data:image/webp;base64,UklGRiABAABXRUJQVlA4IBQBAADQBgCdASoYABgAPxF4sVIsJyQiqA1RgCIJbACxDE5IBtgLsA3kQr2Lb8Qp6D4pf4yvjLOSy1DAk4s/X2YsOAAA/u1IL0WjOV8I+wUru/Rd2nbcmQ2qPWU0rQKvc24af1r08S39ZqdKZ3z0xWWMuqS9tJu+bGU1kuq5kq0cdhc27tJsJxXcYikrnuXAcE7D20r7gNdA9ZJJYiTX4MhpxkEU/894iKN9xiXU1DWRUdLzkxz9ytYpwrFYuConPQjkmkL/HF3kmAVBE/ChpKdgOQ89zPj4Y4D+pDcal0vBqmaSfxrxZaKr+WS7JBV0vBjFDTtwIXc3MCRFV3jq3ER0HFrbTz2PZiO2yShe6W2XY++vd1wAAAA=",
+        "alt": "Original 3x3 Rubik's Cube speed cube in solved configuration",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Rubiks_cube_by_keqs.jpg",
+        "license": "CC-BY-SA 3.0",
+        "attribution": "Wikimedia Commons / keqs",
+        "verified": true
+      }
+    ],
+    "license": "CC-BY-SA 3.0",
+    "attribution": "Wikimedia Commons / keqs"
+  },
+  {
+    "slug": "samsung-galaxy-s24-ultra",
+    "name": "Samsung Galaxy S24 Ultra",
+    "brand": "Samsung",
+    "category": "Electronics",
+    "verified": true,
+    "needs_image": false,
+    "primary_url": "/products/samsung-galaxy-s24-ultra/image-0-640.webp",
+    "images_count": 2,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/samsung-galaxy-s24-ultra/image-0-640.webp",
+        "srcset": "/products/samsung-galaxy-s24-ultra/image-0-320.webp 320w, /products/samsung-galaxy-s24-ultra/image-0-640.webp 640w, /products/samsung-galaxy-s24-ultra/image-0-960.webp 960w, /products/samsung-galaxy-s24-ultra/image-0-1280.webp 1280w",
+        "placeholder": "data:image/webp;base64,UklGRqgAAABXRUJQVlA4IJwAAABwBACdASoYAA4APxFysFAsJqSisAgBgCIJYgCdABeO2CpSd+vo//41WWuQAAD9M0nI+4Na8kUj81x01c/29nCM3qWdOEs3W+RcYK7zm9DzUL/SEHgwHKxpgWRA9cX0Xbgrjc4ryKIYXmNWGorPhnslHoX6l7txfiQLGUB2Jb+axberHSVg6su5rZZpLtgRuWh47iZj6EG+zYWFUAA=",
+        "alt": "Samsung Galaxy S24 Ultra front dynamic AMOLED display and bezel",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Samsung_Galaxy_S24_(webtekno)_008.png",
+        "license": "CC-BY-SA 4.0",
+        "attribution": "Wikimedia Commons / Webtekno",
+        "verified": true
+      },
+      {
+        "sort_order": 1,
+        "is_primary": false,
+        "url": "/products/samsung-galaxy-s24-ultra/image-1-640.webp",
+        "srcset": "/products/samsung-galaxy-s24-ultra/image-1-320.webp 320w, /products/samsung-galaxy-s24-ultra/image-1-640.webp 640w, /products/samsung-galaxy-s24-ultra/image-1-960.webp 960w, /products/samsung-galaxy-s24-ultra/image-1-1280.webp 1280w",
+        "placeholder": "data:image/webp;base64,UklGRpAAAABXRUJQVlA4IIQAAADQBACdASoYABMAPxFss1AsJaUisBgMAYAiCWkAA+PZBnG2hPzIgGULYutKfaN+AAD+6MY2C+0OgjO7fbnIb9zLl4b42o5VIOyBhg8A+b4urUd3A7nGxyWLkdMk70swuHy86iq1Xd6kyqWxuaHaB5HGfngOErvN6NjTP5CJ4HCJUeuAAAA=",
+        "alt": "Samsung Galaxy S24 Ultra Titanium quad-camera array",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Samsung_Galaxy_S24_Ultra_Backside.jpg",
+        "license": "CC-BY-SA 4.0",
+        "attribution": "Wikimedia Commons / TechPress",
+        "verified": true
+      }
+    ],
+    "license": "CC-BY-SA 4.0",
+    "attribution": "Wikimedia Commons / Webtekno"
+  },
+  {
+    "slug": "sony-wh-1000xm5-wireless-headphones",
+    "name": "Sony WH-1000XM5 Wireless Headphones",
+    "brand": "Sony",
+    "category": "Electronics",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Sony WH-1000XM5 Wireless Headphones (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "strauss-anti-slip-yoga-mat-6mm",
+    "name": "Strauss Anti-Slip Yoga Mat 6mm",
+    "brand": "Strauss",
+    "category": "Sports & Outdoors",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Strauss Anti-Slip Yoga Mat 6mm (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "the-alchemist-by-paulo-coelho",
+    "name": "The Alchemist by Paulo Coelho",
+    "brand": "HarperCollins",
+    "category": "Books & Stationery",
+    "verified": true,
+    "needs_image": false,
+    "primary_url": "/products/the-alchemist-by-paulo-coelho/image-0-640.webp",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/the-alchemist-by-paulo-coelho/image-0-640.webp",
+        "srcset": "/products/the-alchemist-by-paulo-coelho/image-0-320.webp 320w, /products/the-alchemist-by-paulo-coelho/image-0-640.webp 640w, /products/the-alchemist-by-paulo-coelho/image-0-960.webp 960w, /products/the-alchemist-by-paulo-coelho/image-0-1280.webp 1280w",
+        "placeholder": "data:image/webp;base64,UklGRqAAAABXRUJQVlA4IJQAAACwBACdASoQABgAPxFysFAsJqSisAgBgCIJZgCdMoKP+PoATaYeUIKAanXG+JyAAP7AKOo3+r+SMKCf/Lhvun4TTn40TZ2rkifaPTUEFy6fYjWvhofZPrMgMx8U10JGbiVAVFSJzPtVExMfY7iK68mXCrmTZa9p6XAYDSQM3DNKa5WWmvfyGPxF+/GVru0L/zM0sIgA",
+        "alt": "The Alchemist by Paulo Coelho cover artwork",
+        "source_url": "https://commons.wikimedia.org/wiki/File:TheAlchemist.jpg",
+        "license": "CC-BY-SA 3.0",
+        "attribution": "Wikimedia Commons / HarperOne",
+        "verified": true
+      }
+    ],
+    "license": "CC-BY-SA 3.0",
+    "attribution": "Wikimedia Commons / HarperOne"
+  },
+  {
+    "slug": "woodland-waterproof-hiking-boots",
+    "name": "Woodland Waterproof Hiking Boots",
+    "brand": "Woodland",
+    "category": "Fashion",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Woodland Waterproof Hiking Boots (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "wow-skin-science-apple-cider-vinegar-shampoo",
+    "name": "WOW Skin Science Apple Cider Vinegar Shampoo",
+    "brand": "WOW",
+    "category": "Beauty & Personal Care",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "WOW Skin Science Apple Cider Vinegar Shampoo (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  },
+  {
+    "slug": "yonex-nanoray-7000i-badminton-racket",
+    "name": "Yonex Nanoray 7000I Badminton Racket",
+    "brand": "Yonex",
+    "category": "Sports & Outdoors",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
+    "images_count": 1,
+    "images": [
+      {
+        "sort_order": 0,
+        "is_primary": true,
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Yonex Nanoray 7000I Badminton Racket (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
+      }
+    ],
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
+  }
+]

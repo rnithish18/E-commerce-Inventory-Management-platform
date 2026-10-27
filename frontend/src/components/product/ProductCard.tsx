@@ -4,6 +4,7 @@ import { Heart, Star, ShoppingCart, Check } from 'lucide-react';
 import { formatPaise, discountPercent } from '../../lib/utils';
 import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
+import { ProductImage } from '../ui/ProductImage';
 
 export interface ProductData {
   id: string;
@@ -19,16 +20,20 @@ export interface ProductData {
   rating_count?: number;
   total_stock?: number;
   image_url?: string | null;
+  secondary_image_url?: string | null;
+  needs_image?: boolean;
 }
 
 interface Props {
   product: ProductData;
+  priority?: boolean;
 }
 
-export function ProductCard({ product }: Props) {
+export function ProductCard({ product, priority = false }: Props) {
   const { addToCart } = useCart();
   const { isWishlisted, toggleWishlist } = useWishlist();
   const [isAdded, setIsAdded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const wishlisted = isWishlisted(product.id);
   const discount = discountPercent(product.price_paise, product.mrp_paise);
@@ -63,8 +68,14 @@ export function ProductCard({ product }: Props) {
     'New': 'bg-blue-500 text-white font-bold',
   };
 
+  const activeImageUrl = isHovered && product.secondary_image_url ? product.secondary_image_url : product.image_url;
+
   return (
-    <div className="group relative flex flex-col bg-navy-800/90 rounded-2xl border border-navy-700/80 hover:border-orange-500/50 p-3.5 transition-all duration-200 hover:-translate-y-1 shadow-lg hover:shadow-orange-500/10">
+    <div 
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="group relative flex flex-col bg-navy-800/90 rounded-2xl border border-navy-700/80 hover:border-orange-500/50 p-3.5 transition-all duration-200 hover:-translate-y-1 shadow-lg hover:shadow-orange-500/10 min-h-[390px]"
+    >
       
       {/* Top action row: Badge & Wishlist Heart */}
       <div className="absolute top-5 left-5 right-5 z-10 flex items-center justify-between pointer-events-none">
@@ -90,17 +101,15 @@ export function ProductCard({ product }: Props) {
 
       {/* Image Container */}
       <Link to={`/product/${product.slug}`} className="block relative aspect-square rounded-xl overflow-hidden bg-navy-900/60 mb-3">
-        <img
-          src={product.image_url || `https://placehold.co/400x400/0f172a/f97316?text=${encodeURIComponent(product.brand || 'ShopNest')}`}
+        <ProductImage
+          src={activeImageUrl}
           alt={product.name}
-          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-          loading="lazy"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = `https://placehold.co/400x400/0f172a/f97316?text=${encodeURIComponent(product.brand || 'ShopNest')}`;
-          }}
+          priority={priority}
+          objectFit="contain"
+          className="transition-transform duration-300 group-hover:scale-105"
         />
         {!inStock && (
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center z-10">
             <span className="bg-red-500/90 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
               Out of Stock
             </span>

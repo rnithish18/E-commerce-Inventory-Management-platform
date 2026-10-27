@@ -109,7 +109,8 @@ router.post('/:id/cancel', async (req: Request, res: Response, next: NextFunctio
       throw new AppError(403, 'Permission denied', 'FORBIDDEN');
     }
 
-    await cancelOrderWithRestock(req.params.id, req.user!.userId, 'Customer requested cancellation');
+    const orderId = req.params.id as string;
+    await cancelOrderWithRestock(orderId, req.user!.userId, 'Customer requested cancellation');
     res.json({ message: 'Order cancelled successfully' });
   } catch (err) {
     next(err);
@@ -120,7 +121,8 @@ router.post('/:id/cancel', async (req: Request, res: Response, next: NextFunctio
 router.post('/:id/refund-request', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { reason } = req.body;
-    await requestRefund(req.params.id, req.user!.userId, reason || 'Customer requested refund');
+    const orderId = req.params.id as string;
+    await requestRefund(orderId, req.user!.userId, reason || 'Customer requested refund');
     res.json({ message: 'Refund request submitted successfully' });
   } catch (err) {
     next(err);

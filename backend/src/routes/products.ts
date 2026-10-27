@@ -20,6 +20,8 @@ interface ProductRow {
   category_slug: string;
   total_stock: number;
   image_url: string | null;
+  secondary_image_url?: string | null;
+  needs_image?: boolean;
 }
 
 // GET /api/v1/products/featured — must be declared BEFORE /:slug
@@ -28,10 +30,11 @@ router.get('/featured', async (_req: Request, res: Response, next: NextFunction)
     const result = await query<ProductRow>(
       `SELECT
          p.id, p.name, p.slug, p.brand, p.price_paise, p.mrp_paise, p.badge,
-         p.average_rating, p.rating_count,
+         p.average_rating, p.rating_count, p.needs_image,
          c.name as category_name, c.slug as category_slug,
          COALESCE(pv.total_stock, 0) as total_stock,
-         pi.url as image_url
+         pi.url as image_url,
+         (SELECT url FROM product_images WHERE product_id = p.id ORDER BY sort_order ASC OFFSET 1 LIMIT 1) as secondary_image_url
        FROM products p
        LEFT JOIN categories c ON p.category_id = c.id
        LEFT JOIN (
@@ -111,10 +114,11 @@ router.get('/', validateQuery(ProductQuerySchema), async (req: Request, res: Res
     const listParams = [...params, limit, offset];
     const productsResult = await query<ProductRow>(
       `SELECT p.id, p.name, p.slug, p.brand, p.price_paise, p.mrp_paise, p.badge,
-              p.average_rating, p.rating_count, p.created_at,
+              p.average_rating, p.rating_count, p.needs_image, p.created_at,
               c.name as category_name, c.slug as category_slug,
               COALESCE(pv.total_stock, 0) as total_stock,
-              pi.url as image_url
+              pi.url as image_url,
+              (SELECT url FROM product_images WHERE product_id = p.id ORDER BY sort_order ASC OFFSET 1 LIMIT 1) as secondary_image_url
        FROM products p
        LEFT JOIN categories c ON p.category_id = c.id
        LEFT JOIN (SELECT product_id, SUM(GREATEST(0, stock_qty - reserved_qty)) as total_stock FROM product_variants GROUP BY product_id) pv ON p.id = pv.product_id
@@ -138,9 +142,9 @@ router.get('/', validateQuery(ProductQuerySchema), async (req: Request, res: Res
 router.get('/:slug', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { slug } = req.params;
-    const productResult = await query<ProductRow & { description: string; is_active: boolean; category_id: string }>(
+    const productResult = await query<ProductRow & { description: string; is_active: boolean; category_id: string; needs_image: boolean }>(
       `SELECT p.id, p.name, p.slug, p.description, p.brand, p.price_paise, p.mrp_paise, p.badge,
-              p.average_rating, p.rating_count, p.is_active, p.created_at,
+              p.average_rating, p.rating_count, p.needs_image, p.is_active, p.created_at,
               c.id as category_id, c.name as category_name, c.slug as category_slug
        FROM products p
        LEFT JOIN categories c ON p.category_id = c.id
@@ -151,7 +155,7 @@ router.get('/:slug', async (req: Request, res: Response, next: NextFunction) => 
 
     const product = productResult.rows[0];
     const [imagesResult, variantsResult, reviewsResult] = await Promise.all([
-      query('SELECT id, url, alt_text, sort_order FROM product_images WHERE product_id = $1 ORDER BY sort_order ASC', [product.id]),
+      query('SELECT id, url, alt_text, sort_order, is_primary, source_url, license, verified FROM product_images WHERE product_id = $1 ORDER BY sort_order ASC', [product.id]),
       query('SELECT id, name, sku, stock_qty, reserved_qty, reorder_threshold, price_adjustment_paise FROM product_variants WHERE product_id = $1', [product.id]),
       query(`SELECT r.id, r.rating, r.title, r.body, r.created_at, u.full_name as reviewer_name
              FROM reviews r JOIN users u ON r.user_id = u.id

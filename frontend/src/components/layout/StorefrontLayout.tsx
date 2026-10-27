@@ -25,6 +25,11 @@ export function StorefrontLayout({ showRightPanel = true }: Props) {
         {/* Right Info & Tracking Panel */}
         {showRightPanel && <RightPanel />}
       </div>
+
+      {/* Storefront Footer Disclaimer */}
+      <footer className="w-full border-t border-navy-800 bg-navy-950/80 py-4 px-6 text-center text-xs text-gray-500">
+        <p>ShopNest is a demonstration store. Brand names and product images belong to their respective owners.</p>
+      </footer>
     </div>
   );
 }

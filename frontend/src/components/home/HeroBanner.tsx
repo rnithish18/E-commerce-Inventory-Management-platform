@@ -10,6 +10,7 @@ interface Slide {
   discount: string;
   category: string;
   bgGradient: string;
+  image: string;
 }
 
 const SLIDES: Slide[] = [
@@ -21,6 +22,7 @@ const SLIDES: Slide[] = [
     discount: 'Up to 45% OFF',
     category: 'electronics',
     bgGradient: 'from-orange-600/90 via-orange-900/60 to-navy-900',
+    image: '/products/samsung-galaxy-s24-ultra/image-0-640.webp',
   },
   {
     badge: 'NEW SEASON ARRIVALS',
@@ -30,15 +32,17 @@ const SLIDES: Slide[] = [
     discount: 'Starting at ₹1,499',
     category: 'fashion',
     bgGradient: 'from-purple-900/80 via-navy-800 to-navy-900',
+    image: '/products/nike-air-force-1-low-white-sneakers/image-0-640.webp',
   },
   {
-    badge: 'HOME APPLIANCES BLOWOUT',
+    badge: 'FLAGSHIP CAMERAS & CREATOR GEAR',
     badgeIcon: <ShieldCheck className="w-3.5 h-3.5 text-green-400" />,
-    title: 'Smart Kitchen & Living Space',
-    subtitle: 'High-speed mixer grinders, digital air fryers, and luxury cotton bedding with manufacturer warranty.',
-    discount: 'Flat 30% OFF',
-    category: 'home-living',
+    title: 'Precision Imaging & Lenses',
+    subtitle: 'High-speed mirrorless bodies, RF-S optical stabilized lenses, and creator accessories with warranty.',
+    discount: 'Flat 20% OFF',
+    category: 'electronics',
     bgGradient: 'from-blue-900/80 via-navy-800 to-navy-900',
+    image: '/products/canon-eos-r50-mirrorless-camera/image-0-640.webp',
   },
 ];
 
@@ -98,9 +102,12 @@ export function HeroBanner() {
         <div className="relative w-full h-full flex items-center justify-center">
           <div className="absolute inset-0 bg-orange-500/20 rounded-full blur-3xl animate-pulse" />
           <img
-            src="/products/hero-headphones.svg"
-            alt="Next-Gen Audio & Smart Tech"
-            className="w-full h-full object-contain filter drop-shadow-2xl transition-transform duration-700 hover:scale-105"
+            src={slide.image}
+            alt={slide.title}
+            className="w-full h-full object-contain filter drop-shadow-2xl transition-all duration-700 hover:scale-105"
+            loading="eager"
+            // @ts-expect-error fetchpriority
+            fetchpriority="high"
           />
         </div>
       </div>

@@ -20,6 +20,7 @@ import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { formatPaise, discountPercent, formatDate } from '../lib/utils';
 import { FullPageSpinner } from '../components/ui/Spinner';
+import { ProductGallery } from '../components/product/ProductGallery';
 
 export function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -85,41 +86,14 @@ export function ProductDetailPage() {
       {/* Main Grid: Gallery & Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         
-        {/* Left: Gallery */}
-        <div className="flex flex-col gap-3">
-          <div className="relative aspect-square rounded-3xl overflow-hidden bg-navy-800 border border-navy-700 shadow-xl">
-            <img
-              src={primaryImage}
-              alt={product.name}
-              className="w-full h-full object-cover object-center"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = `https://placehold.co/600x600/0f172a/f97316?text=${encodeURIComponent(product.brand || 'ShopNest')}`;
-              }}
-            />
-            {product.badge && (
-              <span className="absolute top-4 left-4 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
-                {product.badge}
-              </span>
-            )}
-          </div>
-
-          {/* Thumbnails */}
-          {images.length > 1 && (
-            <div className="flex items-center gap-3 overflow-x-auto py-1">
-              {images.map((img: any, i: number) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setSelectedImage(img.url)}
-                  className={`w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
-                    primaryImage === img.url ? 'border-orange-500 scale-105' : 'border-navy-700 hover:border-gray-500'
-                  }`}
-                >
-                  <img src={img.url} alt="" className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
-          )}
+        {/* Left: Gallery with Zoom & Lightbox */}
+        <div className="w-full">
+          <ProductGallery
+            images={images}
+            productName={product.name}
+            badge={product.badge}
+            needsImage={product.needs_image}
+          />
         </div>
 
         {/* Right: Product Details */}

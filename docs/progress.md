@@ -385,3 +385,38 @@ Running 3 tests using 1 worker
 5. **Verification & Test Evidence**:
    - **Vitest**: 14/14 test files passed, **174 / 174 tests passed** (including 10 tests in `tests/api/uploads_ai.test.ts`).
    - **Playwright**: 13/13 tests passed across all 5 test suites (including `tests/e2e/ai_vision.spec.ts` and `tests/e2e/auth_runaway.spec.ts`).
+
+---
+
+## 9. Phase 1: Real Product Photography, Multi-Width WebP & Detail Gallery
+
+### Completed Deliverables
+1. **Additive Schema Migration (`009_enhance_product_images.js`)**:
+   - Added `is_primary` (boolean default false), `source_url` (text), `license` (varchar 100), and `verified` (boolean default false) to table `product_images`.
+   - Added `needs_image` (boolean default false) to table `products`.
+   - Created database indexes on `(product_id, is_primary)` and `(product_id, sort_order)`.
+2. **Authentic Photography & Multi-Size WebP Pipeline (`scripts/build_real_product_images.js`)**:
+   - Curation of exact-model photographs from legitimate sources (Wikimedia Commons CC-BY-SA, Open Library, Public Domain) with zero hotlinking.
+   - Using `sharp` to produce responsive sets at `320w`, `640w`, `960w`, `1280w` widths and tiny blur-up placeholders under `frontend/public/products/<slug>/`.
+   - Honest fallback handling for unverified items: flagged with `needs_image = true` and neutral `frontend/public/products/photo-coming-soon.svg`, avoiding misleading or mismatched photos.
+   - Comprehensive manifest generated in `database/seed/image-manifest.json` and human-readable attribution table in `docs/image-credits.md`.
+3. **Reusable `<ProductImage>` Component (`ProductImage.tsx`)**:
+   - Enforces fixed aspect-ratio container (`aspect-square` or custom) to eliminate Cumulative Layout Shift (CLS = 0).
+   - Dynamic `srcset` and `sizes` configuration for responsive WebP delivery.
+   - Progressive skeleton & blur-up placeholder with smooth opacity fade-in on load.
+   - Native `loading="lazy"` and `decoding="async"` by default; `priority` prop sets `loading="eager"` and `fetchpriority="high"`.
+   - Fallback error boundary to `/products/photo-coming-soon.svg`.
+4. **Rich Interactive Product Detail Gallery (`ProductGallery.tsx`, `ProductDetailPage.tsx`)**:
+   - Multi-thumbnail selector highlighting the active image with responsive layout.
+   - Keyboard navigation: `ArrowLeft` and `ArrowRight` to cycle images; `Escape` closes lightbox.
+   - Mobile touch swipe gestures (left/right swipe detection).
+   - Desktop hover zoom lens with 2.2x background magnification.
+   - Fullscreen dark lightbox modal with counter, navigation controls, and subtle attribution credit.
+5. **Card & Hero Upgrades**:
+   - `ProductCard.tsx`: Desktop hover cross-fade to `secondary_image_url` when available. First row cards given `priority` for instant above-the-fold paint.
+   - `HeroBanner.tsx`: Replaced SVG icon placeholders with authentic product photography.
+   - Storefront footer disclaimer added across all storefront views: *"ShopNest is a demonstration store. Brand names and product images belong to their respective owners."*
+6. **Verification & Test Evidence**:
+   - **Vitest**: 14/14 test files passed, **174 / 174 tests passed** (55.21s).
+   - **Playwright**: 14/14 tests passed (1.6m) across all journeys.
+   - Total catalog count: 42 verified seeded products in PostgreSQL.
