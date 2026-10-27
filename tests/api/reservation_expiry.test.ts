@@ -16,12 +16,10 @@ describe('Reservation Expiry Worker', () => {
       .send({ email: 'customer2@shopnest.com', password: 'Customer@123!' });
     customerCookie = loginRes.headers['set-cookie'][0];
 
-    const prodRes = await query<{ id: string }>('SELECT id FROM products WHERE is_active = true LIMIT 1');
-    testProductId = prodRes.rows[0].id;
-    const varRes = await query<{ id: string; stock_qty: number }>(
-      'SELECT id, stock_qty FROM product_variants WHERE product_id = $1 LIMIT 1',
-      [testProductId]
+    const varRes = await query<{ id: string; product_id: string; stock_qty: number }>(
+      'SELECT id, product_id, stock_qty FROM product_variants WHERE (stock_qty - reserved_qty) >= 5 LIMIT 1'
     );
+    testProductId = varRes.rows[0].product_id;
     testVariantId = varRes.rows[0].id;
 
     const addrRes = await request(app)

@@ -83,4 +83,26 @@ test.describe('Phase B: AI Image Upload, Vision Analysis & Visual Catalog Search
     await page.waitForURL(/\/product\//, { timeout: 15000 });
     await expect(page.locator('button:has-text("Add to Cart")').first()).toBeVisible({ timeout: 10000 });
   });
+
+  test.afterAll(async () => {
+    // Ensure test isolation: clean up test created product so catalog is never polluted
+    try {
+      const { Pool } = require('../../backend/node_modules/pg');
+      const pool = new Pool({
+        connectionString:
+          process.env.DATABASE_URL || 'postgresql://shopnest:shopnest123@localhost:5432/shopnest_db',
+      });
+      const res = await pool.query("SELECT id FROM products WHERE name ILIKE '%Studio Wireless%'");
+      for (const row of res.rows) {
+        await pool.query('DELETE FROM cart_items WHERE product_id = $1', [row.id]);
+        await pool.query('DELETE FROM wishlists WHERE product_id = $1', [row.id]);
+        await pool.query('DELETE FROM product_images WHERE product_id = $1', [row.id]);
+        await pool.query('DELETE FROM product_variants WHERE product_id = $1', [row.id]);
+        await pool.query('DELETE FROM products WHERE id = $1', [row.id]);
+      }
+      await pool.end();
+    } catch (err) {
+      console.error('Failed to clean up test product:', err);
+    }
+  });
 });

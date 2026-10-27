@@ -74,7 +74,7 @@ export function ProductCard({ product, priority = false }: Props) {
     <div 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group relative flex flex-col bg-navy-800/90 rounded-2xl border border-navy-700/80 hover:border-orange-500/50 p-3.5 transition-all duration-200 hover:-translate-y-1 shadow-lg hover:shadow-orange-500/10 min-h-[390px]"
+      className="group relative flex flex-col bg-navy-800/90 rounded-2xl border border-navy-700/80 hover:border-orange-500/50 p-3.5 transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-1 shadow-lg hover:shadow-orange-500/10 min-h-[390px] will-change-transform transform-gpu"
     >
       
       {/* Top action row: Badge & Wishlist Heart */}
@@ -132,7 +132,7 @@ export function ProductCard({ product, priority = false }: Props) {
       {/* Title */}
       <Link 
         to={`/product/${product.slug}`}
-        className="font-bold text-sm text-gray-100 hover:text-orange-400 transition-colors line-clamp-2 leading-snug mb-2 flex-1"
+        className="font-bold text-sm text-gray-100 hover:text-orange-400 transition-colors line-clamp-2 leading-snug mb-2 flex-1 min-h-[38px]"
         title={product.name}
       >
         {product.name}

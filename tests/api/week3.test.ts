@@ -36,12 +36,10 @@ describe('Week 3: Order State Machine, Refunds, Coupons, Reviews, Admin Auth', (
     customer2Id = cust2Login.body.user.id;
 
     // 4. In-stock Product
-    const prodRes = await query<{ id: string }>('SELECT id FROM products WHERE is_active = true LIMIT 1');
-    testProductId = prodRes.rows[0].id;
-    const varRes = await query<{ id: string }>(
-      'SELECT id FROM product_variants WHERE product_id = $1 LIMIT 1',
-      [testProductId]
+    const varRes = await query<{ id: string; product_id: string }>(
+      'SELECT id, product_id FROM product_variants WHERE (stock_qty - reserved_qty) >= 10 LIMIT 1'
     );
+    testProductId = varRes.rows[0].product_id;
     testVariantId = varRes.rows[0].id;
 
     // 5. Address for Customer 3

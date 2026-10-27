@@ -453,3 +453,25 @@ Running 3 tests using 1 worker
    - **Vitest**: 15/15 test files passed, **183 / 183 tests passed** (including 9 new tests in `tests/api/google_oauth.test.ts`).
    - **Playwright**: 16/16 tests passed (including 2 new tests in `tests/e2e/google_oauth.spec.ts`).
    - Clean state: 42 verified products in database.
+
+---
+
+## 11. Phase 3: Data Quality, Showcase Dynamic Queries & Grid Layout Stability
+
+### Completed Deliverables
+1. **Dynamic Authentication Showcase (`AuthContainer.tsx`)**:
+   - Replaced static mock arrays (`SHOWCASE_PRODUCTS`) with live database-driven queries via `productsApi.featured()`.
+   - Real-time pricing with integer paise rendering (`formatPaise`), authentic category badges, live customer ratings, and responsive `<ProductImage>` rendering.
+   - Cleaned remaining marketing copy ("thousands of verified products") to authentic, truthful store descriptions.
+2. **Category Taxonomy Normalization (`Sidebar.tsx`)**:
+   - Fixed naming discrepancies in storefront sidebar: aligned labels to exact database taxonomy (`Beauty & Personal Care` and `Sports & Outdoors`).
+3. **Product Card Grid Layout Stability (`ProductCard.tsx`)**:
+   - Standardized title line-clamp height with `min-h-[38px]` preventing variable card heights across uneven title lengths.
+   - Replaced generic CSS transitions with GPU-accelerated `transition-[transform,box-shadow,border-color] will-change-transform transform-gpu` to guarantee zero layout shifts or reflows on neighboring grid cards during hover.
+4. **Test Database Isolation & Reservation Synchronization**:
+   - Corrected `tests/e2e/ai_vision.spec.ts` `afterAll` hook with proper backend pg module path, ensuring all test-created vision products are immediately and completely purged from PostgreSQL upon test completion. Confirmed total product count strictly remains 42.
+   - Upgraded `tests/api/week3.test.ts` and `tests/api/reservation_expiry.test.ts` variant selection queries to target products with verified available inventory (`(stock_qty - reserved_qty) >= 10`), guaranteeing idempotent and deterministic test runs.
+5. **Verification & Test Evidence**:
+   - **Vitest**: 15/15 test files passed, **183 / 183 tests passed** (29.32s).
+   - **Playwright**: 16/16 tests passed (1.3m) across all 6 test suites.
+   - Active catalog count: 42 verified seeded products in PostgreSQL.

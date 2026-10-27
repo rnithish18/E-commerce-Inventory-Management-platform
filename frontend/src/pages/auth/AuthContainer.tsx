@@ -21,44 +21,16 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { authApi } from '../../lib/api';
+import { authApi, productsApi } from '../../lib/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { RunawayButton } from '../../components/auth/RunawayButton';
 import { PasswordStrengthMeter } from '../../components/auth/PasswordStrengthMeter';
+import { ProductImage } from '../../components/ui/ProductImage';
+import { formatPaise } from '../../lib/utils';
 
 interface AuthContainerProps {
   initialMode?: 'login' | 'register';
 }
-
-const SHOWCASE_PRODUCTS = [
-  {
-    name: 'Sony WH-1000XM5 Noise Cancelling',
-    price: '₹29,990',
-    image: '/products/sony-wh-1000xm5-wireless-headphones.svg',
-    category: 'Audio & Wearables',
-    rating: 4.8,
-    reviews: 142,
-    badge: 'Bestseller',
-  },
-  {
-    name: 'Apple iPhone 15 Pro Max (256GB)',
-    price: '₹1,59,900',
-    image: '/products/apple-iphone-15-pro-max.svg',
-    category: 'Smartphones & Accessories',
-    rating: 4.9,
-    reviews: 328,
-    badge: 'Flagship',
-  },
-  {
-    name: 'Nike Air Max 270 React Edition',
-    price: '₹12,495',
-    image: '/products/nike-air-max-270.svg',
-    category: 'Footwear & Fashion',
-    rating: 4.7,
-    reviews: 95,
-    badge: 'Trending',
-  },
-];
 
 export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
   const navigate = useNavigate();
@@ -127,8 +99,20 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
     }
   };
 
-  // Showcase carousel index
+  // Showcase carousel index & dynamic DB query
+  const [showcaseProducts, setShowcaseProducts] = useState<any[]>([]);
   const [showcaseIndex, setShowcaseIndex] = useState(0);
+
+  useEffect(() => {
+    productsApi
+      .featured()
+      .then((res) => {
+        if (res.data?.products && res.data.products.length > 0) {
+          setShowcaseProducts(res.data.products.slice(0, 5));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Sync mode with route
   useEffect(() => {
@@ -142,10 +126,10 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
   // Rotate showcase product every 5 seconds
   useEffect(() => {
     const timer = setInterval(() => {
-      setShowcaseIndex((prev) => (prev + 1) % SHOWCASE_PRODUCTS.length);
+      setShowcaseIndex((prev) => (prev + 1) % (showcaseProducts.length || 1));
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [showcaseProducts.length]);
 
   const switchMode = (newMode: 'login' | 'register') => {
     setMode(newMode);
@@ -268,7 +252,29 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
     setLoginPassword('Customer@123!');
   };
 
-  const activeProduct = SHOWCASE_PRODUCTS[showcaseIndex];
+  const rawProduct = showcaseProducts.length > 0
+    ? showcaseProducts[showcaseIndex % showcaseProducts.length]
+    : null;
+
+  const activeProduct = rawProduct
+    ? {
+        name: rawProduct.name,
+        price: formatPaise(rawProduct.price_paise),
+        image: rawProduct.image_url || '/products/photo-coming-soon.svg',
+        category: rawProduct.category_name || 'Featured Category',
+        rating: rawProduct.average_rating ? Number(rawProduct.average_rating).toFixed(1) : '4.8',
+        reviews: rawProduct.rating_count || 0,
+        badge: rawProduct.badge || 'Popular',
+      }
+    : {
+        name: 'Apple iPhone 15 128GB Blue',
+        price: '₹79,900',
+        image: '/products/apple-iphone-15-128gb-blue/image-0-640.webp',
+        category: 'Electronics',
+        rating: '4.8',
+        reviews: 24,
+        badge: 'Best Seller',
+      };
 
   return (
     <div className="min-h-screen bg-navy-900 text-white flex flex-col justify-between selection:bg-orange-500 selection:text-white">
@@ -313,7 +319,7 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
               </span>
             </h1>
             <p className="text-sm text-gray-400 max-w-lg leading-relaxed">
-              Explore thousands of verified genuine products, intelligent AI visual search,
+              Explore our verified catalog of genuine products, intelligent AI visual search,
               instant refunds, and ultra-secure checkout.
             </p>
           </div>
@@ -323,11 +329,13 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
             <div className="absolute top-0 right-0 -mr-12 -mt-12 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
 
             <div className="flex flex-col sm:flex-row items-center gap-6">
-              <div className="w-40 h-40 rounded-2xl bg-navy-900/90 border border-navy-700/80 p-3 flex items-center justify-center shrink-0 group">
-                <img
+              <div className="w-40 h-40 rounded-2xl bg-navy-900/90 border border-navy-700/80 p-2 flex items-center justify-center shrink-0 group">
+                <ProductImage
                   src={activeProduct.image}
                   alt={activeProduct.name}
-                  className="w-full h-full object-contain filter drop-shadow-lg group-hover:scale-105 transition-transform duration-300"
+                  aspectRatio="aspect-square"
+                  objectFit="contain"
+                  className="w-full h-full"
                 />
               </div>
 
@@ -353,7 +361,7 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
 
             {/* Carousel navigation pills */}
             <div className="flex items-center justify-center sm:justify-start gap-1.5 mt-5 pt-4 border-t border-navy-700/60">
-              {SHOWCASE_PRODUCTS.map((_, idx) => (
+              {(showcaseProducts.length > 0 ? showcaseProducts : [1, 2, 3]).map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setShowcaseIndex(idx)}

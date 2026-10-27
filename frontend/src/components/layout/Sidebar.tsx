@@ -31,8 +31,8 @@ const CATEGORIES: CategoryItem[] = [
   { name: 'Electronics', slug: 'electronics', icon: <Laptop className="w-4 h-4" /> },
   { name: 'Fashion', slug: 'fashion', icon: <Shirt className="w-4 h-4" /> },
   { name: 'Home & Living', slug: 'home-living', icon: <Armchair className="w-4 h-4" /> },
-  { name: 'Beauty & Care', slug: 'beauty-personal-care', icon: <Sparkle className="w-4 h-4" /> },
-  { name: 'Sports & Fitness', slug: 'sports-outdoors', icon: <Trophy className="w-4 h-4" /> },
+  { name: 'Beauty & Personal Care', slug: 'beauty-personal-care', icon: <Sparkle className="w-4 h-4" /> },
+  { name: 'Sports & Outdoors', slug: 'sports-outdoors', icon: <Trophy className="w-4 h-4" /> },
   { name: 'Books & Stationery', slug: 'books-stationery', icon: <BookOpen className="w-4 h-4" /> },
   { name: 'Toys & Games', slug: 'toys-games', icon: <Gamepad2 className="w-4 h-4" /> },
 ];
