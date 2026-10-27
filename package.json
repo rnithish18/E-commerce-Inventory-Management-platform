@@ -12,6 +12,7 @@
     "seed": "cd backend && npm run seed",
     "test": "cd backend && npm test",
     "test:e2e": "npx playwright test",
+    "images:ingest": "node scripts/ingest_images.js",
     "build:backend": "cd backend && npm run build",
     "build:frontend": "cd frontend && npm run build"
   },

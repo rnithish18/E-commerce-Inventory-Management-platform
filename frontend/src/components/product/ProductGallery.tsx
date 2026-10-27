@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Maximize2, X, ShieldCheck, ZoomIn } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Maximize2, X, ShieldCheck, ZoomIn, ExternalLink } from 'lucide-react';
 import { ProductImage } from '../ui/ProductImage';
 
 export interface GalleryImage {
@@ -214,6 +214,28 @@ export function ProductGallery({ images, productName, badge, needsImage }: Props
               />
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Credit line under gallery for CC-BY/CC-BY-SA images */}
+      {activeImage.license && activeImage.verified && !activeImage.license.includes('CC0') && (
+        <div className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-navy-950/70 border border-navy-800 text-[11px] text-gray-400">
+          <div className="flex items-center gap-1.5 truncate">
+            <span className="text-gray-300 font-medium shrink-0">Photo:</span>
+            <span className="truncate">{activeImage.attribution || 'Wikimedia Commons'}</span>
+            <span className="text-orange-400 font-mono shrink-0">({activeImage.license})</span>
+          </div>
+          {activeImage.source_url && (
+            <a
+              href={activeImage.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-300 underline shrink-0 flex items-center gap-0.5"
+            >
+              Source
+              <ExternalLink className="w-2.5 h-2.5" />
+            </a>
+          )}
         </div>
       )}
 

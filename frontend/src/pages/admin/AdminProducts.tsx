@@ -30,6 +30,7 @@ interface ProductItem {
   category_name: string;
   total_stock: number;
   image_url: string | null;
+  needs_image?: boolean;
 }
 
 interface Category {
@@ -59,6 +60,11 @@ export function AdminProducts() {
   const [uploadedImages, setUploadedImages] = useState<UploadedImageItem[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Quick Image Upload for existing products
+  const [quickUploadProduct, setQuickUploadProduct] = useState<ProductItem | null>(null);
+  const [quickUploadedImages, setQuickUploadedImages] = useState<UploadedImageItem[]>([]);
+  const [quickUploading, setQuickUploading] = useState(false);
 
   const handleApplySuggestions = (suggestions: Partial<AiAnalysisData>) => {
     if (suggestions.suggestedTitle) setName(suggestions.suggestedTitle);
@@ -285,7 +291,15 @@ export function AdminProducts() {
                         </div>
                         <div>
                           <div className="font-semibold text-white truncate max-w-xs">{p.name}</div>
-                          {p.brand && <div className="text-[11px] text-gray-400">{p.brand}</div>}
+                          <div className="flex items-center gap-2 mt-0.5">
+                            {p.brand && <span className="text-[11px] text-gray-400">{p.brand}</span>}
+                            {(p.needs_image || !p.image_url || p.image_url.includes('coming-soon')) && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 px-1.5 py-0.2 rounded">
+                                <AlertCircle className="w-2.5 h-2.5" />
+                                Needs image
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -320,14 +334,30 @@ export function AdminProducts() {
                       )}
                     </td>
                     <td className="py-3.5 px-4 text-right">
-                      {p.is_active && (
-                        <button
-                          onClick={() => handleDeactivate(p.id, p.name)}
-                          className="btn-secondary py-1 px-2.5 text-[11px] text-red-400 hover:text-red-300"
-                        >
-                          Deactivate
-                        </button>
-                      )}
+                      <div className="flex items-center justify-end gap-2">
+                        {(p.needs_image || !p.image_url || p.image_url.includes('coming-soon')) && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setQuickUploadProduct(p);
+                              setQuickUploadedImages([]);
+                            }}
+                            className="btn-secondary py-1 px-2.5 text-[11px] text-amber-400 hover:text-amber-300 border-amber-500/30 hover:border-amber-500/50 flex items-center gap-1"
+                            title="Upload Photo for product"
+                          >
+                            <Upload className="w-3 h-3" />
+                            Upload Photo
+                          </button>
+                        )}
+                        {p.is_active && (
+                          <button
+                            onClick={() => handleDeactivate(p.id, p.name)}
+                            className="btn-secondary py-1 px-2.5 text-[11px] text-red-400 hover:text-red-300"
+                          >
+                            Deactivate
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -530,6 +560,74 @@ export function AdminProducts() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Image Upload Modal */}
+      {quickUploadProduct && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="card w-full max-w-lg p-6 border-navy-600 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => {
+                setQuickUploadProduct(null);
+                setQuickUploadedImages([]);
+              }}
+              className="absolute right-4 top-4 text-gray-400 hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h3 className="text-base font-bold text-white mb-1 flex items-center gap-2">
+              <Upload className="w-5 h-5 text-amber-400" />
+              Upload Product Image
+            </h3>
+            <p className="text-xs text-gray-400 mb-4 truncate">
+              {quickUploadProduct.name} ({quickUploadProduct.brand})
+            </p>
+
+            <ImageUploader
+              images={quickUploadedImages}
+              onChange={(imgs) => setQuickUploadedImages(imgs)}
+              maxImages={3}
+            />
+
+            <div className="mt-5 pt-4 border-t border-navy-700 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setQuickUploadProduct(null);
+                  setQuickUploadedImages([]);
+                }}
+                className="btn-secondary py-1.5 px-3 text-xs"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={quickUploadedImages.length === 0 || quickUploading}
+                onClick={async () => {
+                  if (quickUploadedImages.length === 0 || !quickUploadProduct) return;
+                  try {
+                    setQuickUploading(true);
+                    const primaryUrl = quickUploadedImages[0].url;
+                    await api.post(`/admin/products/${quickUploadProduct.id}/quick-image`, {
+                      url: primaryUrl
+                    });
+                    toast.success('Product image updated successfully!');
+                    setQuickUploadProduct(null);
+                    setQuickUploadedImages([]);
+                    fetchProducts();
+                  } catch {
+                    toast.error('Failed to link image');
+                  } finally {
+                    setQuickUploading(false);
+                  }
+                }}
+                className="btn-primary py-1.5 px-4 text-xs flex items-center gap-1.5 disabled:opacity-50"
+              >
+                {quickUploading ? 'Linking...' : 'Save Image'}
+              </button>
+            </div>
           </div>
         </div>
       )}

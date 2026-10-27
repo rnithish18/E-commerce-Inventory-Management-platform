@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
 import { Topbar } from './Topbar';
 import { Sidebar } from './Sidebar';
 import { RightPanel } from './RightPanel';
@@ -27,8 +27,14 @@ export function StorefrontLayout({ showRightPanel = true }: Props) {
       </div>
 
       {/* Storefront Footer Disclaimer */}
-      <footer className="w-full border-t border-navy-800 bg-navy-950/80 py-4 px-6 text-center text-xs text-gray-500">
-        <p>ShopNest is a demonstration store. Brand names and product images belong to their respective owners.</p>
+      <footer className="w-full border-t border-navy-800 bg-navy-950/80 py-4 px-6 text-center text-xs text-gray-400">
+        <p>
+          ShopNest is a demonstration store. Brand names and product images belong to their respective owners.
+          <span className="mx-2 text-gray-600">•</span>
+          <Link to="/image-credits" className="text-orange-400 hover:text-orange-300 underline font-medium">
+            Image credits & licensing
+          </Link>
+        </p>
       </footer>
     </div>
   );

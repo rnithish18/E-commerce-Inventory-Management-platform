@@ -102,26 +102,24 @@
     "name": "Atomic Habits by James Clear",
     "brand": "Penguin Random House",
     "category": "Books & Stationery",
-    "verified": true,
-    "needs_image": false,
-    "primary_url": "/products/atomic-habits-by-james-clear/image-0-640.webp",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
     "images_count": 1,
     "images": [
       {
         "sort_order": 0,
         "is_primary": true,
-        "url": "/products/atomic-habits-by-james-clear/image-0-640.webp",
-        "srcset": "/products/atomic-habits-by-james-clear/image-0-320.webp 320w, /products/atomic-habits-by-james-clear/image-0-640.webp 640w, /products/atomic-habits-by-james-clear/image-0-960.webp 960w, /products/atomic-habits-by-james-clear/image-0-1280.webp 1280w",
-        "placeholder": "data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAADwAgCdASoPABgAPxFysFAsJqSisAgBgCIJZQCo9C0kAAD+7snIvAFVClLQAAAA",
-        "alt": "Atomic Habits by James Clear Penguin Random House book cover",
-        "source_url": "https://openlibrary.org/works/OL17930368W/Atomic_Habits",
-        "license": "Fair Use Reference / Open Library",
-        "attribution": "Open Library / Penguin Random House",
-        "verified": true
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Atomic Habits by James Clear (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
       }
     ],
-    "license": "Fair Use Reference / Open Library",
-    "attribution": "Open Library / Penguin Random House"
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
   },
   {
     "slug": "boat-rockerz-550-bluetooth-headphones",
@@ -298,26 +296,24 @@
     "name": "Funskool Monopoly India Board Game",
     "brand": "Funskool",
     "category": "Toys & Games",
-    "verified": true,
-    "needs_image": false,
-    "primary_url": "/products/funskool-monopoly-india-board-game/image-0-640.webp",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
     "images_count": 1,
     "images": [
       {
         "sort_order": 0,
         "is_primary": true,
-        "url": "/products/funskool-monopoly-india-board-game/image-0-640.webp",
-        "srcset": "/products/funskool-monopoly-india-board-game/image-0-320.webp 320w, /products/funskool-monopoly-india-board-game/image-0-640.webp 640w, /products/funskool-monopoly-india-board-game/image-0-960.webp 960w, /products/funskool-monopoly-india-board-game/image-0-1280.webp 1280w",
-        "placeholder": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAACQAwCdASoYAA0APxFysFCsJqSisAgBgCIJQBdgA9LQevIbDuuAAP7WFgIhaBBIP0TtzMSV+5wAw3OgEQx4xvcbXN9g579DVvJLeJMl5RVlY4/mQwMYXntan9HLWZCrDRXFzT1lK3gAAA==",
-        "alt": "Monopoly classic board game with tokens, chance cards, and property deeds",
-        "source_url": "https://commons.wikimedia.org/wiki/File:Monopoly_board_on_white_bg.jpg",
-        "license": "CC-BY-SA 3.0",
-        "attribution": "Wikimedia Commons / BoardGamesArchive",
-        "verified": true
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Funskool Monopoly India Board Game (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
       }
     ],
-    "license": "CC-BY-SA 3.0",
-    "attribution": "Wikimedia Commons / BoardGamesArchive"
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
   },
   {
     "slug": "hm-floral-midi-dress",
@@ -444,26 +440,24 @@
     "name": "LEGO Classic Creative Bricks Box 484pcs",
     "brand": "LEGO",
     "category": "Toys & Games",
-    "verified": true,
-    "needs_image": false,
-    "primary_url": "/products/lego-classic-creative-bricks-box-484pcs/image-0-640.webp",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
     "images_count": 1,
     "images": [
       {
         "sort_order": 0,
         "is_primary": true,
-        "url": "/products/lego-classic-creative-bricks-box-484pcs/image-0-640.webp",
-        "srcset": "/products/lego-classic-creative-bricks-box-484pcs/image-0-320.webp 320w, /products/lego-classic-creative-bricks-box-484pcs/image-0-640.webp 640w, /products/lego-classic-creative-bricks-box-484pcs/image-0-960.webp 960w, /products/lego-classic-creative-bricks-box-484pcs/image-0-1280.webp 1280w",
-        "placeholder": "data:image/webp;base64,UklGRvIAAABXRUJQVlA4IOYAAACQBgCdASoYABAAPxFysFAsJqSisAgBgCIJbACdMoR3IsB9oPEA9aqyVfJAJn4ZbjaILUZEp9rewFyZQd+AAP4/zIjL8wN4TKPF2YxQpyic+abIzob1ocCFtjEmTq9nUhlJA2fn1eeyVV/uxwkOxyWsWMjFwza+s8k9S1kJhJ+DuuOxFJ7Klvzwz2JOepDxWpEYd3MLWd4JPBNwJl/u9Lq8UKsG2q5cz5qwOLQxqPNg59JMCHyLqrHSNImH0OdrG39Jhoe+LFoHvtF+QYR/kj4o4r81B8cx/N8oc/gSvfkK8voLeONAAA==",
-        "alt": "LEGO Classic multi-color building bricks assortment",
-        "source_url": "https://commons.wikimedia.org/wiki/File:Lego_Color_Bricks.jpg",
-        "license": "CC-BY-SA 2.0",
-        "attribution": "Wikimedia Commons / Alan Chia",
-        "verified": true
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "LEGO Classic Creative Bricks Box 484pcs (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
       }
     ],
-    "license": "CC-BY-SA 2.0",
-    "attribution": "Wikimedia Commons / Alan Chia"
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
   },
   {
     "slug": "levis-511-slim-fit-stretch-jeans",
@@ -518,26 +512,24 @@
     "name": "Logitech MX Master 3S Wireless Mouse",
     "brand": "Logitech",
     "category": "Electronics",
-    "verified": true,
-    "needs_image": false,
-    "primary_url": "/products/logitech-mx-master-3s-wireless-mouse/image-0-640.webp",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
     "images_count": 1,
     "images": [
       {
         "sort_order": 0,
         "is_primary": true,
-        "url": "/products/logitech-mx-master-3s-wireless-mouse/image-0-640.webp",
-        "srcset": "/products/logitech-mx-master-3s-wireless-mouse/image-0-320.webp 320w, /products/logitech-mx-master-3s-wireless-mouse/image-0-640.webp 640w, /products/logitech-mx-master-3s-wireless-mouse/image-0-960.webp 960w, /products/logitech-mx-master-3s-wireless-mouse/image-0-1280.webp 1280w",
-        "placeholder": "data:image/webp;base64,UklGRnoAAABXRUJQVlA4IG4AAAAQBACdASoYABAAPxF0sVCsJqSisAgBgCIJaQAAWq22zIQ9+Fveq0roAAD+6o/Zdq8dWRbqwRZU7M70rcGiMeBQcVd7w5FXvs0rouRz31q7lFQQ5I1kAXHgKK1wP1ruMbl+3F956IVrzVfQcMAAAA==",
-        "alt": "Logitech MX Master Ergonomic Wireless Laser Mouse",
-        "source_url": "https://commons.wikimedia.org/wiki/File:2017_Mysz_komputerowa_Logitech_MX_Master.jpg",
-        "license": "CC-BY-SA 4.0",
-        "attribution": "Wikimedia Commons / HardwareContributor",
-        "verified": true
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "Logitech MX Master 3S Wireless Mouse (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
       }
     ],
-    "license": "CC-BY-SA 4.0",
-    "attribution": "Wikimedia Commons / HardwareContributor"
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
   },
   {
     "slug": "mamaearth-vitamin-c-face-serum-30ml",
@@ -862,24 +854,12 @@
     "category": "Electronics",
     "verified": true,
     "needs_image": false,
-    "primary_url": "/products/samsung-galaxy-s24-ultra/image-0-640.webp",
-    "images_count": 2,
+    "primary_url": "/products/samsung-galaxy-s24-ultra/image-1-640.webp",
+    "images_count": 1,
     "images": [
       {
         "sort_order": 0,
         "is_primary": true,
-        "url": "/products/samsung-galaxy-s24-ultra/image-0-640.webp",
-        "srcset": "/products/samsung-galaxy-s24-ultra/image-0-320.webp 320w, /products/samsung-galaxy-s24-ultra/image-0-640.webp 640w, /products/samsung-galaxy-s24-ultra/image-0-960.webp 960w, /products/samsung-galaxy-s24-ultra/image-0-1280.webp 1280w",
-        "placeholder": "data:image/webp;base64,UklGRqgAAABXRUJQVlA4IJwAAABwBACdASoYAA4APxFysFAsJqSisAgBgCIJYgCdABeO2CpSd+vo//41WWuQAAD9M0nI+4Na8kUj81x01c/29nCM3qWdOEs3W+RcYK7zm9DzUL/SEHgwHKxpgWRA9cX0Xbgrjc4ryKIYXmNWGorPhnslHoX6l7txfiQLGUB2Jb+axberHSVg6su5rZZpLtgRuWh47iZj6EG+zYWFUAA=",
-        "alt": "Samsung Galaxy S24 Ultra front dynamic AMOLED display and bezel",
-        "source_url": "https://commons.wikimedia.org/wiki/File:Samsung_Galaxy_S24_(webtekno)_008.png",
-        "license": "CC-BY-SA 4.0",
-        "attribution": "Wikimedia Commons / Webtekno",
-        "verified": true
-      },
-      {
-        "sort_order": 1,
-        "is_primary": false,
         "url": "/products/samsung-galaxy-s24-ultra/image-1-640.webp",
         "srcset": "/products/samsung-galaxy-s24-ultra/image-1-320.webp 320w, /products/samsung-galaxy-s24-ultra/image-1-640.webp 640w, /products/samsung-galaxy-s24-ultra/image-1-960.webp 960w, /products/samsung-galaxy-s24-ultra/image-1-1280.webp 1280w",
         "placeholder": "data:image/webp;base64,UklGRpAAAABXRUJQVlA4IIQAAADQBACdASoYABMAPxFss1AsJaUisBgMAYAiCWkAA+PZBnG2hPzIgGULYutKfaN+AAD+6MY2C+0OgjO7fbnIb9zLl4b42o5VIOyBhg8A+b4urUd3A7nGxyWLkdMk70swuHy86iq1Xd6kyqWxuaHaB5HGfngOErvN6NjTP5CJ4HCJUeuAAAA=",
@@ -946,26 +926,24 @@
     "name": "The Alchemist by Paulo Coelho",
     "brand": "HarperCollins",
     "category": "Books & Stationery",
-    "verified": true,
-    "needs_image": false,
-    "primary_url": "/products/the-alchemist-by-paulo-coelho/image-0-640.webp",
+    "verified": false,
+    "needs_image": true,
+    "primary_url": "/products/photo-coming-soon.svg",
     "images_count": 1,
     "images": [
       {
         "sort_order": 0,
         "is_primary": true,
-        "url": "/products/the-alchemist-by-paulo-coelho/image-0-640.webp",
-        "srcset": "/products/the-alchemist-by-paulo-coelho/image-0-320.webp 320w, /products/the-alchemist-by-paulo-coelho/image-0-640.webp 640w, /products/the-alchemist-by-paulo-coelho/image-0-960.webp 960w, /products/the-alchemist-by-paulo-coelho/image-0-1280.webp 1280w",
-        "placeholder": "data:image/webp;base64,UklGRqAAAABXRUJQVlA4IJQAAACwBACdASoQABgAPxFysFAsJqSisAgBgCIJZgCdMoKP+PoATaYeUIKAanXG+JyAAP7AKOo3+r+SMKCf/Lhvun4TTn40TZ2rkifaPTUEFy6fYjWvhofZPrMgMx8U10JGbiVAVFSJzPtVExMfY7iK68mXCrmTZa9p6XAYDSQM3DNKa5WWmvfyGPxF+/GVru0L/zM0sIgA",
-        "alt": "The Alchemist by Paulo Coelho cover artwork",
-        "source_url": "https://commons.wikimedia.org/wiki/File:TheAlchemist.jpg",
-        "license": "CC-BY-SA 3.0",
-        "attribution": "Wikimedia Commons / HarperOne",
-        "verified": true
+        "url": "/products/photo-coming-soon.svg",
+        "alt": "The Alchemist by Paulo Coelho (Photo coming soon)",
+        "source_url": "ShopNest Standard Placeholder",
+        "license": "CC0 1.0 Universal",
+        "attribution": "ShopNest Design Studio",
+        "verified": false
       }
     ],
-    "license": "CC-BY-SA 3.0",
-    "attribution": "Wikimedia Commons / HarperOne"
+    "license": "CC0 1.0 Universal",
+    "attribution": "ShopNest Design Studio"
   },
   {
     "slug": "woodland-waterproof-hiking-boots",

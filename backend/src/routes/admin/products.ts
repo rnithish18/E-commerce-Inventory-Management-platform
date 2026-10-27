@@ -18,7 +18,7 @@ router.get('/', async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await query(
       `SELECT p.id, p.name, p.slug, p.brand, p.price_paise, p.mrp_paise, p.badge,
-              p.average_rating, p.is_active, p.created_at,
+              p.average_rating, p.needs_image, p.is_active, p.created_at,
               c.name as category_name,
               COALESCE(pv.total_stock, 0)::int as total_stock,
               pi.url as image_url
@@ -95,6 +95,37 @@ router.post('/', validate(CreateProductSchema), async (req: Request, res: Respon
     } finally {
       client.release();
     }
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/v1/admin/products/:id/quick-image
+router.post('/:id/quick-image', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { url } = req.body;
+    if (!url) throw new AppError(400, 'Image URL required', 'BAD_REQUEST');
+
+    // Remove placeholder images
+    await query("DELETE FROM product_images WHERE product_id = $1 AND url LIKE '%photo-coming-soon%'", [id]);
+
+    // Insert new product image
+    const imgId = uuidv4();
+    await query(
+      `INSERT INTO product_images (id, product_id, url, alt_text, sort_order, is_primary, source_url, license, verified)
+       VALUES ($1, $2, $3, 'Product photo', 0, true, 'admin-uploaded', 'Store Owner Asset', true)`,
+      [imgId, id, url]
+    );
+
+    // Set needs_image = false
+    const result = await query(
+      'UPDATE products SET needs_image = false, updated_at = NOW() WHERE id = $1 RETURNING *',
+      [id]
+    );
+    if (!result.rows[0]) throw new AppError(404, 'Product not found', 'NOT_FOUND');
+
+    res.json({ message: 'Image linked successfully', product: result.rows[0] });
   } catch (err) {
     next(err);
   }
