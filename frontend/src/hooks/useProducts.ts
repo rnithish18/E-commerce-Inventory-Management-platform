@@ -33,3 +33,11 @@ export function useProduct(slug: string) {
     staleTime: 60_000,
   })
 }
+
+export function useCatalogFilters() {
+  return useQuery({
+    queryKey: ['catalog-filters'],
+    queryFn: () => productsApi.filters().then(r => r.data),
+    staleTime: 5 * 60_000,
+  })
+}

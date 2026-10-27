@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /checkout
+Disallow: /cart
+Disallow: /orders
+Disallow: /wishlist
+
+Sitemap: https://shopnest.com/sitemap.xml

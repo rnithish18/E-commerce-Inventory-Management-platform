@@ -3,6 +3,7 @@ import { requireAuth } from '../middleware/auth';
 import { processCheckout, getUserOrders, getOrderDetail } from '../services/order';
 import { cancelOrderWithRestock } from '../services/orderStateMachine';
 import { requestRefund } from '../services/refund';
+import { generateInvoicePdf } from '../services/invoice';
 import { query } from '../db/query';
 import { AppError } from '../middleware/errorHandler';
 
@@ -89,6 +90,27 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const order = await getOrderDetail(req.params.id as string, req.user!.role === 'ADMIN' ? undefined : req.user!.userId);
     res.json({ order });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/v1/orders/:id/invoice - Download GST compliant Tax Invoice PDF
+router.get('/:id/invoice', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const orderId = req.params.id as string;
+    const userId = req.user!.role === 'ADMIN' ? undefined : req.user!.userId;
+
+    const pdfDoc = await generateInvoicePdf(orderId, userId);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+      'Content-Disposition',
+      `inline; filename="ShopNest_Invoice_${orderId.slice(0, 8).toUpperCase()}.pdf"`
+    );
+
+    pdfDoc.pipe(res);
+    pdfDoc.end();
   } catch (err) {
     next(err);
   }

@@ -4,6 +4,7 @@ import { requireAuth, requireAdmin } from '../../middleware/auth';
 import { AppError } from '../../middleware/errorHandler';
 import { transitionOrderStatus, cancelOrderWithRestock, OrderStatus } from '../../services/orderStateMachine';
 import { approveRefund } from '../../services/refund';
+import { sendOrderStatusChangeEmail } from '../../services/mailer';
 import { v4 as uuidv4 } from 'uuid';
 
 const router = Router();
@@ -86,7 +87,8 @@ router.get('/:id', async (req, res, next) => {
 router.patch('/:id/status', async (req, res, next) => {
   try {
     const { status, note } = req.body;
-    await transitionOrderStatus(req.params.id, status as OrderStatus, req.user!.userId, note);
+    await transitionOrderStatus(req.params.id as string, status as OrderStatus, req.user!.userId, note);
+    sendOrderStatusChangeEmail(req.params.id as string, status as string).catch(() => {});
     res.json({ message: `Order transitioned to ${status}` });
   } catch (err) { next(err); }
 });

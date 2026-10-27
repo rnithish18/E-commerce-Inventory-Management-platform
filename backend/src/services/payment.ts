@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { getClient, query } from '../db/query';
 import { AppError } from '../middleware/errorHandler';
 import { v4 as uuidv4 } from 'uuid';
+import { sendOrderConfirmationEmail } from './mailer';
 
 export interface VerifyPaymentInput {
   orderId: string;
@@ -147,6 +148,7 @@ export async function handlePaymentSuccess(
     );
 
     await client.query('COMMIT');
+    sendOrderConfirmationEmail(orderId).catch(() => {});
     return { success: true, idempotent: false };
   } catch (err) {
     await client.query('ROLLBACK');

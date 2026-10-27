@@ -8,7 +8,8 @@ import {
   AlertCircle, 
   ChevronRight, 
   XCircle, 
-  ArrowRight 
+  ArrowRight,
+  FileText
 } from 'lucide-react';
 import api from '../lib/api';
 import { formatPaise, formatDateTime } from '../lib/utils';
@@ -139,7 +140,7 @@ export function MyOrdersPage() {
                 </div>
 
                 {/* Total and actions */}
-                <div className="flex items-center justify-between pt-3 border-t border-navy-600/60 text-xs">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-navy-600/60 text-xs">
                   <div>
                     <span className="text-gray-400">Total Paid: </span>
                     <span className="font-mono font-black text-white text-sm">
@@ -147,13 +148,27 @@ export function MyOrdersPage() {
                     </span>
                   </div>
 
-                  <Link
-                    to={`/order-confirmation/${order.id}`}
-                    className="flex items-center gap-1 text-orange-400 hover:text-orange-300 font-semibold"
-                  >
-                    <span>View Confirmation & Tracking Details</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </Link>
+                  <div className="flex items-center gap-3">
+                    {order.status !== 'PENDING_PAYMENT' && order.status !== 'CANCELLED' && (
+                      <a
+                        href={`/api/v1/orders/${order.id}/invoice`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-navy-700/80 hover:bg-navy-700 text-orange-400 font-semibold border border-navy-600 transition-colors"
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        <span>Tax Invoice (PDF)</span>
+                      </a>
+                    )}
+
+                    <Link
+                      to={`/order-confirmation/${order.id}`}
+                      className="flex items-center gap-1 text-orange-400 hover:text-orange-300 font-semibold"
+                    >
+                      <span>Tracking & Details</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </Link>
+                  </div>
                 </div>
 
               </div>

@@ -475,3 +475,44 @@ Running 3 tests using 1 worker
    - **Vitest**: 15/15 test files passed, **183 / 183 tests passed** (29.32s).
    - **Playwright**: 16/16 tests passed (1.3m) across all 6 test suites.
    - Active catalog count: 42 verified seeded products in PostgreSQL.
+
+---
+
+## 12. Phase 4: Smart Autosuggest, Catalog Filters, GST Invoices, SEO & UX Polish
+
+### Completed Deliverables
+1. **Smart Autosuggest Search with Trigram Fuzzy Matching (`pg_trgm`)**:
+   - Applied additive migration `011_search_and_review_enhancements.js` adding PostgreSQL `pg_trgm` extension and GIN trigram indexes on `products(name)`, `products(brand)`, and `categories(name)`.
+   - Created endpoint `GET /api/v1/products/suggest?q=...` returning typo-tolerant suggestions with relevance scoring and image thumbnails.
+   - Enhanced `Topbar.tsx` search bar with debounced autosuggest dropdown, matching substring highlighting, keyboard navigation (`ArrowDown`, `ArrowUp`, `Enter`, `Escape`), and persistent recent search history stored in `localStorage` with individual removal.
+2. **Dynamic Multi-Faceted Catalog Filters (`ShopPage.tsx`, `backend/src/routes/products.ts`)**:
+   - Created endpoint `GET /api/v1/products/filters` aggregating distinct brands, dynamic price boundaries, and category counts.
+   - Upgraded `GET /api/v1/products` query processing to support multi-brand arrays (`brands=Apple,Sony`), price range (`min_price`, `max_price`), customer rating thresholds (`rating=4`), and minimum discount filters (`discount=20`).
+   - Implemented sticky desktop filter sidebar and responsive mobile slide-over filter drawer.
+   - Integrated active filter chips bar with individual tag dismissal (`X`) and "Clear all" action, fully synchronized bidirectionally with URL search parameters.
+3. **Product Detail Page Architecture Upgrades (`ProductDetailPage.tsx`)**:
+   - Added structured Technical Specifications table detailing Brand, SKU/Model, Warranty, GST Assessment, and Return Policies.
+   - Dynamic variant selector enabling interactive switching of product options with price adjustment and real-time inventory checks.
+   - Stock urgency badge ("⚡ Only X left in stock — order soon!") displaying when variant stock is 10 or fewer units.
+   - Interactive Pincode delivery estimator calculating courier timelines across 6-digit Indian postal codes.
+   - "You May Also Like" recommendation carousel fetching 4 active related products from the same category.
+   - "Recently Viewed" section persistently tracking and surfacing user browsing history.
+4. **Customer Photo Reviews & Community Moderation**:
+   - Added `review_images` table and `review_helpful_votes` join table in database migration `011`.
+   - Added `POST /api/v1/reviews/:id/helpful` allowing customers to upvote insightful reviews.
+   - Extended review submission supporting up to 3 customer photograph uploads with server validation.
+   - Interactive rating distribution bar breakdown (5-star to 1-star percentage visualization) and multi-mode sorting (Most Helpful, Top Rated, Newest).
+5. **Downloadable GST Tax Invoice PDF & Transactional Mailer**:
+   - Created `backend/src/services/invoice.ts` utilizing `pdfkit` to generate fully formatted A4 tax invoices with ShopNest GSTIN (`29AAAAA0000A1Z5`), place of supply, HSN codes (8518), 18% GST breakdown, and integer paise math.
+   - Endpoint `GET /api/v1/orders/:id/invoice` streams downloadable PDF for any paid or confirmed order.
+   - Added prominent "Download Tax Invoice (PDF)" action buttons on both `OrderConfirmationPage.tsx` and `MyOrdersPage.tsx`.
+   - Built unified transactional mailer (`backend/src/services/mailer.ts`) dispatching order confirmation notifications upon payment capture and status update alerts upon shipment.
+6. **Performance Code-Splitting, SEO & Accessibility Polish**:
+   - Implemented route-level code splitting using `React.lazy` and `Suspense` across all 20 app pages in `App.tsx`, slashing initial bundle size from > 1061 kB down to 368 kB (gzip 113 kB).
+   - Integrated `react-helmet-async` and embedded Schema.org JSON-LD `Product` structured metadata on product detail pages.
+   - Generated production `sitemap.xml` cataloging all categories and 42 active products, plus `robots.txt`.
+   - Added accessible "Skip to main content" link and persistent Dark/Light mode theme toggle in `Topbar.tsx`.
+7. **Verification & Test Evidence**:
+   - **Vitest**: **16 / 16 test files passed**, **192 / 192 tests passed** (including 9 new tests in `tests/api/phase4_features.test.ts`).
+   - **Playwright**: **16 / 16 tests passed** across all end-to-end customer and administrative journeys.
+   - Total verified database catalog: 42 authentic seeded products.

@@ -121,14 +121,55 @@ export const aiApi = {
 // ── Products ──
 export interface ProductListParams {
   page?: number; limit?: number; search?: string; category?: string;
+  brand?: string; brands?: string;
   min_price?: number; max_price?: number;
+  rating?: number; discount?: number;
   sort?: 'price_asc' | 'price_desc' | 'rating_desc' | 'newest' | 'discount_desc';
   in_stock?: 'true' | 'false';
 }
+
+export interface SuggestionItem {
+  id: string;
+  name: string;
+  slug: string;
+  brand: string;
+  category_name: string;
+  price_paise: number;
+  image_url: string | null;
+  score: number;
+}
+
+export interface CatalogFilters {
+  brands: Array<{ name: string; count: number }>;
+  priceRange: { min_paise: number; max_paise: number };
+  categories: Array<{ id: string; name: string; slug: string; count: number }>;
+}
+
 export const productsApi = {
   list: (params?: ProductListParams) => api.get('/products', { params }),
   featured: () => api.get('/products/featured'),
   detail: (slug: string) => api.get(`/products/${slug}`),
+  suggest: (q: string) => api.get<{ suggestions: SuggestionItem[] }>('/products/suggest', { params: { q } }),
+  filters: () => api.get<CatalogFilters>('/products/filters'),
+}
+
+// ── Reviews ──
+export const reviewsApi = {
+  submit: (data: {
+    product_id: string;
+    order_item_id: string;
+    rating: number;
+    title: string;
+    body: string;
+    images?: string[];
+  }) => api.post('/reviews', data),
+  toggleHelpful: (reviewId: string) =>
+    api.post<{ helpful: boolean; helpful_count: number }>(`/reviews/${reviewId}/helpful`),
+}
+
+// ── Invoices ──
+export const ordersApi = {
+  getInvoiceUrl: (orderId: string) => `/api/v1/orders/${orderId}/invoice`,
 }
 
 // ── Categories ──

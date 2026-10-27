@@ -8,7 +8,8 @@ import {
   Truck, 
   ArrowRight, 
   Clock, 
-  ShieldCheck 
+  ShieldCheck,
+  FileText
 } from 'lucide-react';
 import api from '../lib/api';
 import { formatPaise, formatDateTime } from '../lib/utils';
@@ -261,6 +262,16 @@ export function OrderConfirmationPage() {
 
           {/* Action links */}
           <div className="flex flex-col gap-2 pt-1">
+            <a
+              href={`/api/v1/orders/${order.id}/invoice`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center gap-2 py-2.5 bg-navy-800 hover:bg-navy-700 text-orange-400 font-bold text-xs rounded-xl border border-orange-500/30 transition-colors shadow-sm"
+            >
+              <FileText className="w-4 h-4" />
+              <span>Download Tax Invoice (PDF)</span>
+            </a>
+
             <Link
               to="/orders"
               className="w-full flex items-center justify-center gap-2 py-2.5 bg-navy-700 hover:bg-navy-600 text-white font-bold text-xs rounded-xl border border-navy-600 transition-colors"
