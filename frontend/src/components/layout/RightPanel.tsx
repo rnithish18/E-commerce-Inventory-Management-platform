@@ -307,7 +307,7 @@ export function RightPanel() {
                 <p className={`text-xs leading-tight ${['DELIVERED', 'REFUND_REQUESTED', 'REFUNDED'].includes(latestOrder.status) ? 'font-bold text-green-400' : 'font-medium text-gray-400'}`}>
                   {latestOrder.status === 'DELIVERED' ? 'Delivered' : 'Delivery'}
                 </p>
-                <p className="text-[10px] text-gray-500">
+                <p className="text-[10px] text-gray-400">
                   {latestOrder.status === 'DELIVERED' ? 'Package received' : 'Pending arrival'}
                 </p>
               </div>

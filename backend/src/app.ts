@@ -106,6 +106,65 @@ const healthHandler = async (_req: express.Request, res: express.Response) => {
 app.get('/health', healthHandler);
 app.get('/api/v1/health', healthHandler);
 
+// Dynamic sitemap.xml generated directly from PostgreSQL
+app.get('/sitemap.xml', async (_req: express.Request, res: express.Response) => {
+  try {
+    const [catsResult, prodsResult] = await Promise.all([
+      query<{ slug: string; created_at: string }>('SELECT slug, created_at FROM categories ORDER BY name ASC'),
+      query<{ slug: string; updated_at: string }>('SELECT slug, updated_at FROM products WHERE is_active = true ORDER BY name ASC'),
+    ]);
+
+    const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const now = new Date().toISOString().split('T')[0];
+
+    const staticRoutes = [
+      { loc: `${baseUrl}/`, priority: '1.0', changefreq: 'daily', lastmod: now },
+      { loc: `${baseUrl}/shop`, priority: '0.9', changefreq: 'daily', lastmod: now },
+      { loc: `${baseUrl}/image-credits`, priority: '0.7', changefreq: 'weekly', lastmod: now },
+    ];
+
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+
+    for (const r of staticRoutes) {
+      xml += '  <url>\n';
+      xml += `    <loc>${r.loc}</loc>\n`;
+      xml += `    <lastmod>${r.lastmod}</lastmod>\n`;
+      xml += `    <changefreq>${r.changefreq}</changefreq>\n`;
+      xml += `    <priority>${r.priority}</priority>\n`;
+      xml += '  </url>\n';
+    }
+
+    for (const cat of catsResult.rows) {
+      xml += '  <url>\n';
+      xml += `    <loc>${baseUrl}/shop?category=${encodeURIComponent(cat.slug)}</loc>\n`;
+      xml += `    <lastmod>${now}</lastmod>\n`;
+      xml += '    <changefreq>weekly</changefreq>\n';
+      xml += '    <priority>0.8</priority>\n';
+      xml += '  </url>\n';
+    }
+
+    for (const p of prodsResult.rows) {
+      const pDate = p.updated_at ? new Date(p.updated_at).toISOString().split('T')[0] : now;
+      xml += '  <url>\n';
+      xml += `    <loc>${baseUrl}/product/${encodeURIComponent(p.slug)}</loc>\n`;
+      xml += `    <lastmod>${pDate}</lastmod>\n`;
+      xml += '    <changefreq>daily</changefreq>\n';
+      xml += '    <priority>0.8</priority>\n';
+      xml += '  </url>\n';
+    }
+
+    xml += '</urlset>';
+
+    res.header('Content-Type', 'application/xml');
+    res.header('Cache-Control', 'public, max-age=3600');
+    res.send(xml);
+  } catch (err) {
+    console.error('Failed to generate dynamic sitemap.xml:', err);
+    res.status(500).send('Error generating sitemap');
+  }
+});
+
 // API routes with rate limiters
 app.use('/api/v1/auth', authLimiter, authRoutes);
 app.use('/api/v1/products', productRoutes);

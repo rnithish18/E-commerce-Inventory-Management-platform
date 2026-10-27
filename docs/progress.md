@@ -516,3 +516,61 @@ Running 3 tests using 1 worker
    - **Vitest**: **16 / 16 test files passed**, **192 / 192 tests passed** (including 9 new tests in `tests/api/phase4_features.test.ts`).
    - **Playwright**: **16 / 16 tests passed** across all end-to-end customer and administrative journeys.
    - Total verified database catalog: 42 authentic seeded products.
+
+---
+
+## 13. Phase 5: Honest Photo Audit, Ingestion Pipeline, Attribution & Admin Ingestion (Commit `57d6296`)
+
+### Completed Deliverables
+1. **Zero-Mock Photo Catalog Audit (All 42 Products)**:
+   - Executed automated database audit script (`scripts/execute_photo_audit.js`) querying PostgreSQL directly.
+   - Verified exactly 5 authentic exact-model photographs under Creative Commons licenses (iPhone 15, Canon EOS R50, Nike Air Force 1, Rubik's Cube 3x3, Samsung Galaxy S24 Ultra).
+   - Identified and removed all mismatched images (Funskool Monopoly with US Atlantic City board, LEGO Classic 484pcs with loose bricks, Logitech MX Master 3S with 2017 Gen 1 mouse, and book covers from Open Library without open licenses), setting `needs_image = true`.
+   - Saved detailed 42-row audit in `docs/audit_table_42.json` and documented in `docs/image-credits.md`.
+2. **Storefront Attribution & Image Credits Page**:
+   - Created `frontend/src/pages/ImageCreditsPage.tsx` and registered `/image-credits` and `/credits` routes.
+   - Added "Image credits & licensing" link in storefront footer (`StorefrontLayout.tsx`).
+   - Added live attribution credit line under product gallery on product detail pages (`ProductGallery.tsx`) showing author, license, and link to Wikimedia source.
+3. **Image Ingestion Pipeline (`npm run images:ingest`)**:
+   - Built `scripts/ingest_images.js` utilizing `sharp` to process incoming photos from `incoming-images/<product-slug>.(jpg|png|webp)`.
+   - Automatically strips EXIF metadata, generates WebP sets (320, 640, 960, 1280px) and blur placeholder, inserts `product_images` rows, and appends to `database/seed/image-manifest.json`.
+   - Created `incoming-images/README.md` listing the 37 items awaiting user-supplied photos.
+4. **Admin "Needs Image" Management**:
+   - Enhanced `AdminProducts.tsx` with "Needs image" amber badge and interactive quick-upload modal utilizing `ImageUploader`.
+   - Added `POST /api/v1/admin/products/:id/quick-image` backend endpoint.
+
+---
+
+## 14. Phase 6: Honest Settings, Database Isolation, Lighthouse QA & Responsive Evidence
+
+### Completed Deliverables
+1. **Honest Tax Invoice & GST Configuration (`backend/src/services/invoice.ts`)**:
+   - Configured invoice service to inspect `process.env.SELLER_GSTIN`.
+   - When unset, prominently stamps `"DEMO INVOICE — NOT A VALID TAX INVOICE (DEMO ENVIRONMENT)"` in a high-contrast yellow banner across the invoice header and labels seller as sample demonstration store.
+2. **Transactional Mailer Production SMTP & Fallback (`backend/src/services/mailer.ts`)**:
+   - Installed `nodemailer` with real SMTP transport configured via `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`.
+   - When `SMTP_HOST` is unset, falls back cleanly to labeled console logger (`[Dev Mailer / Console Fallback]`).
+3. **PostgreSQL Test Database Isolation (`shopnest_test_db`)**:
+   - Created test database initialization script `scripts/reset_test_db.js` cloning schema and clean state via `CREATE DATABASE shopnest_test_db WITH TEMPLATE shopnest_db`.
+   - Configured `backend/src/test-setup.ts` to connect to `TEST_DATABASE_URL` during tests.
+   - Created `scripts/check_db_counts.js` verifying before/after row counts on dev database (`shopnest_db`) to guarantee zero test pollution.
+4. **Live Dynamic Sitemap (`/sitemap.xml`)**:
+   - Implemented `GET /sitemap.xml` endpoint in `backend/src/app.ts` querying live database categories and products.
+   - Added Vite dev/preview proxy in `frontend/vite.config.ts` and updated `frontend/public/robots.txt`.
+5. **Orders UX & Refunds (`frontend/src/pages/MyOrdersPage.tsx`)**:
+   - Added "Cancel Order" action for permitted states (`PENDING_PAYMENT`, `PAID`, `PROCESSING`).
+   - Added "Request Refund" modal for `DELIVERED` orders with reason selector and status badges (`Refund Under Review`, `Amount Refunded`).
+6. **Real Measured Lighthouse Audit (Saved in `docs/lighthouse/summary.json`)**:
+   - **Home (Desktop)**: Performance = **86** (>= 85 PASS), Accessibility = **96** (>= 95 PASS)
+   - **Catalog (Desktop)**: Performance = **90** (>= 85 PASS), Accessibility = **96** (>= 95 PASS)
+   - **Product (Desktop)**: Performance = **89** (>= 85 PASS), Accessibility = **96** (>= 95 PASS)
+   - **Product (Mobile)**: Performance = **89**, Accessibility = **91**
+   - **Home (Mobile)**: Performance = 73, Accessibility = 92
+   - **Catalog (Mobile)**: Performance = 74, Accessibility = 92
+7. **Responsive & Visual Evidence Capture (`tests/e2e/responsive_and_evidence.spec.ts`)**:
+   - Captured responsive viewports at 360px, 768px, and 1280px for Home, Catalog (with filter drawer), Product Detail, Cart, and Login.
+   - Captured required feature evidence screenshots: `login_view.png`, `google_button_hidden.png`, `product_gallery_zoom.png`, `filters_open.png`, `search_autosuggest.png`, `invoice_pdf_view.png`, `photo_review.png`.
+8. **Final Verification & Test Evidence**:
+   - **Vitest**: **16 / 16 test files passed**, **192 / 192 tests passed** (36.97s).
+   - **Playwright**: **8 / 8 test files passed**, **25 / 25 tests passed** (2.2m).
+   - TypeScript frontend and backend builds compile cleanly with zero errors.

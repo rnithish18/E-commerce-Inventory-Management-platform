@@ -133,16 +133,21 @@ export function HeroBanner() {
       </div>
 
       {/* Slide indicators */}
-      <div className="absolute left-6 sm:left-10 bottom-4 z-20 flex items-center gap-1.5">
+      <div className="absolute left-6 sm:left-10 bottom-3 z-20 flex items-center gap-1">
         {SLIDES.map((_, i) => (
           <button
             key={i}
+            type="button"
             onClick={() => setCurrent(i)}
-            className={`h-1.5 rounded-full transition-all ${
-              i === current ? 'w-6 bg-orange-500' : 'w-1.5 bg-white/30'
-            }`}
+            className="p-2 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-orange-400 rounded-full"
             aria-label={`Go to slide ${i + 1}`}
-          />
+          >
+            <span
+              className={`h-2 rounded-full transition-all block ${
+                i === current ? 'w-6 bg-orange-400' : 'w-2 bg-white/40 hover:bg-white/70'
+              }`}
+            />
+          </button>
         ))}
       </div>
     </div>

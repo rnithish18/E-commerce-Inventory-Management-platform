@@ -140,7 +140,7 @@ export function ShopPage() {
       
       {/* Brands Multi-Select */}
       <div className="border-b border-navy-700/70 pb-5">
-        <h4 className="font-bold text-gray-200 uppercase tracking-wider mb-3">Brands</h4>
+        <h3 className="font-bold text-gray-200 uppercase tracking-wider mb-3">Brands</h3>
         <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
           {filterMetadata?.brands && filterMetadata.brands.length > 0 ? (
             filterMetadata.brands.map((b) => {
@@ -176,7 +176,7 @@ export function ShopPage() {
       {/* Price Range Slider */}
       <div className="border-b border-navy-700/70 pb-5">
         <div className="flex items-center justify-between mb-2">
-          <h4 className="font-bold text-gray-200 uppercase tracking-wider">Price Range</h4>
+          <h3 className="font-bold text-gray-200 uppercase tracking-wider">Price Range</h3>
           <span className="text-[11px] font-mono text-orange-400 font-semibold">
             ₹{localPriceRange[0]} - ₹{localPriceRange[1]}
           </span>
@@ -184,6 +184,7 @@ export function ShopPage() {
         <div className="flex items-center gap-2">
           <input
             type="range"
+            aria-label="Filter products by maximum price in rupees"
             min="0"
             max="90000"
             step="500"
@@ -203,7 +204,7 @@ export function ShopPage() {
 
       {/* Customer Rating Filter */}
       <div className="border-b border-navy-700/70 pb-5">
-        <h4 className="font-bold text-gray-200 uppercase tracking-wider mb-2.5">Customer Rating</h4>
+        <h3 className="font-bold text-gray-200 uppercase tracking-wider mb-2.5">Customer Rating</h3>
         <div className="space-y-1.5">
           {[4, 3, 2].map((r) => {
             const active = currentRating === r;
@@ -236,7 +237,7 @@ export function ShopPage() {
 
       {/* Minimum Discount Filter */}
       <div className="border-b border-navy-700/70 pb-5">
-        <h4 className="font-bold text-gray-200 uppercase tracking-wider mb-2.5">Minimum Discount</h4>
+        <h3 className="font-bold text-gray-200 uppercase tracking-wider mb-2.5">Minimum Discount</h3>
         <div className="grid grid-cols-2 gap-1.5">
           {[10, 20, 30, 50].map((disc) => {
             const active = currentDiscount === disc;
@@ -245,9 +246,9 @@ export function ShopPage() {
                 key={disc}
                 type="button"
                 onClick={() => updateParam('discount', active ? null : String(disc))}
-                className={`py-1.5 px-2 rounded-lg text-center font-semibold transition-colors ${
+                className={`py-1.5 px-2 rounded-lg text-center font-bold transition-colors ${
                   active
-                    ? 'bg-orange-500 text-white shadow-sm'
+                    ? 'bg-orange-500 text-navy-950 shadow-sm'
                     : 'bg-navy-700/60 hover:bg-navy-700 text-gray-300'
                 }`}
               >
@@ -312,9 +313,9 @@ export function ShopPage() {
               key={cat.slug}
               type="button"
               onClick={() => updateParam('category', cat.slug)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-colors ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-colors ${
                 currentCategory === cat.slug
-                  ? 'bg-orange-500 text-white shadow-sm'
+                  ? 'bg-orange-500 text-navy-950 shadow-sm'
                   : 'bg-navy-700 text-gray-300 hover:text-white hover:bg-navy-600'
               }`}
             >
@@ -339,6 +340,7 @@ export function ShopPage() {
           <div className="flex items-center gap-1.5 bg-navy-700 px-3 py-1.5 rounded-xl border border-navy-600 text-xs">
             <ArrowUpDown className="w-3.5 h-3.5 text-gray-400" />
             <select
+              aria-label="Sort products by"
               value={currentSort}
               onChange={(e) => updateParam('sort', e.target.value)}
               className="bg-transparent text-white font-medium focus:outline-none cursor-pointer"
@@ -445,7 +447,7 @@ export function ShopPage() {
           <div className="flex items-center justify-between pb-4 mb-4 border-b border-navy-700">
             <div className="flex items-center gap-2">
               <SlidersHorizontal className="w-4 h-4 text-orange-400" />
-              <h3 className="font-bold text-white text-sm">Refine Catalog</h3>
+              <h2 className="font-bold text-white text-sm">Refine Catalog</h2>
             </div>
             {hasActiveFilters && (
               <button
@@ -539,7 +541,7 @@ export function ShopPage() {
               <div className="flex items-center justify-between pb-4 mb-4 border-b border-navy-700">
                 <div className="flex items-center gap-2">
                   <SlidersHorizontal className="w-4 h-4 text-orange-400" />
-                  <h3 className="font-bold text-white text-sm">Filters</h3>
+                  <h2 className="font-bold text-white text-sm">Filters</h2>
                 </div>
                 <button
                   type="button"

@@ -24,31 +24,62 @@ export async function generateInvoicePdf(
   const gray = '#64748b';
   const lightGray = '#f1f5f9';
 
+  const sellerGstin = process.env.SELLER_GSTIN;
+  const isDemoInvoice = !sellerGstin;
+
+  // Prominent Demo Banner if GSTIN is not configured
+  if (isDemoInvoice) {
+    doc
+      .rect(50, 22, 500, 18)
+      .fillColor('#fef3c7')
+      .fill();
+    doc
+      .fillColor('#92400e')
+      .fontSize(8)
+      .font('Helvetica-Bold')
+      .text('DEMO INVOICE — NOT A VALID TAX INVOICE (DEMO ENVIRONMENT)', 50, 27, { align: 'center', width: 500 });
+  }
+
   // Header
   doc
     .fillColor(orange)
     .fontSize(22)
     .font('Helvetica-Bold')
-    .text('ShopNest', 50, 45)
+    .text('ShopNest', 50, isDemoInvoice ? 48 : 45)
     .fontSize(10)
     .fillColor(navy)
     .font('Helvetica-Bold')
-    .text('TAX INVOICE / BILL OF SUPPLY', 50, 72)
+    .text(isDemoInvoice ? 'SAMPLE ORDER RECEIPT' : 'TAX INVOICE / BILL OF SUPPLY', 50, isDemoInvoice ? 74 : 72)
     .font('Helvetica')
     .fillColor(gray)
-    .text('Original for Recipient', 50, 86);
+    .text(isDemoInvoice ? 'Demo Order Documentation' : 'Original for Recipient', 50, isDemoInvoice ? 88 : 86);
 
   // Seller Details (Right Side)
-  doc
-    .fontSize(8)
-    .fillColor(navy)
-    .font('Helvetica-Bold')
-    .text('Sold By: ShopNest Retail Private Limited', 320, 45, { align: 'right' })
-    .font('Helvetica')
-    .fillColor(gray)
-    .text('Plot 42, Electronic City Phase 1', 320, 57, { align: 'right' })
-    .text('Bengaluru, Karnataka - 560100, India', 320, 69, { align: 'right' })
-    .text('GSTIN: 29AAAAA0000A1Z5 | PAN: AAAAA0000A', 320, 81, { align: 'right' });
+  if (sellerGstin) {
+    doc
+      .fontSize(8)
+      .fillColor(navy)
+      .font('Helvetica-Bold')
+      .text('Sold By: ShopNest Retail Private Limited', 300, 45, { align: 'right' })
+      .font('Helvetica')
+      .fillColor(gray)
+      .text('Plot 42, Electronic City Phase 1', 300, 57, { align: 'right' })
+      .text('Bengaluru, Karnataka - 560100, India', 300, 69, { align: 'right' })
+      .text(`GSTIN: ${sellerGstin} | State: Karnataka (29)`, 300, 81, { align: 'right' });
+  } else {
+    doc
+      .fontSize(8)
+      .fillColor('#991b1b')
+      .font('Helvetica-Bold')
+      .text('Seller: Sample Demonstration Store', 300, 48, { align: 'right' })
+      .font('Helvetica')
+      .fillColor(gray)
+      .text('ShopNest E-Commerce Platform', 300, 60, { align: 'right' })
+      .text('Bengaluru, Karnataka, India', 300, 72, { align: 'right' })
+      .fillColor('#b91c1c')
+      .font('Helvetica-Bold')
+      .text('GSTIN: Unconfigured (Set SELLER_GSTIN)', 300, 84, { align: 'right' });
+  }
 
   doc
     .moveTo(50, 105)

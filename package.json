@@ -13,10 +13,13 @@
     "test": "cd backend && npm test",
     "test:e2e": "npx playwright test",
     "images:ingest": "node scripts/ingest_images.js",
+    "test:reset-db": "node scripts/reset_test_db.js",
+    "audit:lighthouse": "node scripts/audit_lighthouse_all.js",
     "build:backend": "cd backend && npm run build",
     "build:frontend": "cd frontend && npm run build"
   },
   "devDependencies": {
-    "@playwright/test": "^1.64.1"
+    "@playwright/test": "^1.64.1",
+    "lighthouse": "^13.5.0"
   }
 }

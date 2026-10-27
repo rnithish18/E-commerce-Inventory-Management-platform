@@ -6,4 +6,4 @@ Disallow: /cart
 Disallow: /orders
 Disallow: /wishlist
 
-Sitemap: https://shopnest.com/sitemap.xml
+Sitemap: http://localhost:5173/sitemap.xml

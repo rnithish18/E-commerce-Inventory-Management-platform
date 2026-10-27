@@ -112,13 +112,13 @@ export function HomePage() {
       </section>
 
       {/* 4. Value Propositions / Trust Badges */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 py-8 border-t border-navy-700/60">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 py-8 border-t border-navy-700/60" aria-label="Store Guarantees">
         <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-navy-800/40 border border-navy-700/60">
           <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0 border border-orange-500/20">
             <Truck className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="text-xs font-bold text-white">Free Express Delivery</h4>
+            <h3 className="text-xs font-bold text-white">Free Express Delivery</h3>
             <p className="text-[11px] text-gray-400 mt-0.5">On all orders above ₹500</p>
           </div>
         </div>
@@ -128,7 +128,7 @@ export function HomePage() {
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="text-xs font-bold text-white">100% Genuine Brands</h4>
+            <h3 className="text-xs font-bold text-white">100% Genuine Brands</h3>
             <p className="text-[11px] text-gray-400 mt-0.5">Direct from verified distributors</p>
           </div>
         </div>
@@ -138,7 +138,7 @@ export function HomePage() {
             <RotateCcw className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="text-xs font-bold text-white">7-Day Free Returns</h4>
+            <h3 className="text-xs font-bold text-white">7-Day Free Returns</h3>
             <p className="text-[11px] text-gray-400 mt-0.5">Hassle-free doorstep pickup</p>
           </div>
         </div>
@@ -148,7 +148,7 @@ export function HomePage() {
             <Headphones className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="text-xs font-bold text-white">24/7 Dedicated Support</h4>
+            <h3 className="text-xs font-bold text-white">24/7 Dedicated Support</h3>
             <p className="text-[11px] text-gray-400 mt-0.5">Instant live chat assistance</p>
           </div>
         </div>

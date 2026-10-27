@@ -19,6 +19,9 @@ import toast from 'react-hot-toast';
 export function MyOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refundOrderId, setRefundOrderId] = useState<string | null>(null);
+  const [refundReason, setRefundReason] = useState('');
+  const [submittingRefund, setSubmittingRefund] = useState(false);
 
   const fetchOrders = async () => {
     try {
@@ -47,6 +50,25 @@ export function MyOrdersPage() {
     }
   };
 
+  const handleRequestRefund = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!refundOrderId) return;
+    try {
+      setSubmittingRefund(true);
+      await api.post(`/orders/${refundOrderId}/refund-request`, {
+        reason: refundReason || 'Customer requested return and refund',
+      });
+      toast.success('Refund request submitted successfully. Support team will review shortly.');
+      setRefundOrderId(null);
+      setRefundReason('');
+      fetchOrders();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to submit refund request');
+    } finally {
+      setSubmittingRefund(false);
+    }
+  };
+
   if (loading) return <FullPageSpinner />;
 
   const statusColors: Record<string, string> = {
@@ -57,7 +79,8 @@ export function MyOrdersPage() {
     'OUT_FOR_DELIVERY': 'bg-orange-500/10 text-orange-400 border-orange-500/30',
     'DELIVERED': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
     'CANCELLED': 'bg-red-500/10 text-red-400 border-red-500/30',
-    'REFUNDED': 'bg-gray-500/10 text-gray-400 border-gray-500/30',
+    'REFUND_REQUESTED': 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+    'REFUNDED': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40',
   };
 
   return (
@@ -93,6 +116,9 @@ export function MyOrdersPage() {
           {orders.map((order) => {
             const items = order.items || [];
             const canCancel = ['PENDING_PAYMENT', 'PAID', 'PROCESSING'].includes(order.status);
+            const canRequestRefund = ['DELIVERED'].includes(order.status);
+            const isRefundPending = order.status === 'REFUND_REQUESTED';
+            const isRefunded = order.status === 'REFUNDED';
 
             return (
               <div key={order.id} className="card p-5 flex flex-col gap-4">
@@ -116,10 +142,34 @@ export function MyOrdersPage() {
                     {canCancel && (
                       <button
                         onClick={() => handleCancelOrder(order.id)}
-                        className="text-[11px] text-red-400 hover:text-red-300 font-semibold px-2 py-0.5 rounded hover:bg-red-500/10 transition-colors"
+                        className="text-[11px] text-red-400 hover:text-red-300 font-semibold px-2 py-0.5 rounded border border-red-500/30 hover:bg-red-500/10 transition-colors"
                       >
-                        Cancel
+                        Cancel Order
                       </button>
+                    )}
+
+                    {canRequestRefund && (
+                      <button
+                        onClick={() => {
+                          setRefundOrderId(order.id);
+                          setRefundReason('');
+                        }}
+                        className="text-[11px] text-amber-400 hover:text-amber-300 font-semibold px-2 py-0.5 rounded border border-amber-500/30 hover:bg-amber-500/10 transition-colors"
+                      >
+                        Request Refund
+                      </button>
+                    )}
+
+                    {isRefundPending && (
+                      <span className="text-[10px] font-bold text-amber-300 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-full">
+                        Refund Under Review
+                      </span>
+                    )}
+
+                    {isRefunded && (
+                      <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                        Amount Refunded
+                      </span>
                     )}
                   </div>
                 </div>
@@ -174,6 +224,61 @@ export function MyOrdersPage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Refund Request Modal */}
+      {refundOrderId && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="card w-full max-w-md p-6 border-navy-600 shadow-2xl relative">
+            <h3 className="text-base font-bold text-white mb-2">Request Order Refund</h3>
+            <p className="text-xs text-gray-400 mb-4">
+              Order #{refundOrderId.slice(0, 8).toUpperCase()}. Please specify your reason for requesting a refund. Our team will review and process your return.
+            </p>
+            <form onSubmit={handleRequestRefund} className="flex flex-col gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  Reason for Refund
+                </label>
+                <select
+                  value={refundReason}
+                  onChange={(e) => setRefundReason(e.target.value)}
+                  className="w-full bg-navy-900 border border-navy-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500 mb-2"
+                >
+                  <option value="">Select a reason or type below...</option>
+                  <option value="Item damaged or defective on arrival">Item damaged or defective on arrival</option>
+                  <option value="Received incorrect product or variant">Received incorrect product or variant</option>
+                  <option value="Package arrived significantly late">Package arrived significantly late</option>
+                  <option value="Product not as described on storefront">Product not as described on storefront</option>
+                  <option value="Other customer preference">Other customer preference</option>
+                </select>
+                <textarea
+                  rows={3}
+                  value={refundReason}
+                  onChange={(e) => setRefundReason(e.target.value)}
+                  placeholder="Provide additional details regarding the return..."
+                  className="w-full bg-navy-900 border border-navy-700 rounded-xl p-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 resize-none"
+                  required
+                />
+              </div>
+              <div className="flex items-center justify-end gap-3 pt-2 border-t border-navy-700">
+                <button
+                  type="button"
+                  onClick={() => setRefundOrderId(null)}
+                  className="btn-secondary text-xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingRefund || !refundReason.trim()}
+                  className="btn-primary text-xs disabled:opacity-50"
+                >
+                  {submittingRefund ? 'Submitting...' : 'Submit Refund Request'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 

@@ -237,7 +237,8 @@ export function Topbar() {
                 </button>
                 <button 
                   type="submit"
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+                  aria-label="Submit search"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-orange-500 hover:bg-orange-400 text-navy-950 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors"
                 >
                   Search
                 </button>
@@ -531,7 +532,7 @@ export function Topbar() {
                 </Link>
                 <Link
                   to="/register"
-                  className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white shadow-md shadow-orange-500/20 transition-all"
+                  className="text-xs font-bold px-3 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-400 text-navy-950 shadow-md shadow-orange-500/20 transition-all"
                 >
                   Sign Up
                 </Link>
@@ -541,6 +542,7 @@ export function Topbar() {
             {/* Cart Button */}
             <Link
               to="/cart"
+              aria-label="Shopping Cart"
               className="relative flex items-center gap-2 p-2 rounded-xl bg-navy-700/80 hover:bg-navy-700 text-white border border-navy-600 transition-colors"
             >
               <ShoppingCart className="w-5 h-5 text-orange-400" />

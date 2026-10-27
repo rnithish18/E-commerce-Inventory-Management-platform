@@ -27,7 +27,7 @@ router.get('/', async (req, res, next) => {
 router.patch('/:id/moderate', async (req, res, next) => {
   try {
     const { status } = req.body;
-    if (!['approved', 'hidden', 'pending'].includes(status)) {
+    if (!['approved', 'hidden', 'pending', 'rejected'].includes(status)) {
       return next(new Error('Invalid review status'));
     }
 

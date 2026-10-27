@@ -59,13 +59,13 @@ export function ProductCard({ product, priority = false }: Props) {
     setTimeout(() => setIsAdded(false), 2000);
   };
 
-  // Badge color mapping
+  // Badge color mapping - strictly WCAG AA compliant contrast
   const badgeColors: Record<string, string> = {
-    'Best Seller': 'bg-amber-500 text-black font-extrabold',
-    'Hot': 'bg-red-500 text-white font-bold',
-    'Trending': 'bg-purple-500 text-white font-bold',
-    'Sale': 'bg-green-500 text-white font-bold',
-    'New': 'bg-blue-500 text-white font-bold',
+    'Best Seller': 'bg-amber-400 text-navy-950 font-black',
+    'Hot': 'bg-red-600 text-white font-bold',
+    'Trending': 'bg-purple-600 text-white font-bold',
+    'Sale': 'bg-emerald-400 text-navy-950 font-bold',
+    'New': 'bg-sky-400 text-navy-950 font-bold',
   };
 
   const activeImageUrl = isHovered && product.secondary_image_url ? product.secondary_image_url : product.image_url;
@@ -80,7 +80,7 @@ export function ProductCard({ product, priority = false }: Props) {
       {/* Top action row: Badge & Wishlist Heart */}
       <div className="absolute top-5 left-5 right-5 z-10 flex items-center justify-between pointer-events-none">
         {product.badge ? (
-          <span className={`px-2 py-0.5 rounded-full text-[10px] tracking-wider uppercase shadow-sm pointer-events-auto ${badgeColors[product.badge] || 'bg-orange-500 text-white'}`}>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] tracking-wider uppercase shadow-sm pointer-events-auto ${badgeColors[product.badge] || 'bg-orange-500 text-navy-950 font-bold'}`}>
             {product.badge}
           </span>
         ) : <div />}
@@ -123,7 +123,7 @@ export function ProductCard({ product, priority = false }: Props) {
           {product.brand || 'ShopNest Choice'}
         </span>
         {product.category_name && (
-          <span className="truncate max-w-[100px] text-gray-500">
+          <span className="truncate max-w-[100px] text-gray-400">
             {product.category_name}
           </span>
         )}
@@ -151,7 +151,7 @@ export function ProductCard({ product, priority = false }: Props) {
             </span>
           </>
         ) : (
-          <span className="text-[11px] text-gray-500 italic">
+          <span className="text-[11px] text-gray-400 italic">
             No reviews yet
           </span>
         )}
@@ -164,7 +164,7 @@ export function ProductCard({ product, priority = false }: Props) {
         </span>
         {product.mrp_paise > product.price_paise && (
           <>
-            <span className="text-xs text-gray-500 line-through">
+            <span className="text-xs text-gray-400 line-through">
               {formatPaise(product.mrp_paise)}
             </span>
             <span className="text-[10px] font-bold text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded whitespace-nowrap shrink-0">
