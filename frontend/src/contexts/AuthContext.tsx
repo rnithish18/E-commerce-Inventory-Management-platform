@@ -6,6 +6,7 @@ interface User {
   email: string
   full_name: string
   role: 'CUSTOMER' | 'ADMIN'
+  phone?: string | null
 }
 
 interface AuthContextType {
@@ -14,6 +15,7 @@ interface AuthContextType {
   login: (email: string, password: string, rememberMe?: boolean) => Promise<void>
   logout: () => Promise<void>
   setUser: (u: User | null) => void
+  refreshUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -22,11 +24,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
+  const refreshUser = async () => {
+    try {
+      const r = await authApi.me()
+      setUser(r.data.user)
+    } catch {
+      setUser(null)
+    }
+  }
+
   useEffect(() => {
-    authApi.me()
-      .then(r => setUser(r.data.user))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false))
+    refreshUser().finally(() => setLoading(false))
   }, [])
 
   const login = async (email: string, password: string, rememberMe?: boolean) => {
@@ -40,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, setUser }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, setUser, refreshUser }}>
       {children}
     </AuthContext.Provider>
   )

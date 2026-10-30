@@ -53,8 +53,7 @@ export function ProductImage({
         alt={alt}
         loading={priority ? 'eager' : 'lazy'}
         decoding="async"
-        // @ts-expect-error fetchpriority is a modern HTML attribute
-        fetchpriority={priority ? 'high' : 'auto'}
+        fetchPriority={priority ? 'high' : 'auto'}
         onLoad={() => setLoaded(true)}
         onError={() => {
           if (!hasError) {

@@ -574,3 +574,52 @@ Running 3 tests using 1 worker
    - **Vitest**: **16 / 16 test files passed**, **192 / 192 tests passed** (36.97s).
    - **Playwright**: **8 / 8 test files passed**, **25 / 25 tests passed** (2.2m).
    - TypeScript frontend and backend builds compile cleanly with zero errors.
+
+---
+
+## 15. Part A: Multi-Provider Authentication, Google One Tap, Phone OTP & Magic Links
+
+### Completed Deliverables
+1. **Dynamic Provider Registry (`backend/src/auth/providers/`)**:
+   - Built a modular provider subsystem supporting `google`, `facebook`, `github`, `phone`, and `magicLink`.
+   - `GET /api/v1/auth/providers` dynamically discovers available authentication mechanisms based strictly on environment keys.
+   - If no third-party providers are configured, the frontend gracefully hides the entire "Continue with" section and divider completely.
+2. **Database Migration (`database/migrations/1793334423836_create-user-identities.js`)**:
+   - `user_identities` table (`id`, `user_id`, `provider`, `provider_user_id`, `email`, `email_verified`, `created_at`, `updated_at`, UNIQUE(`provider`, `provider_user_id`)).
+   - Backfilled legacy `users.google_sub` records into `user_identities`.
+   - `phone_otps` table (`id`, `phone`, `otp_hash`, `attempts`, `max_attempts`, `resend_available_at`, `expires_at`, `consumed_at`, `ip_address`).
+   - `magic_links` table (`id`, `email`, `token_hash`, `cookie_binding_hash`, `expires_at`, `consumed_at`, `ip_address`).
+   - Made `users.password_hash` nullable for passwordless users; added `users.phone` and `users.phone_verified` with partial unique index on verified numbers.
+3. **Strict Account Linking & Admin Protection Security Invariants**:
+   - Account linking allowed ONLY when provider explicitly confirms email is verified (`email_verified = true`).
+   - Store Administrator accounts (`role = 'ADMIN'`) are strictly blocked from social and passwordless sign-ins (`ADMIN_SOCIAL_BLOCKED`).
+   - State + PKCE on all OAuth redirect flows with strict redirect-URI verification and same-site returnUrl sanitization.
+   - Structured audit logging (`audit_log`) for every login method with actor user ID, provider name, and IP address.
+   - Seamless guest cart merge on login.
+4. **Google One Tap / GIS (`accounts.google.com/gsi/client`)**:
+   - Server-side token verification using `google-auth-library` (`POST /api/v1/auth/google/credential`).
+   - Helmet CSP updated with Google Identity Services domains.
+5. **Phone OTP (+91) & Dev SMS Logger**:
+   - 6-digit cryptographically secure hashed OTP with 5-minute expiry, max 5 attempts, and 30-second cooldown timer.
+   - Constant-time verification (`crypto.timingSafeEqual`).
+   - Clean development fallback printing `[DEV SMS]` to the server console when external SMS credentials are unset.
+6. **Email Magic Links with Browser Cookie Binding**:
+   - Single-use 15-minute token with browser cookie binding (`magic_binding`), rejecting tokens opened in mismatched browsers.
+   - Dedicated verification landing page `frontend/src/pages/auth/MagicLinkVerifyPage.tsx` with error handling and retry controls.
+7. **Customer Profile & Connected Methods Management (`frontend/src/pages/customer/ProfilePage.tsx`)**:
+   - Route `/profile` added under storefront layout.
+   - Displays all connected identities with active badges and disconnect controls.
+   - Disconnect protection: rejects disconnecting the only sign-in method if no password has been configured (`CANNOT_DISCONNECT_LAST_METHOD`).
+   - "Set Password" interface with interactive password strength meter for passwordless users.
+8. **Frontend Auth UI Enhancements (`frontend/src/pages/auth/AuthContainer.tsx`)**:
+   - Official brand SVGs for Google, Facebook, GitHub, Phone OTP, and Magic Link.
+   - "Last used" pill indicating previous sign-in method from `localStorage`.
+   - Interactive Phone OTP modal with live 30s countdown and Magic Link modal.
+   - Runaway button evasion scoped strictly to email/password form submit button; social and OTP buttons remain directly clickable.
+9. **Documentation**:
+   - Created comprehensive guide `docs/social-login.md` documenting setup, redirect URIs, env vars, and security invariants.
+   - Updated `backend/.env.example` with provider configuration templates.
+10. **Test Verification**:
+    - **Vitest Suite**: **17 / 17 test files passed**, **213 / 213 tests passed** (Baseline 192).
+    - **Playwright E2E Suite**: **9 / 9 test files passed**, **28 / 28 tests passed** (Baseline 25).
+    - TypeScript frontend and backend compile cleanly with zero errors.

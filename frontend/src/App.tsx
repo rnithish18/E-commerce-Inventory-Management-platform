@@ -17,12 +17,14 @@ const CheckoutPage = lazy(() => import('./pages/CheckoutPage').then(m => ({ defa
 const OrderConfirmationPage = lazy(() => import('./pages/OrderConfirmationPage').then(m => ({ default: m.OrderConfirmationPage })));
 const MyOrdersPage = lazy(() => import('./pages/MyOrdersPage').then(m => ({ default: m.MyOrdersPage })));
 const WishlistPage = lazy(() => import('./pages/customer/WishlistPage').then(m => ({ default: m.WishlistPage })));
+const ProfilePage = lazy(() => import('./pages/customer/ProfilePage').then(m => ({ default: m.ProfilePage })));
 const ImageCreditsPage = lazy(() => import('./pages/ImageCreditsPage').then(m => ({ default: m.ImageCreditsPage })));
 
 // Auth
 const LoginPage = lazy(() => import('./pages/auth/LoginPage').then(m => ({ default: m.LoginPage })));
 const RegisterPage = lazy(() => import('./pages/auth/RegisterPage').then(m => ({ default: m.RegisterPage })));
 const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })));
+const MagicLinkVerifyPage = lazy(() => import('./pages/auth/MagicLinkVerifyPage').then(m => ({ default: m.MagicLinkVerifyPage })));
 
 // Admin
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
@@ -82,6 +84,14 @@ export default function App() {
                       </ProtectedRoute>
                     } 
                   />
+                  <Route 
+                    path="/profile" 
+                    element={
+                      <ProtectedRoute>
+                        <ProfilePage />
+                      </ProtectedRoute>
+                    } 
+                  />
                   <Route path="/image-credits" element={<ImageCreditsPage />} />
                   <Route path="/credits" element={<Navigate to="/image-credits" replace />} />
                 </Route>
@@ -90,6 +100,7 @@ export default function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="/auth/magic-link" element={<MagicLinkVerifyPage />} />
 
                 {/* Admin Dashboard Protected Routes */}
                 <Route

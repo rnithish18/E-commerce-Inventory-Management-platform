@@ -19,6 +19,8 @@ import {
   X,
   Send,
   AlertCircle,
+  Loader2,
+  Check,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { authApi, productsApi } from '../../lib/api';
@@ -38,7 +40,7 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
   const [searchParams] = useSearchParams();
   const returnUrl = searchParams.get('returnUrl') || '/';
 
-  const { login } = useAuth();
+  const { login, refreshUser } = useAuth();
   const [mode, setMode] = useState<'login' | 'register'>(
     location.pathname === '/register' ? 'register' : initialMode
   );
@@ -65,25 +67,122 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
   const [forgotSuccess, setForgotSuccess] = useState(false);
   const [devResetToken, setDevResetToken] = useState<string | null>(null);
 
-  // Google OAuth status and error handling
-  const [googleEnabled, setGoogleEnabled] = useState(false);
+  // Provider subsystem state
+  const [providersConfig, setProvidersConfig] = useState<{
+    google: boolean;
+    facebook: boolean;
+    github: boolean;
+    phone: boolean;
+    magicLink: boolean;
+    googleClientId?: string;
+  }>({
+    google: false,
+    facebook: false,
+    github: false,
+    phone: false,
+    magicLink: false,
+  });
+  const [lastUsedProvider, setLastUsedProvider] = useState<string | null>(null);
+
+  // Phone OTP modal state
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
+  const [phoneInput, setPhoneInput] = useState('');
+  const [phoneOtpInput, setPhoneOtpInput] = useState('');
+  const [phoneStep, setPhoneStep] = useState<'phone' | 'otp'>('phone');
+  const [phoneCooldown, setPhoneCooldown] = useState(0);
+  const [phoneLoading, setPhoneLoading] = useState(false);
+
+  // Magic Link modal state
+  const [showMagicModal, setShowMagicModal] = useState(false);
+  const [magicEmail, setMagicEmail] = useState('');
+  const [magicSent, setMagicSent] = useState(false);
+  const [magicLoading, setMagicLoading] = useState(false);
+
   const oauthError = searchParams.get('error');
 
   useEffect(() => {
     authApi
       .getProviders()
       .then((res: any) => {
-        const enabled = Boolean(res.data?.google ?? res.data?.providers?.google);
-        setGoogleEnabled(enabled);
+        const p = res.data || {};
+        const provs = p.providers || {};
+        setProvidersConfig({
+          google: Boolean(p.google ?? provs.google),
+          facebook: Boolean(p.facebook ?? provs.facebook),
+          github: Boolean(p.github ?? provs.github),
+          phone: Boolean(p.phone ?? provs.phone),
+          magicLink: Boolean(p.magicLink ?? provs.magicLink),
+          googleClientId: p.googleClientId,
+        });
       })
-      .catch(() => setGoogleEnabled(false));
+      .catch(() => {});
+
+    try {
+      setLastUsedProvider(localStorage.getItem('shopnest_last_auth_provider'));
+    } catch {}
   }, []);
+
+  // Cooldown countdown for Phone OTP
+  useEffect(() => {
+    if (phoneCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setPhoneCooldown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [phoneCooldown]);
+
+  // Google One Tap / GIS Setup
+  useEffect(() => {
+    if (providersConfig.google && providersConfig.googleClientId) {
+      const handleCredential = async (response: any) => {
+        try {
+          setLoading(true);
+          await authApi.verifyGoogleCredential(response.credential, returnUrl);
+          try {
+            localStorage.setItem('shopnest_last_auth_provider', 'google');
+          } catch {}
+          await refreshUser();
+          toast.success('Signed in with Google One Tap!');
+          navigate(returnUrl);
+        } catch (err: any) {
+          toast.error(err.response?.data?.message || 'Google One Tap sign-in failed');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const initGsi = () => {
+        if ((window as any).google?.accounts?.id) {
+          (window as any).google.accounts.id.initialize({
+            client_id: providersConfig.googleClientId,
+            callback: handleCredential,
+            auto_select: false,
+            cancel_on_tap_outside: true,
+          });
+          (window as any).google.accounts.id.prompt();
+        }
+      };
+
+      if (!(window as any).google?.accounts?.id) {
+        const script = document.createElement('script');
+        script.src = 'https://accounts.google.com/gsi/client';
+        script.async = true;
+        script.defer = true;
+        script.onload = initGsi;
+        document.body.appendChild(script);
+      } else {
+        initGsi();
+      }
+    }
+  }, [providersConfig.google, providersConfig.googleClientId, returnUrl, navigate, refreshUser]);
 
   const getOAuthErrorMessage = (code: string | null) => {
     if (!code) return null;
     switch (code) {
       case 'admin_google_blocked':
-        return 'Google sign-in is not permitted for Admin accounts. Please log in with your email and password.';
+        return 'Google sign-in is not permitted for Admin accounts. Store Administrator accounts cannot sign in using social or passwordless methods. Please sign in using your administrator email and password.';
+      case 'admin_social_blocked':
+        return 'Store Administrator accounts cannot sign in using social or passwordless methods. Please sign in using your administrator email and password.';
       case 'email_not_verified':
         return 'Your Google email address is not verified by Google. Please verify it or sign in with your password.';
       case 'invalid_state':
@@ -92,10 +191,12 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
         return 'Google sign-in was cancelled.';
       case 'account_disabled':
         return 'Your account has been deactivated. Please contact support.';
-      case 'google_not_configured':
-        return 'Google sign-in is not configured in this environment.';
+      case 'oauth_failed':
+        return 'Authentication could not be completed. Please try again.';
+      case 'missing_code':
+        return 'Authorization code was missing. Please try again.';
       default:
-        return 'Google authentication could not be completed. Please try again.';
+        return 'Authentication could not be completed. Please try again.';
     }
   };
 
@@ -160,6 +261,9 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
     try {
       setLoading(true);
       await login(loginEmail, loginPassword, rememberMe);
+      try {
+        localStorage.setItem('shopnest_last_auth_provider', 'email');
+      } catch {}
       toast.success(
         roleContext === 'ADMIN'
           ? 'Welcome, Admin! Redirecting to Management Console...'
@@ -236,8 +340,91 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
   };
 
   const handleGoogleOAuth = () => {
+    try {
+      localStorage.setItem('shopnest_last_auth_provider', 'google');
+    } catch {}
     const redirectReturnUrl = encodeURIComponent(returnUrl || '/');
     window.location.href = `/api/v1/auth/google?returnUrl=${redirectReturnUrl}`;
+  };
+
+  const handleFacebookOAuth = () => {
+    try {
+      localStorage.setItem('shopnest_last_auth_provider', 'facebook');
+    } catch {}
+    const redirectReturnUrl = encodeURIComponent(returnUrl || '/');
+    window.location.href = `/api/v1/auth/facebook?returnUrl=${redirectReturnUrl}`;
+  };
+
+  const handleGitHubOAuth = () => {
+    try {
+      localStorage.setItem('shopnest_last_auth_provider', 'github');
+    } catch {}
+    const redirectReturnUrl = encodeURIComponent(returnUrl || '/');
+    window.location.href = `/api/v1/auth/github?returnUrl=${redirectReturnUrl}`;
+  };
+
+  const handleSendPhoneOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanPhone = phoneInput.trim();
+    if (!cleanPhone) {
+      toast.error('Please enter a phone number');
+      return;
+    }
+
+    try {
+      setPhoneLoading(true);
+      await authApi.sendPhoneOtp(cleanPhone);
+      setPhoneStep('otp');
+      setPhoneCooldown(30);
+      toast.success('Verification code dispatched via SMS!');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to send verification code');
+    } finally {
+      setPhoneLoading(false);
+    }
+  };
+
+  const handleVerifyPhoneOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (phoneOtpInput.length !== 6) {
+      toast.error('Please enter the 6-digit verification code');
+      return;
+    }
+
+    try {
+      setPhoneLoading(true);
+      await authApi.verifyPhoneOtp(phoneInput.trim(), phoneOtpInput.trim(), returnUrl);
+      try {
+        localStorage.setItem('shopnest_last_auth_provider', 'phone');
+      } catch {}
+      await refreshUser();
+      toast.success('Signed in successfully!');
+      setShowPhoneModal(false);
+      navigate(returnUrl);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Invalid or expired verification code');
+    } finally {
+      setPhoneLoading(false);
+    }
+  };
+
+  const handleSendMagicLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isEmailValid(magicEmail)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
+    try {
+      setMagicLoading(true);
+      await authApi.sendMagicLink(magicEmail.trim(), returnUrl);
+      setMagicSent(true);
+      toast.success('Magic sign-in link dispatched to your inbox!');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to send magic link');
+    } finally {
+      setMagicLoading(false);
+    }
   };
 
   const fillDemoAdmin = () => {
@@ -490,40 +677,133 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
               <div className="mb-4 p-3 rounded-xl bg-red-500/15 border border-red-500/40 text-red-300 text-xs flex items-start gap-2.5">
                 <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="font-semibold text-red-200">Google Authentication</p>
+                  <p className="font-semibold text-red-200">Sign-In Notice</p>
                   <p className="mt-0.5 leading-relaxed">{getOAuthErrorMessage(oauthError)}</p>
                 </div>
               </div>
             )}
 
-            {/* Google OAuth Button (Visible only when configured on server) */}
-            {googleEnabled && (
+            {/* Provider Buttons Group (Only rendered when at least one provider is configured) */}
+            {(providersConfig.google ||
+              providersConfig.facebook ||
+              providersConfig.github ||
+              providersConfig.phone ||
+              providersConfig.magicLink) && (
               <>
-                <button
-                  type="button"
-                  onClick={handleGoogleOAuth}
-                  className="w-full py-2.5 px-4 mb-4 rounded-xl bg-navy-900/80 hover:bg-navy-700/80 border border-navy-700 text-gray-200 text-xs font-semibold flex items-center justify-center gap-2.5 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-400/50"
-                >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24">
-                    <path
-                      fill="#4285F4"
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    />
-                    <path
-                      fill="#34A853"
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    />
-                    <path
-                      fill="#FBBC05"
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                    />
-                    <path
-                      fill="#EA4335"
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                    />
-                  </svg>
-                  <span>Continue with Google</span>
-                </button>
+                <div className="space-y-2 mb-4">
+                  {providersConfig.google && (
+                    <button
+                      type="button"
+                      onClick={handleGoogleOAuth}
+                      className="w-full py-2.5 px-3.5 rounded-xl bg-navy-900/80 hover:bg-navy-700/80 border border-navy-700 text-gray-200 text-xs font-semibold flex items-center justify-between transition-colors focus:outline-none focus:ring-2 focus:ring-teal-400/50"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                          <path
+                            fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                          />
+                          <path
+                            fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                          />
+                          <path
+                            fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                          />
+                          <path
+                            fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                          />
+                        </svg>
+                        <span>Continue with Google</span>
+                      </div>
+                      {lastUsedProvider === 'google' && (
+                        <span className="px-2 py-0.5 rounded-full bg-teal-500/15 text-teal-400 border border-teal-500/30 text-[10px] font-bold">
+                          Last used
+                        </span>
+                      )}
+                    </button>
+                  )}
+
+                  {providersConfig.facebook && (
+                    <button
+                      type="button"
+                      onClick={handleFacebookOAuth}
+                      className="w-full py-2.5 px-3.5 rounded-xl bg-navy-900/80 hover:bg-navy-700/80 border border-navy-700 text-gray-200 text-xs font-semibold flex items-center justify-between transition-colors focus:outline-none focus:ring-2 focus:ring-teal-400/50"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-4 h-4 rounded-full bg-[#1877F2] flex items-center justify-center p-0.5 shrink-0">
+                          <svg className="w-full h-full fill-white" viewBox="0 0 24 24">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                          </svg>
+                        </div>
+                        <span>Continue with Facebook</span>
+                      </div>
+                      {lastUsedProvider === 'facebook' && (
+                        <span className="px-2 py-0.5 rounded-full bg-teal-500/15 text-teal-400 border border-teal-500/30 text-[10px] font-bold">
+                          Last used
+                        </span>
+                      )}
+                    </button>
+                  )}
+
+                  {providersConfig.github && (
+                    <button
+                      type="button"
+                      onClick={handleGitHubOAuth}
+                      className="w-full py-2.5 px-3.5 rounded-xl bg-navy-900/80 hover:bg-navy-700/80 border border-navy-700 text-gray-200 text-xs font-semibold flex items-center justify-between transition-colors focus:outline-none focus:ring-2 focus:ring-teal-400/50"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <svg className="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
+                          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                        </svg>
+                        <span>Continue with GitHub</span>
+                      </div>
+                      {lastUsedProvider === 'github' && (
+                        <span className="px-2 py-0.5 rounded-full bg-teal-500/15 text-teal-400 border border-teal-500/30 text-[10px] font-bold">
+                          Last used
+                        </span>
+                      )}
+                    </button>
+                  )}
+
+                  {providersConfig.phone && (
+                    <button
+                      type="button"
+                      onClick={() => setShowPhoneModal(true)}
+                      className="w-full py-2.5 px-3.5 rounded-xl bg-navy-900/80 hover:bg-navy-700/80 border border-navy-700 text-gray-200 text-xs font-semibold flex items-center justify-between transition-colors focus:outline-none focus:ring-2 focus:ring-teal-400/50"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <span>Continue with Phone OTP (+91)</span>
+                      </div>
+                      {lastUsedProvider === 'phone' && (
+                        <span className="px-2 py-0.5 rounded-full bg-teal-500/15 text-teal-400 border border-teal-500/30 text-[10px] font-bold">
+                          Last used
+                        </span>
+                      )}
+                    </button>
+                  )}
+
+                  {providersConfig.magicLink && (
+                    <button
+                      type="button"
+                      onClick={() => setShowMagicModal(true)}
+                      className="w-full py-2.5 px-3.5 rounded-xl bg-navy-900/80 hover:bg-navy-700/80 border border-navy-700 text-gray-200 text-xs font-semibold flex items-center justify-between transition-colors focus:outline-none focus:ring-2 focus:ring-teal-400/50"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Sparkles className="w-4 h-4 text-orange-400 shrink-0" />
+                        <span>Continue with Magic Link</span>
+                      </div>
+                      {lastUsedProvider === 'magicLink' && (
+                        <span className="px-2 py-0.5 rounded-full bg-teal-500/15 text-teal-400 border border-teal-500/30 text-[10px] font-bold">
+                          Last used
+                        </span>
+                      )}
+                    </button>
+                  )}
+                </div>
 
                 <div className="relative flex items-center justify-center my-4">
                   <div className="border-t border-navy-700 w-full" />
@@ -829,6 +1109,206 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
                       <span>Send Reset Link</span>
                       <Send className="w-3.5 h-3.5" />
                     </>
+                  )}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Phone OTP Modal */}
+      {showPhoneModal && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-sm bg-navy-800 border border-navy-700 rounded-3xl p-6 sm:p-7 shadow-2xl relative">
+            <button
+              type="button"
+              onClick={() => {
+                setShowPhoneModal(false);
+                setPhoneStep('phone');
+                setPhoneOtpInput('');
+              }}
+              className="absolute top-5 right-5 text-gray-400 hover:text-white p-1 rounded-lg hover:bg-navy-700 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="text-center mb-5">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center mb-3">
+                <Phone className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-white">
+                {phoneStep === 'phone' ? 'Sign in with Phone' : 'Enter Verification Code'}
+              </h3>
+              <p className="text-xs text-gray-400 mt-1">
+                {phoneStep === 'phone'
+                  ? 'Enter your mobile number to receive a 6-digit one-time passcode.'
+                  : `Enter the 6-digit code sent to ${phoneInput}.`}
+              </p>
+            </div>
+
+            {phoneStep === 'phone' ? (
+              <form onSubmit={handleSendPhoneOtp} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                    Mobile Number
+                  </label>
+                  <div className="relative flex items-center">
+                    <span className="absolute left-3.5 text-xs font-bold text-gray-400 select-none">
+                      +91
+                    </span>
+                    <input
+                      type="tel"
+                      required
+                      value={phoneInput}
+                      onChange={(e) => setPhoneInput(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                      placeholder="9876543210"
+                      className="input pl-12 text-xs font-mono tracking-wider focus:ring-teal-400/70 focus:border-teal-400"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={phoneLoading || phoneInput.length < 10}
+                  className="btn-primary w-full py-2.5 text-xs flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {phoneLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <span>Send Verification Code</span>
+                  )}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyPhoneOtp} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                    6-Digit Security Code
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    maxLength={6}
+                    value={phoneOtpInput}
+                    onChange={(e) => setPhoneOtpInput(e.target.value.replace(/\D/g, ''))}
+                    placeholder="000000"
+                    className="input text-center text-lg font-mono tracking-widest font-black focus:ring-teal-400/70 focus:border-teal-400"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-gray-400">
+                  <button
+                    type="button"
+                    onClick={() => setPhoneStep('phone')}
+                    className="hover:text-gray-200 transition-colors"
+                  >
+                    Change number
+                  </button>
+
+                  {phoneCooldown > 0 ? (
+                    <span className="text-gray-500">Resend in {phoneCooldown}s</span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleSendPhoneOtp}
+                      className="text-orange-400 hover:text-orange-300 font-bold transition-colors"
+                    >
+                      Resend Code
+                    </button>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={phoneLoading || phoneOtpInput.length !== 6}
+                  className="btn-primary w-full py-2.5 text-xs flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {phoneLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <span>Verify & Continue</span>
+                  )}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Magic Link Modal */}
+      {showMagicModal && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-sm bg-navy-800 border border-navy-700 rounded-3xl p-6 sm:p-7 shadow-2xl relative">
+            <button
+              type="button"
+              onClick={() => {
+                setShowMagicModal(false);
+                setMagicSent(false);
+              }}
+              className="absolute top-5 right-5 text-gray-400 hover:text-white p-1 rounded-lg hover:bg-navy-700 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="text-center mb-5">
+              <div className="w-12 h-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-orange-400 mx-auto flex items-center justify-center mb-3">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-white">
+                {magicSent ? 'Check Your Inbox' : 'One-Click Sign In'}
+              </h3>
+              <p className="text-xs text-gray-400 mt-1">
+                {magicSent
+                  ? `We've sent a magic sign-in link to ${magicEmail}.`
+                  : 'Receive a passwordless sign-in link directly in your email inbox.'}
+              </p>
+            </div>
+
+            {magicSent ? (
+              <div className="space-y-4 text-center">
+                <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300">
+                  Click the link in your email to instantly authenticate. Links expire after 15 minutes and can only be opened on this device.
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowMagicModal(false);
+                    setMagicSent(false);
+                  }}
+                  className="btn-primary w-full py-2.5 text-xs font-bold"
+                >
+                  Done
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSendMagicLink} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                    Your Email Address
+                  </label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="email"
+                      required
+                      value={magicEmail}
+                      onChange={(e) => setMagicEmail(e.target.value)}
+                      placeholder="name@example.com"
+                      className="input pl-10 text-xs focus:ring-teal-400/70 focus:border-teal-400"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={magicLoading || !isEmailValid(magicEmail)}
+                  className="btn-primary w-full py-2.5 text-xs flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {magicLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <span>Send Magic Link</span>
                   )}
                 </button>
               </form>

@@ -37,7 +37,47 @@ export const authApi = {
   resetPassword: (data: { token: string; password: string }) =>
     api.post('/auth/reset-password', data),
   getProviders: () =>
-    api.get<{ providers: { google: boolean } }>('/auth/providers'),
+    api.get<{
+      google: boolean;
+      facebook: boolean;
+      github: boolean;
+      phone: boolean;
+      magicLink: boolean;
+      googleClientId?: string;
+      providers: {
+        google: boolean;
+        facebook: boolean;
+        github: boolean;
+        phone: boolean;
+        magicLink: boolean;
+      };
+    }>('/auth/providers'),
+  verifyGoogleCredential: (credential: string, returnUrl?: string) =>
+    api.post('/auth/google/credential', { credential, returnUrl }),
+  sendPhoneOtp: (phone: string) =>
+    api.post('/auth/phone/send-otp', { phone }),
+  verifyPhoneOtp: (phone: string, code: string, returnUrl?: string) =>
+    api.post('/auth/phone/verify-otp', { phone, code, returnUrl }),
+  sendMagicLink: (email: string, returnUrl?: string) =>
+    api.post('/auth/magic-link/send', { email, returnUrl }),
+  verifyMagicLink: (token: string, returnUrl?: string) =>
+    api.post('/auth/magic-link/verify', { token, returnUrl }),
+  getIdentities: () =>
+    api.get<{
+      hasPassword: boolean;
+      email: string | null;
+      phone: string | null;
+      identities: Array<{
+        provider: string;
+        provider_user_id: string;
+        email: string | null;
+        created_at: string;
+      }>;
+    }>('/auth/identities'),
+  disconnectIdentity: (provider: string) =>
+    api.post(`/auth/identities/${provider}/disconnect`),
+  setPassword: (password: string) =>
+    api.post('/auth/set-password', { password }),
 }
 
 // ── Uploads & AI ──

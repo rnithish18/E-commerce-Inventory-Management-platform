@@ -7,11 +7,11 @@ const pool = new Pool({
 async function resetTestDb() {
   console.log('Resetting shopnest_test_db from template shopnest_db...');
   try {
-    // Terminate existing connections to test db if any
+    // Terminate existing connections to test db and shopnest_db if any
     await pool.query(`
       SELECT pg_terminate_backend(pg_stat_activity.pid)
       FROM pg_stat_activity
-      WHERE pg_stat_activity.datname = 'shopnest_test_db'
+      WHERE pg_stat_activity.datname IN ('shopnest_test_db', 'shopnest_db')
         AND pid <> pg_backend_pid();
     `);
     await pool.query('DROP DATABASE IF EXISTS shopnest_test_db;');
