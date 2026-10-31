@@ -514,7 +514,12 @@ export function AdminOrders() {
                               <span className="text-[10px] text-gray-500 font-mono">{formatDateTime(ev.created_at)}</span>
                             </div>
                             <p className="text-gray-300 text-[11px] mt-0.5">{ev.description}</p>
-                            {ev.location && <p className="text-gray-500 text-[10px]">📍 {ev.location}</p>}
+                            {ev.location && (
+                              <p className="text-gray-500 text-[10px] flex items-center gap-1 mt-0.5">
+                                <MapPin className="w-2.5 h-2.5 text-gray-400" />
+                                <span>{ev.location}</span>
+                              </p>
+                            )}
                           </div>
                         </div>
                       ))

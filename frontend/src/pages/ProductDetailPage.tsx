@@ -342,8 +342,9 @@ export function ProductDetailPage() {
 
             {/* Urgency Badge if stock is 10 or less */}
             {inStock && totalStock <= 10 && (
-              <span className="px-2.5 py-0.5 rounded-md bg-red-500/10 text-red-400 border border-red-500/30 text-[11px] font-bold animate-pulse">
-                ⚡ Only {totalStock} left — order soon!
+              <span className="px-2.5 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[11px] font-bold flex items-center gap-1.5 w-fit">
+                <Clock className="w-3.5 h-3.5" />
+                <span>Low stock: Only {totalStock} units remaining</span>
               </span>
             )}
           </div>

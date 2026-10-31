@@ -20,6 +20,16 @@ const WishlistPage = lazy(() => import('./pages/customer/WishlistPage').then(m =
 const ProfilePage = lazy(() => import('./pages/customer/ProfilePage').then(m => ({ default: m.ProfilePage })));
 const ImageCreditsPage = lazy(() => import('./pages/ImageCreditsPage').then(m => ({ default: m.ImageCreditsPage })));
 
+// Store & Policy Pages
+const AboutPage = lazy(() => import('./pages/store/AboutPage').then(m => ({ default: m.AboutPage })));
+const ShippingReturnsPage = lazy(() => import('./pages/store/ShippingReturnsPage').then(m => ({ default: m.ShippingReturnsPage })));
+const PrivacyPage = lazy(() => import('./pages/store/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
+const TermsPage = lazy(() => import('./pages/store/TermsPage').then(m => ({ default: m.TermsPage })));
+const FaqPage = lazy(() => import('./pages/store/FaqPage').then(m => ({ default: m.FaqPage })));
+const ContactPage = lazy(() => import('./pages/store/ContactPage').then(m => ({ default: m.ContactPage })));
+const TrackOrderPage = lazy(() => import('./pages/store/TrackOrderPage').then(m => ({ default: m.TrackOrderPage })));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
+
 // Auth
 const LoginPage = lazy(() => import('./pages/auth/LoginPage').then(m => ({ default: m.LoginPage })));
 const RegisterPage = lazy(() => import('./pages/auth/RegisterPage').then(m => ({ default: m.RegisterPage })));
@@ -94,6 +104,13 @@ export default function App() {
                   />
                   <Route path="/image-credits" element={<ImageCreditsPage />} />
                   <Route path="/credits" element={<Navigate to="/image-credits" replace />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/shipping-returns" element={<ShippingReturnsPage />} />
+                  <Route path="/privacy" element={<PrivacyPage />} />
+                  <Route path="/terms" element={<TermsPage />} />
+                  <Route path="/faq" element={<FaqPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/track-order" element={<TrackOrderPage />} />
                 </Route>
 
                 {/* Authentication Pages (Standalone) */}
@@ -139,7 +156,7 @@ export default function App() {
                 </Route>
 
                 {/* 404 Fallback */}
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="*" element={<NotFoundPage />} />
 
               </Routes>
             </Suspense>

@@ -207,9 +207,17 @@ export const reviewsApi = {
     api.post<{ helpful: boolean; helpful_count: number }>(`/reviews/${reviewId}/helpful`),
 }
 
-// ── Invoices ──
+// ── Invoices & Orders ──
 export const ordersApi = {
   getInvoiceUrl: (orderId: string) => `/api/v1/orders/${orderId}/invoice`,
+  trackGuest: (orderId: string, email: string) =>
+    api.post<{ order: any }>('/orders/track-guest', { orderId, email }),
+}
+
+// ── Contact ──
+export const contactApi = {
+  submit: (data: { name: string; email: string; subject: string; message: string }) =>
+    api.post<{ success: boolean; message: string }>('/contact', data),
 }
 
 // ── Categories ──

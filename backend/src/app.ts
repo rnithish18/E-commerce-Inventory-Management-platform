@@ -26,12 +26,14 @@ import adminReviewRoutes from './routes/admin/reviews';
 import adminDashboardRoutes from './routes/admin/dashboard';
 import adminAnalyticsRoutes from './routes/admin/analytics';
 import webhookRoutes from './routes/webhooks';
+import contactRoutes from './routes/contact';
 import {
   authLimiter,
   couponLimiter,
   paymentLimiter,
   uploadLimiter,
   aiLimiter,
+  contactLimiter,
   csrfProtection,
 } from './middleware/security';
 import { query } from './db/query';
@@ -122,6 +124,13 @@ app.get('/sitemap.xml', async (_req: express.Request, res: express.Response) => 
     const staticRoutes = [
       { loc: `${baseUrl}/`, priority: '1.0', changefreq: 'daily', lastmod: now },
       { loc: `${baseUrl}/shop`, priority: '0.9', changefreq: 'daily', lastmod: now },
+      { loc: `${baseUrl}/about`, priority: '0.7', changefreq: 'monthly', lastmod: now },
+      { loc: `${baseUrl}/shipping-returns`, priority: '0.7', changefreq: 'monthly', lastmod: now },
+      { loc: `${baseUrl}/privacy`, priority: '0.6', changefreq: 'monthly', lastmod: now },
+      { loc: `${baseUrl}/terms`, priority: '0.6', changefreq: 'monthly', lastmod: now },
+      { loc: `${baseUrl}/faq`, priority: '0.7', changefreq: 'monthly', lastmod: now },
+      { loc: `${baseUrl}/contact`, priority: '0.7', changefreq: 'monthly', lastmod: now },
+      { loc: `${baseUrl}/track-order`, priority: '0.8', changefreq: 'monthly', lastmod: now },
       { loc: `${baseUrl}/image-credits`, priority: '0.7', changefreq: 'weekly', lastmod: now },
     ];
 
@@ -188,6 +197,7 @@ app.use('/api/v1/admin/coupons', adminCouponRoutes);
 app.use('/api/v1/admin/reviews', adminReviewRoutes);
 app.use('/api/v1/admin/dashboard', adminDashboardRoutes);
 app.use('/api/v1/admin/analytics', adminAnalyticsRoutes);
+app.use('/api/v1/contact', contactLimiter, contactRoutes);
 app.use('/api/v1/webhooks', webhookRoutes);
 
 // 404

@@ -75,7 +75,7 @@ export async function exchangeAndVerifyGithubCode(params: {
     }),
   });
 
-  const tokenData = await tokenRes.json();
+  const tokenData = (await tokenRes.json()) as any;
   if (!tokenRes.ok || !tokenData.access_token) {
     throw new AppError(400, tokenData.error_description || 'Failed to exchange GitHub authorization code', 'OAUTH_FAILED');
   }
@@ -87,7 +87,7 @@ export async function exchangeAndVerifyGithubCode(params: {
       'User-Agent': 'ShopNest-Auth-Server',
     },
   });
-  const userData = await userRes.json();
+  const userData = (await userRes.json()) as any;
 
   if (!userRes.ok || !userData.id) {
     throw new AppError(400, 'Failed to fetch GitHub user details', 'OAUTH_FAILED');
@@ -100,7 +100,7 @@ export async function exchangeAndVerifyGithubCode(params: {
       'User-Agent': 'ShopNest-Auth-Server',
     },
   });
-  const emailsData = await emailsRes.json();
+  const emailsData = (await emailsRes.json()) as any;
 
   let primaryVerifiedEmail: string | null = null;
   if (Array.isArray(emailsData)) {

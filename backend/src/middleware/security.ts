@@ -67,6 +67,19 @@ export const aiLimiter = rateLimit({
   },
 });
 
+// 6. Rate limiter for contact form inquiries (10 inquiries per 15 minutes)
+export const contactLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => process.env.NODE_ENV === 'test',
+  message: {
+    error: 'TOO_MANY_REQUESTS',
+    message: 'Too many contact messages sent. Please wait a few minutes before sending another inquiry.',
+  },
+});
+
 // 6. CSRF / Origin Verification Middleware for state-mutating requests
 export function csrfProtection(req: Request, _res: Response, next: NextFunction): void {
   // Safe HTTP methods do not require origin validation

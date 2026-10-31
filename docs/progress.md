@@ -623,3 +623,36 @@ Running 3 tests using 1 worker
     - **Vitest Suite**: **17 / 17 test files passed**, **213 / 213 tests passed** (Baseline 192).
     - **Playwright E2E Suite**: **9 / 9 test files passed**, **28 / 28 tests passed** (Baseline 25).
     - TypeScript frontend and backend compile cleanly with zero errors.
+
+---
+
+## 16. Part B: Editorial Commerce Design System, Public Storefront Pages & Order Tracking
+
+### Completed Deliverables
+1. **Editorial Commerce Design System (`docs/design-system.md`)**:
+   - Replaced generic landing-page and template aesthetics (decorative emojis, neon gradients, pulsing glows) with a disciplined, editorial retail language.
+   - Installed self-hosted `@fontsource/bricolage-grotesque` (display/headlines) and `@fontsource/inter` (body and numerals) in `frontend/src/index.css` and `frontend/tailwind.config.js`.
+   - Replaced UI emojis across the storefront (`Topbar`, `RunawayButton`, `ProductDetailPage`, `AdminOrders`) with clean, semantic Lucide icons (`Sparkles`, `Truck`, `ShieldCheck`, `Clock`, `MapPin`).
+2. **Dedicated Storefront & Legal / Policy Pages (`frontend/src/pages/store/`)**:
+   - **About Page (`/about`)**: Narrative covering ShopNest origin, curated merchandise principles, integer paise monetary engineering, and fulfillment logistics.
+   - **Shipping & Returns Policy (`/shipping-returns`)**: Clear breakdowns of standard (3-5 business days) vs express (1-2 days) shipping, free delivery threshold (₹500), 7-day hassle-free return window, and reverse pickup workflow.
+   - **Privacy Policy (`/privacy`)**: Transparent disclosures detailing customer data processing, JWT cookie security, payment gateway tokenization (zero raw card storage), and user data deletion rights.
+   - **Terms of Service (`/terms`)**: Binding terms covering account responsibilities, inventory reservation windows, pricing disclaimers, and dispute resolution under Karnataka jurisdiction.
+   - **Frequently Asked Questions (`/faq`)**: Interactive accordion categorized across Ordering, Shipping, Payments, Returns, and Security with live keyword search filtering.
+   - **Contact Us (`/contact`)**: Support desk directory (support email, Bangalore HQ address, business hours) paired with a live inquiry form hooked to the backend API with automated submission feedback.
+   - **Guest Order Tracking (`/track-order`)**: Public lookup portal enabling customers to verify tracking timelines and delivery milestones using Order ID and account email without requiring login.
+   - **Custom 404 Not Found Page (`frontend/src/pages/NotFoundPage.tsx`)**: Bespoke editorial error page with direct navigation routes back to the store, catalog, and support.
+3. **Backend Contact & Guest Tracking Subsystem**:
+   - **Contact Inquiries API (`backend/src/routes/contact.ts`)**:
+     - `POST /api/v1/contact` with input validation (name, email, subject, message) and database storage into `contact_messages`.
+     - Rate limited via `contactLimiter` in `backend/src/middleware/security.ts` (10 inquiries / 15 minutes).
+   - **Guest Order Tracking API (`backend/src/routes/orders.ts`)**:
+     - `POST /api/v1/orders/track-guest` supporting full or prefix UUID matching verified against customer email, returning full order status and tracking events.
+   - **Dynamic XML Sitemap (`backend/src/app.ts`)**:
+     - Integrated all store and policy URLs (`/about`, `/shipping-returns`, `/privacy`, `/terms`, `/faq`, `/contact`, `/track-order`, `/image-credits`) into `/sitemap.xml`.
+4. **Navigation & Footer Synchronization**:
+   - **Storefront Footer (`frontend/src/components/layout/StorefrontLayout.tsx`)**: Replaced placeholder links with organized navigation columns (Shop, Information, Customer Service, Legal) pointing to all real pages, newsletter subscription input, and payment trust badges.
+   - **Lazy Loading & Route Splitting (`frontend/src/App.tsx`)**: Code-split all new pages with `React.lazy` and `Suspense`, maintaining lightweight initial page load times.
+5. **Quality Assurance & Verification**:
+   - Both backend (`tsc`) and frontend (`tsc -b && vite build`) compile with **0 errors**.
+   - Created comprehensive integration test suite `tests/api/part_b_store_pages.test.ts` validating contact form submissions, validation rejections, guest tracking matching, and XML sitemap generation.

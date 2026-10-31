@@ -8,6 +8,39 @@ import { query } from '../db/query';
 import { AppError } from '../middleware/errorHandler';
 
 const router = Router();
+
+// POST /api/v1/orders/track-guest - Public order tracking by Order ID and Account Email
+router.post('/track-guest', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { orderId, email } = req.body;
+    if (!orderId || !email) {
+      throw new AppError(400, 'Both Order ID and order email are required for tracking', 'VALIDATION_ERROR');
+    }
+
+    const cleanOrderId = String(orderId).trim().toLowerCase();
+    const cleanEmail = String(email).trim().toLowerCase();
+
+    const orderRes = await query<{ id: string; user_id: string }>(
+      `SELECT o.id, o.user_id 
+       FROM orders o 
+       JOIN users u ON o.user_id = u.id 
+       WHERE (LOWER(o.id) = $1 OR LOWER(o.id) LIKE $2) 
+         AND LOWER(u.email) = $3
+       LIMIT 1`,
+      [cleanOrderId, `${cleanOrderId}%`, cleanEmail]
+    );
+
+    if (orderRes.rows.length === 0) {
+      throw new AppError(404, 'No order found matching the provided Order ID and email address.', 'ORDER_NOT_FOUND');
+    }
+
+    const order = await getOrderDetail(orderRes.rows[0].id, orderRes.rows[0].user_id);
+    res.json({ order });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.use(requireAuth);
 
 // POST /api/v1/orders/checkout

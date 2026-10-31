@@ -18,6 +18,8 @@ import {
   Sun,
   Moon,
   ArrowRight,
+  Sparkles,
+  Truck,
 } from 'lucide-react';
 import { VisualSearchModal } from '../search/VisualSearchModal';
 import { useAuth } from '../../contexts/AuthContext';
@@ -194,7 +196,7 @@ export function Topbar() {
           
           {/* Brand / Logo */}
           <Link to="/" className="flex items-center gap-3 group shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-600 to-orange-400 flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:scale-105 transition-transform duration-200">
+            <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-200">
               <ShoppingBag className="w-5 h-5 text-white" />
             </div>
             <div className="hidden sm:block">
@@ -405,7 +407,7 @@ export function Topbar() {
                   <div className="p-2 space-y-1.5 text-xs">
                     <div className="p-2.5 rounded-xl bg-navy-700/50 hover:bg-navy-700 transition-colors">
                       <div className="flex items-center gap-2 text-orange-400 font-bold mb-0.5">
-                        <span>🎁</span>
+                        <Sparkles className="w-3.5 h-3.5 text-orange-400" />
                         <span>WELCOME10 Active</span>
                       </div>
                       <p className="text-[11px] text-gray-300">
@@ -414,8 +416,8 @@ export function Topbar() {
                     </div>
 
                     <div className="p-2.5 rounded-xl bg-navy-700/50 hover:bg-navy-700 transition-colors">
-                      <div className="flex items-center gap-2 text-green-400 font-bold mb-0.5">
-                        <span>🚚</span>
+                      <div className="flex items-center gap-2 text-emerald-400 font-bold mb-0.5">
+                        <Truck className="w-3.5 h-3.5 text-emerald-400" />
                         <span>Free Express Shipping</span>
                       </div>
                       <p className="text-[11px] text-gray-300">

@@ -13,10 +13,10 @@ interface RunawayButtonProps {
 }
 
 const DODGE_HINTS = [
-  'Fill in your email first! 📝',
-  'Password is required! 🔒',
-  "I don't open for empty forms! 😉",
-  'Nice try! Please complete the fields ✨',
+  'Enter your account email first.',
+  'Password credentials required.',
+  'Form requires valid input.',
+  'Complete the required fields.',
 ];
 
 export function RunawayButton({
@@ -70,7 +70,7 @@ export function RunawayButton({
     if (nextCount >= 3) {
       // Escape hatch triggered! Stay in place
       setOffset({ x: 0, y: 0 });
-      setHint('Okay, fine! Fill the fields below 😊');
+      setHint('Evasion paused. Please complete all fields.');
       return;
     }
 
@@ -131,8 +131,8 @@ export function RunawayButton({
         className={`w-full py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 select-none outline-none focus:ring-2 focus:ring-teal-400/80 focus:ring-offset-2 focus:ring-offset-navy-900 ${
           isValid
             ? roleContext === 'ADMIN'
-              ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-lg shadow-orange-500/30 ring-1 ring-orange-400/50 cursor-pointer animate-pulse-subtle'
-              : 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg shadow-orange-500/30 cursor-pointer'
+              ? 'bg-amber-500 hover:bg-amber-600 text-navy-950 font-black cursor-pointer shadow-md'
+              : 'bg-orange-500 hover:bg-orange-600 text-white cursor-pointer shadow-md'
             : isFocused || isDodgeLocked
             ? 'bg-navy-700 hover:bg-navy-600 text-gray-200 border border-navy-500 cursor-pointer'
             : 'bg-navy-700/80 hover:bg-navy-700 text-gray-400 border border-navy-600/60 cursor-pointer'

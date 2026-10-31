@@ -69,7 +69,7 @@ export async function exchangeAndVerifyFacebookCode(params: {
   tokenUrl.searchParams.set('code', params.code);
 
   const tokenRes = await fetch(tokenUrl.toString());
-  const tokenData = await tokenRes.json();
+  const tokenData = (await tokenRes.json()) as any;
 
   if (!tokenRes.ok || !tokenData.access_token) {
     throw new AppError(400, tokenData.error?.message || 'Failed to exchange Facebook token', 'OAUTH_FAILED');
@@ -81,7 +81,7 @@ export async function exchangeAndVerifyFacebookCode(params: {
   meUrl.searchParams.set('access_token', tokenData.access_token);
 
   const meRes = await fetch(meUrl.toString());
-  const meData = await meRes.json();
+  const meData = (await meRes.json()) as any;
 
   if (!meRes.ok || !meData.id) {
     throw new AppError(400, 'Failed to fetch Facebook user profile', 'OAUTH_FAILED');

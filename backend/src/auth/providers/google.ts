@@ -40,7 +40,7 @@ export async function exchangeAndVerifyGoogleCode(params: {
   code: string;
   codeVerifier: string;
   callbackUrl: string;
-}): Promise<NormalizedProfile & { sub: string; email_verified: boolean; name?: string }> {
+}): Promise<NormalizedProfile & { sub: string; email_verified: boolean; name?: string; picture?: string }> {
   if (mockExchange) {
     const res: any = await mockExchange(params.code, params.codeVerifier);
     const isVerified = Boolean(res.emailVerified ?? res.email_verified);
