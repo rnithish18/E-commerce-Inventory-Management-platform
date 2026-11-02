@@ -9,7 +9,8 @@ import {
   Upload, 
   X, 
   Check, 
-  AlertCircle 
+  AlertCircle,
+  Sparkles 
 } from 'lucide-react';
 import api, { AiAnalysisData } from '../../lib/api';
 import { formatPaise } from '../../lib/utils';
@@ -529,7 +530,10 @@ export function AdminProducts() {
               <div>
                 <label className="block text-xs font-semibold text-gray-300 mb-1.5 flex items-center justify-between">
                   <span>Product Images & AI Vision Analysis</span>
-                  <span className="text-[10px] text-teal-400 font-bold">✨ AI Suggestion Ready</span>
+                  <span className="text-[10px] text-teal-400 font-bold flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    <span>AI Suggestion Ready</span>
+                  </span>
                 </label>
                 <ImageUploader
                   images={uploadedImages}

@@ -230,7 +230,7 @@ export function ImageUploader({
       }
 
       setAnalysisResult(res.data.data);
-      toast.success('AI vision analysis complete!', { icon: '✨' });
+      toast.success('AI vision analysis complete!');
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'AI analysis failed. Please try again.');
     } finally {

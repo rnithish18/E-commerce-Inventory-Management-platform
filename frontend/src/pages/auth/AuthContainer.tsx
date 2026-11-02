@@ -267,8 +267,7 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
       toast.success(
         roleContext === 'ADMIN'
           ? 'Welcome, Admin! Redirecting to Management Console...'
-          : 'Logged in successfully! Welcome back to ShopNest.',
-        { icon: '✨' }
+          : 'Logged in successfully! Welcome back to ShopNest.'
       );
       if (roleContext === 'ADMIN') {
         navigate('/admin/dashboard');
@@ -305,7 +304,7 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
         phone: phone || undefined,
         password: regPassword,
       });
-      toast.success('Account created successfully! Welcome to ShopNest.', { icon: '🎉' });
+      toast.success('Account created successfully! Welcome to ShopNest.');
       // Automatically log them in
       await login(regEmail, regPassword, false);
       navigate(returnUrl);
@@ -501,8 +500,8 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
             </div>
             <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
               Curated products. <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500">
-                Delivered in minutes.
+              <span className="text-orange-500 font-display">
+                Delivered across India.
               </span>
             </h1>
             <p className="text-sm text-gray-400 max-w-lg leading-relaxed">
@@ -512,7 +511,7 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
           </div>
 
           {/* Dynamic Showcase Card */}
-          <div className="relative rounded-3xl bg-gradient-to-br from-navy-800/90 to-navy-700/60 border border-navy-600/60 p-6 shadow-2xl backdrop-blur-md overflow-hidden transition-all duration-500">
+          <div className="relative rounded-3xl bg-navy-800/90 border border-navy-700 p-6 shadow-xl backdrop-blur-md overflow-hidden transition-all duration-300">
             <div className="absolute top-0 right-0 -mr-12 -mt-12 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
 
             <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -1044,7 +1043,7 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
                 {devResetToken && (
                   <div className="p-3 rounded-xl bg-navy-900 border border-orange-500/30 text-left">
                     <p className="text-[11px] font-bold text-orange-400 mb-1">
-                      🛠️ Dev Mode Active:
+                      Developer Environment:
                     </p>
                     <Link
                       to={`/reset-password?token=${devResetToken}`}

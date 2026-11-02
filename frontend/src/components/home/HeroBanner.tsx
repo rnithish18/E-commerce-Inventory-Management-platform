@@ -15,33 +15,33 @@ interface Slide {
 
 const SLIDES: Slide[] = [
   {
-    badge: 'SUPER ELECTRONICS SALE',
+    badge: 'CURATED ELECTRONICS',
     badgeIcon: <Zap className="w-3.5 h-3.5 text-yellow-400" />,
-    title: 'Next-Gen Audio & Smart Tech',
-    subtitle: 'Upgrade your daily productivity with noise-cancelling headphones, AMOLED smartwatches, and flagship phones.',
-    discount: 'Up to 45% OFF',
+    title: 'Flagship Performance. Honest Pricing.',
+    subtitle: 'Explore authentic flagship smartphones, noise-cancelling acoustics, and wearable tech with manufacturer warranty.',
+    discount: 'Up to 35% OFF',
     category: 'electronics',
-    bgGradient: 'from-orange-600/90 via-orange-900/60 to-navy-900',
+    bgGradient: 'from-navy-800 via-navy-900 to-navy-950',
     image: '/products/samsung-galaxy-s24-ultra/image-0-640.webp',
   },
   {
-    badge: 'NEW SEASON ARRIVALS',
+    badge: 'AUTHENTIC FOOTWEAR',
     badgeIcon: <Sparkles className="w-3.5 h-3.5 text-orange-400" />,
-    title: 'Trendy Streetwear & Footwear',
-    subtitle: 'Step up your wardrobe with premium genuine sneakers, relaxed denims, and timeless casual jackets.',
-    discount: 'Starting at ₹1,499',
+    title: 'Iconic Silhouettes & Street Classics',
+    subtitle: 'Step into genuine, verified sneakers and apparel inspected for physical authenticity and build quality.',
+    discount: 'Starting at ₹2,499',
     category: 'fashion',
-    bgGradient: 'from-purple-900/80 via-navy-800 to-navy-900',
+    bgGradient: 'from-navy-800 via-navy-900 to-navy-950',
     image: '/products/nike-air-force-1-low-white-sneakers/image-0-640.webp',
   },
   {
-    badge: 'FLAGSHIP CAMERAS & CREATOR GEAR',
-    badgeIcon: <ShieldCheck className="w-3.5 h-3.5 text-green-400" />,
-    title: 'Precision Imaging & Lenses',
-    subtitle: 'High-speed mirrorless bodies, RF-S optical stabilized lenses, and creator accessories with warranty.',
-    discount: 'Flat 20% OFF',
+    badge: 'PRECISION CREATOR GEAR',
+    badgeIcon: <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />,
+    title: 'High-Speed Mirrorless Systems',
+    subtitle: 'Next-generation optical sensor bodies, stabilization lenses, and creator optics ready for same-day dispatch.',
+    discount: 'Flat 15% OFF',
     category: 'electronics',
-    bgGradient: 'from-blue-900/80 via-navy-800 to-navy-900',
+    bgGradient: 'from-navy-800 via-navy-900 to-navy-950',
     image: '/products/canon-eos-r50-mirrorless-camera/image-0-640.webp',
   },
 ];
@@ -71,7 +71,7 @@ export function HeroBanner() {
           <span>{slide.badge}</span>
         </div>
 
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black font-display text-white tracking-tight leading-tight">
           {slide.title}
         </h1>
 
