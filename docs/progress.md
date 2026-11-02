@@ -656,3 +656,5 @@ Running 3 tests using 1 worker
 5. **Quality Assurance & Verification**:
    - Both backend (`tsc`) and frontend (`tsc -b && vite build`) compile with **0 errors**.
    - Created comprehensive integration test suite `tests/api/part_b_store_pages.test.ts` validating contact form submissions, validation rejections, guest tracking matching, and XML sitemap generation.
+   - Built Playwright end-to-end test suite `tests/e2e/store_pages.spec.ts` covering About story rendering, Shipping/Returns timelines, DPDP Act 2023 disclosures, Terms clauses, FAQ accordion expansion & search filtering, Contact form dispatch, Guest tracking validation, and Custom 404 page navigation.
+   - Refined `HeroBanner` with authentic editorial copywriting, restrained navy gradient depth, and `font-display` display typography.
