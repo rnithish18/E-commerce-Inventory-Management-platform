@@ -8,7 +8,7 @@
 FROM node:20-alpine AS frontend-build
 WORKDIR /build/frontend
 COPY frontend/package*.json ./
-RUN npm ci
+RUN npm install --prefer-offline
 COPY frontend/ ./
 RUN npm run build
 # Output: /build/frontend/dist
@@ -17,7 +17,7 @@ RUN npm run build
 FROM node:20-alpine AS backend-build
 WORKDIR /build/backend
 COPY backend/package*.json ./
-RUN npm ci
+RUN npm install --prefer-offline
 COPY backend/ ./
 RUN npm run build
 # Output: /build/backend/dist
@@ -32,7 +32,7 @@ WORKDIR /app
 
 # Install only production dependencies
 COPY backend/package*.json ./
-RUN npm ci --omit=dev && npm cache clean --force
+RUN npm install --omit=dev --prefer-offline && npm cache clean --force
 
 # Copy compiled backend
 COPY --from=backend-build /build/backend/dist ./dist
