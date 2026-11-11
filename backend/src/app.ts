@@ -210,7 +210,8 @@ app.use(express.static(frontendPath, { maxAge: '7d' }));
 
 // SPA fallback — any non-API, non-file request gets index.html
 // so React Router can handle client-side routes
-app.get('*', (req, res, next) => {
+// Note: Express 5 requires named wildcards; use regex for compatibility
+app.get(/(.*)/, (req, res, next) => {
   // Don't intercept API or upload routes (they should 404 normally)
   if (req.path.startsWith('/api/') || req.path.startsWith('/uploads/')) {
     return next();
