@@ -1,5 +1,7 @@
-# render.yaml — ShopNest single-service deployment
+# render.yaml — ShopNest single-service deployment (Free Tier)
 # Render auto-detects this file and uses it for Blueprint deploys.
+# NOTE: Free tier spins down after inactivity (~15 min).
+#       No persistent disks, SSH, scaling, or one-off jobs.
 
 services:
   - type: web
@@ -7,7 +9,7 @@ services:
     runtime: docker
     repo: https://github.com/rnithish18/E-commerce-Inventory-Management-platform
     branch: main
-    plan: starter
+    plan: free
     region: singapore
     dockerfilePath: ./Dockerfile
     healthCheckPath: /health
@@ -34,13 +36,9 @@ services:
         value: /app/uploads
       - key: MAX_FILE_SIZE_MB
         value: "5"
-    disk:
-      name: uploads
-      mountPath: /app/uploads
-      sizeGB: 1
 
 databases:
   - name: shopnest-db
-    plan: starter
+    plan: free
     databaseName: shopnest_db
     user: shopnest
