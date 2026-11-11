@@ -40,6 +40,9 @@ import { query } from './db/query';
 
 const app = express();
 
+// Trust the first reverse proxy (Render, Railway, etc.)
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
@@ -200,7 +203,24 @@ app.use('/api/v1/admin/analytics', adminAnalyticsRoutes);
 app.use('/api/v1/contact', contactLimiter, contactRoutes);
 app.use('/api/v1/webhooks', webhookRoutes);
 
-// 404
+// ---------- Serve Frontend in Production ----------
+// In the Docker image, the Vite build output lives at /app/public
+const frontendPath = path.join(__dirname, '..', 'public');
+app.use(express.static(frontendPath, { maxAge: '7d' }));
+
+// SPA fallback — any non-API, non-file request gets index.html
+// so React Router can handle client-side routes
+app.get('*', (req, res, next) => {
+  // Don't intercept API or upload routes (they should 404 normally)
+  if (req.path.startsWith('/api/') || req.path.startsWith('/uploads/')) {
+    return next();
+  }
+  res.sendFile(path.join(frontendPath, 'index.html'), (err) => {
+    if (err) next();
+  });
+});
+
+// 404 (only reached by API routes that don't match)
 app.use((_req, res) => {
   res.status(404).json({ error: 'NOT_FOUND', message: 'The requested endpoint does not exist' });
 });

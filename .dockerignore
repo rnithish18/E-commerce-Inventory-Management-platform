@@ -1,0 +1,15 @@
+node_modules
+.git
+.env
+*.log
+dist
+coverage
+test-results
+playwright-report
+.nyc_output
+incoming-images
+.DS_Store
+*.md
+!README.md
+.agents
+.gemini
