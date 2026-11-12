@@ -6,6 +6,15 @@ import { Toaster } from 'react-hot-toast'
 import './index.css'
 import App from './App'
 
+// Apply saved theme BEFORE React mounts to prevent flash
+const savedTheme = (() => { try { return localStorage.getItem('shopnest_theme'); } catch { return null; } })();
+// Default to dark; only switch to light if explicitly saved as 'light'
+if (savedTheme === 'light') {
+  document.documentElement.classList.remove('dark');
+} else {
+  document.documentElement.classList.add('dark');
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
