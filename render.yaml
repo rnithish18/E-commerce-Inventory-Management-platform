@@ -26,6 +26,8 @@ services:
         value: https://shopnest.onrender.com
       - key: PUBLIC_URL
         value: https://shopnest.onrender.com
+      - key: ALLOWED_ORIGINS
+        value: https://shopnest.onrender.com
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRES_IN
