@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
@@ -46,6 +46,12 @@ const AdminCoupons = lazy(() => import('./pages/admin/AdminCoupons').then(m => (
 const AdminReviews = lazy(() => import('./pages/admin/AdminReviews').then(m => ({ default: m.AdminReviews })));
 const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics').then(m => ({ default: m.AdminAnalytics })));
 const AdminPlaceholder = lazy(() => import('./pages/admin/AdminPlaceholder').then(m => ({ default: m.AdminPlaceholder })));
+
+/** Redirect alias: preserves the full query string when redirecting. */
+function RedirectAlias({ to }: { to: string }) {
+  const { search } = useLocation();
+  return <Navigate to={to + search} replace />;
+}
 
 export default function App() {
   return (
@@ -154,6 +160,19 @@ export default function App() {
                     } 
                   />
                 </Route>
+
+                {/* ── Safety-net redirect aliases (keeps returnUrl / search params) ── */}
+                {/* Legacy /auth/* paths used by older Topbar code */}
+                <Route path="/auth/login"    element={<RedirectAlias to="/login" />} />
+                <Route path="/auth/register" element={<RedirectAlias to="/register" />} />
+                {/* Common alternative spellings */}
+                <Route path="/signin"  element={<RedirectAlias to="/login" />} />
+                <Route path="/signup"  element={<RedirectAlias to="/register" />} />
+                {/* /account and sub-paths */}
+                <Route path="/account"         element={<RedirectAlias to="/profile" />} />
+                <Route path="/account/profile" element={<RedirectAlias to="/profile" />} />
+                <Route path="/account/orders"  element={<RedirectAlias to="/orders" />} />
+                <Route path="/account/*"       element={<RedirectAlias to="/profile" />} />
 
                 {/* 404 Fallback */}
                 <Route path="*" element={<NotFoundPage />} />

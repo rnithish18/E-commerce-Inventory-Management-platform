@@ -12,7 +12,7 @@ export function MobileTabBar() {
     { to: '/shop',            Icon: Grid3X3,      label: 'Categories' },
     { to: '/shop?search=1',   Icon: Search,       label: 'Search' },
     { to: '/cart',            Icon: ShoppingCart, label: 'Cart', count: itemCount },
-    { to: '/account/orders',  Icon: User,         label: 'Account' },
+    { to: '/profile',         Icon: User,         label: 'Account' },
   ];
 
   return (

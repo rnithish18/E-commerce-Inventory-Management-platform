@@ -293,7 +293,7 @@ export function Topbar() {
             {/* Account dropdown */}
             <div ref={accountRef} className="relative">
               <button
-                onClick={() => user ? setAccountOpen(o => !o) : navigate('/auth/login')}
+                onClick={() => user ? setAccountOpen(o => !o) : navigate('/login')}
                 title={user ? user.full_name : 'Sign in'}
                 className="flex items-center gap-1.5 p-2 rounded-btn text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-navy-800 transition-colors"
               >
@@ -310,9 +310,9 @@ export function Topbar() {
                     <p className="text-xs font-semibold text-neutral-900 dark:text-white truncate">{user.full_name}</p>
                     <p className="text-[11px] text-neutral-500 dark:text-neutral-400 truncate">{user.email}</p>
                   </div>
-                  <MenuLink to="/account/orders" icon={Package} label="My Orders" onClick={() => setAccountOpen(false)} />
+                  <MenuLink to="/orders" icon={Package} label="My Orders" onClick={() => setAccountOpen(false)} />
                   <MenuLink to="/wishlist" icon={Heart} label="Wishlist" onClick={() => setAccountOpen(false)} />
-                  <MenuLink to="/account/profile" icon={Settings} label="Profile" onClick={() => setAccountOpen(false)} />
+                  <MenuLink to="/profile" icon={Settings} label="Profile" onClick={() => setAccountOpen(false)} />
                   <MenuLink to="/track-order" icon={Package} label="Track Order" onClick={() => setAccountOpen(false)} />
                   {user.role === 'ADMIN' && (
                     <MenuLink to="/admin" icon={Settings} label="Admin Panel" onClick={() => setAccountOpen(false)} />

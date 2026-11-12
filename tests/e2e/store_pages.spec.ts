@@ -68,10 +68,11 @@ test.describe('Part B: Store Pages, DPDP Compliance, Editorial Footers & Guest T
     await expect(page.locator('text=No matching order found')).toBeVisible({ timeout: 8000 });
   });
 
-  test('Non-existent URL renders custom branded 404 page', async ({ page }) => {
+  test('Non-existent URL renders custom 404 page', async ({ page }) => {
     await page.goto('/department/non-existent-test-page-404');
     await expect(page.locator('p:has-text("404")')).toBeVisible();
-    await expect(page.locator('h1:has-text("Page Not Found")')).toBeVisible();
-    await expect(page.locator('a:has-text("Storefront Home")')).toBeVisible();
+    await expect(page.locator('h1:has-text("This page does not exist.")')).toBeVisible();
+    await expect(page.locator('a:has-text("Go to Home")')).toBeVisible();
+    await expect(page.locator('a:has-text("Browse Catalog")')).toBeVisible();
   });
 });
