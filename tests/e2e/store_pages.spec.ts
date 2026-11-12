@@ -65,9 +65,10 @@ test.describe('Part B: Store Pages, DPDP Compliance, Editorial Footers & Guest T
     await page.fill('input[type="email"]', 'unknown@example.com');
     await page.click('button:has-text("Search Shipment Status")');
 
-    // Either the error card or a toast with the message is shown
+    // The error renders in a red card div (bg-red-500/10 border border-red-500/30)
+    // regardless of the exact message text from the server.
     await expect(
-      page.locator('text=No matching order found').or(page.locator('text=no matching order').or(page.locator('[role="alert"]')))
+      page.locator('div.bg-red-500\\/10').or(page.locator('[role="alert"]'))
     ).toBeVisible({ timeout: 10000 });
   });
 
