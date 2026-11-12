@@ -280,7 +280,7 @@ export function ShopPage() {
     <div className="flex gap-6">
 
       {/* ── Desktop filter sidebar ── */}
-      <aside className="hidden lg:block w-56 xl:w-64 shrink-0">
+      <aside className="hidden lg:block w-56 xl:w-64 shrink-0 filter-sidebar">
         <div className="sticky top-28 bg-white dark:bg-navy-800 border border-surface-border dark:border-white/10 rounded-card overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-surface-border dark:border-white/10">
             <span className="text-sm font-semibold text-neutral-900 dark:text-white">Filters</span>
