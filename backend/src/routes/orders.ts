@@ -24,7 +24,7 @@ router.post('/track-guest', async (req: Request, res: Response, next: NextFuncti
       `SELECT o.id, o.user_id 
        FROM orders o 
        JOIN users u ON o.user_id = u.id 
-       WHERE (LOWER(o.id) = $1 OR LOWER(o.id) LIKE $2) 
+       WHERE (LOWER(o.id::text) = $1 OR LOWER(o.id::text) LIKE $2) 
          AND LOWER(u.email) = $3
        LIMIT 1`,
       [cleanOrderId, `${cleanOrderId}%`, cleanEmail]
