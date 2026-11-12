@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import path from 'path';
+import compression from 'compression';
 
 import { errorHandler } from './middleware/errorHandler';
 import authRoutes from './routes/auth';
@@ -42,6 +43,10 @@ const app = express();
 
 // Trust the first reverse proxy (Render, Railway, etc.)
 app.set('trust proxy', 1);
+
+// Gzip / Brotli compression — place before all routes
+// Skips already-compressed content (images, streams) automatically
+app.use(compression({ level: 6 }));
 
 // Security middleware
 app.use(helmet({
@@ -204,18 +209,45 @@ app.use('/api/v1/contact', contactLimiter, contactRoutes);
 app.use('/api/v1/webhooks', webhookRoutes);
 
 // ---------- Serve Frontend in Production ----------
-// In the Docker image, the Vite build output lives at /app/public
+// Vite output lives at /app/public (copied there in Dockerfile)
 const frontendPath = path.join(__dirname, '..', 'public');
-app.use(express.static(frontendPath, { maxAge: '7d' }));
 
-// SPA fallback — any non-API, non-file request gets index.html
-// so React Router can handle client-side routes
-// Note: Express 5 requires named wildcards; use regex for compatibility
+// Hashed assets (/assets/*.js, /assets/*.css, /assets/*.woff2)
+// — content-addressed → immutable, 1 year cache
+app.use(
+  '/assets',
+  express.static(path.join(frontendPath, 'assets'), {
+    immutable: true,
+    maxAge: '1y',
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      res.setHeader('Vary', 'Accept-Encoding');
+    },
+  })
+);
+
+// Everything else (index.html, favicon, manifest) — no cache / short cache
+app.use(
+  express.static(frontendPath, {
+    maxAge: '0',
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.html')) {
+        // HTML must revalidate every time so deploys propagate immediately
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      } else {
+        res.setHeader('Cache-Control', 'public, max-age=604800'); // 7d for static assets
+      }
+      res.setHeader('Vary', 'Accept-Encoding');
+    },
+  })
+);
+
+// SPA fallback — any non-API, non-file request → index.html
 app.get(/(.*)/, (req, res, next) => {
-  // Don't intercept API or upload routes (they should 404 normally)
   if (req.path.startsWith('/api/') || req.path.startsWith('/uploads/')) {
     return next();
   }
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.sendFile(path.join(frontendPath, 'index.html'), (err) => {
     if (err) next();
   });
