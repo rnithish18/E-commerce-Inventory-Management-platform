@@ -1,159 +1,189 @@
-import React, { useState } from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Sparkles, 
-  Flame, 
-  Award, 
-  TrendingUp, 
-  ArrowRight, 
-  Truck, 
-  ShieldCheck, 
-  RotateCcw, 
-  Headphones 
-} from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Truck, RotateCcw, Shield } from 'lucide-react';
 import { HeroBanner } from '../components/home/HeroBanner';
 import { CategoryTiles } from '../components/home/CategoryTiles';
 import { ProductCard, ProductData } from '../components/product/ProductCard';
 import { ProductCardSkeleton } from '../components/ui/Skeleton';
 import { useFeaturedProducts } from '../hooks/useProducts';
-
-const FILTER_TABS = [
-  { id: 'all', label: 'All Picks', icon: <Sparkles className="w-3.5 h-3.5" /> },
-  { id: 'Best Seller', label: 'Best Sellers', icon: <Award className="w-3.5 h-3.5" /> },
-  { id: 'Trending', label: 'Trending', icon: <TrendingUp className="w-3.5 h-3.5" /> },
-  { id: 'Hot', label: 'Hot Deals', icon: <Flame className="w-3.5 h-3.5" /> },
-];
+import { useQuery } from '@tanstack/react-query';
+import { api } from '../lib/api';
 
 export function HomePage() {
-  const [activeTab, setActiveTab] = useState('all');
-  const { data, isLoading } = useFeaturedProducts();
+  const { data: featuredData, isLoading } = useFeaturedProducts();
+  const { data: dealsData } = useQuery({
+    queryKey: ['home-deals'],
+    queryFn: () => api.get('/products?badge=Sale&limit=10').then(r => r.data),
+    staleTime: 5 * 60 * 1000,
+  });
+  const { data: newData } = useQuery({
+    queryKey: ['home-new-arrivals'],
+    queryFn: () => api.get('/products?sort=newest&limit=10').then(r => r.data),
+    staleTime: 5 * 60 * 1000,
+  });
 
-  const products: ProductData[] = data?.products || [];
-
-  const filteredProducts = activeTab === 'all'
-    ? products
-    : products.filter(p => p.badge === activeTab);
+  const featured: ProductData[] = featuredData?.products ?? [];
+  const deals: ProductData[]    = dealsData?.products    ?? [];
+  const newArrivals: ProductData[] = newData?.products   ?? [];
 
   return (
-    <div className="flex flex-col gap-2">
-      {/* 1. Hero Carousel */}
+    <div className="space-y-6 pb-20 md:pb-6">
+
+      {/* 1. Hero carousel */}
       <HeroBanner />
 
-      {/* 2. Popular Categories */}
+      {/* 2. Category circles */}
       <CategoryTiles />
 
-      {/* 3. Featured Products Section */}
-      <section className="mb-10">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <div className="inline-flex items-center gap-1.5 text-orange-400 text-xs font-bold uppercase tracking-wider mb-1">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Handpicked For You</span>
-            </div>
-            <h2 className="text-2xl font-black text-white tracking-tight">
-              Featured Products
-            </h2>
-          </div>
+      {/* 3. Deals of the day */}
+      {(dealsData || isLoading) && (
+        <Section
+          title="Deals of the Day"
+          subtitle="Prices reduced on selected items"
+          to="/shop?badge=Sale"
+        >
+          <HorizontalProductRow products={deals} loading={!dealsData} />
+        </Section>
+      )}
 
-          {/* Filter Pills */}
-          <div className="flex items-center gap-1.5 bg-navy-800 p-1.5 rounded-2xl border border-navy-700 overflow-x-auto">
-            {FILTER_TABS.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
-                  activeTab === tab.id
-                    ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20'
-                    : 'text-gray-400 hover:text-white hover:bg-navy-700/60'
-                }`}
-              >
-                {tab.icon}
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Product Cards Grid */}
+      {/* 4. Featured products — 2×5 grid */}
+      <Section title="Featured Products" to="/shop">
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <ProductCardSkeleton key={i} />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            {Array.from({ length: 10 }).map((_, i) => <ProductCardSkeleton key={i} />)}
+          </div>
+        ) : featured.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            {featured.slice(0, 10).map((p, i) => (
+              <ProductCard key={p.id} product={p} priority={i < 4} />
             ))}
           </div>
-        ) : filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredProducts.map((p, idx) => (
-              <ProductCard key={p.id} product={p} priority={idx < 4} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12 bg-navy-800/40 rounded-3xl border border-navy-700/60">
-            <p className="text-gray-300 font-semibold text-sm">No items matching this filter</p>
-            <button
-              onClick={() => setActiveTab('all')}
-              className="mt-3 text-xs text-orange-400 hover:text-orange-300 font-bold"
-            >
-              Reset filter to view all
-            </button>
-          </div>
-        )}
+        ) : null}
+      </Section>
 
-        <div className="mt-8 text-center">
+      {/* 5. New arrivals — horizontal scroll */}
+      {(newData || isLoading) && (
+        <Section
+          title="New Arrivals"
+          subtitle="Recently added to the catalogue"
+          to="/shop?sort=newest"
+        >
+          <HorizontalProductRow products={newArrivals} loading={!newData} />
+        </Section>
+      )}
+
+      {/* 6. Info strip — factual only, no invented claims */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 py-2 border-t border-surface-border dark:border-white/10">
+        <InfoItem icon={Truck}    title="Free delivery"     sub="On orders above ₹500" />
+        <InfoItem icon={RotateCcw} title="7-day returns"   sub="Subject to return policy" />
+        <InfoItem icon={Shield}   title="Secure checkout"  sub="Payments via Razorpay (test mode)" />
+      </div>
+    </div>
+  );
+}
+
+/* ── Shared sub-components ───────────────────────────────────────────── */
+
+function Section({
+  title, subtitle, to, children,
+}: {
+  title: string;
+  subtitle?: string;
+  to?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section>
+      <div className="flex items-baseline justify-between mb-3">
+        <div>
+          <h2 className="section-title">{title}</h2>
+          {subtitle && <p className="section-subtitle mt-0.5">{subtitle}</p>}
+        </div>
+        {to && (
           <Link
-            to="/shop"
-            className="inline-flex items-center gap-2 bg-navy-800 hover:bg-navy-700 text-white font-bold text-xs px-6 py-3 rounded-xl border border-navy-600/80 transition-colors shadow-md"
+            to={to}
+            className="flex items-center gap-1 text-xs text-primary font-medium hover:underline shrink-0"
           >
-            <span>Explore All 40+ Products in Catalog</span>
-            <ArrowRight className="w-4 h-4 text-orange-400" />
+            View all <ArrowRight className="w-3.5 h-3.5" />
           </Link>
-        </div>
-      </section>
+        )}
+      </div>
+      {children}
+    </section>
+  );
+}
 
-      {/* 4. Value Propositions / Trust Badges */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 py-8 border-t border-navy-700/60" aria-label="Store Guarantees">
-        <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-navy-800/40 border border-navy-700/60">
-          <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0 border border-orange-500/20">
-            <Truck className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-xs font-bold text-white">Free Express Delivery</h3>
-            <p className="text-[11px] text-gray-400 mt-0.5">On all orders above ₹500</p>
-          </div>
-        </div>
+function HorizontalProductRow({
+  products,
+  loading,
+}: {
+  products: ProductData[];
+  loading: boolean;
+}) {
+  const rowRef = useRef<HTMLDivElement>(null);
 
-        <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-navy-800/40 border border-navy-700/60">
-          <div className="w-10 h-10 rounded-xl bg-green-500/10 text-green-400 flex items-center justify-center shrink-0 border border-green-500/20">
-            <ShieldCheck className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-xs font-bold text-white">100% Genuine Brands</h3>
-            <p className="text-[11px] text-gray-400 mt-0.5">Direct from verified distributors</p>
-          </div>
-        </div>
+  function scroll(dir: 'l' | 'r') {
+    rowRef.current?.scrollBy({ left: dir === 'r' ? 220 : -220, behavior: 'smooth' });
+  }
 
-        <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-navy-800/40 border border-navy-700/60">
-          <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0 border border-blue-500/20">
-            <RotateCcw className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-xs font-bold text-white">7-Day Free Returns</h3>
-            <p className="text-[11px] text-gray-400 mt-0.5">Hassle-free doorstep pickup</p>
-          </div>
-        </div>
+  return (
+    <div className="relative group">
+      {/* Left arrow */}
+      <button
+        onClick={() => scroll('l')}
+        aria-label="Scroll left"
+        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-white dark:bg-navy-800 border border-surface-border dark:border-white/10 rounded-full shadow-card flex items-center justify-center opacity-0 group-hover:opacity-100 transition -translate-x-3 hover:border-primary"
+      >
+        <ChevronLeft className="w-4 h-4 text-neutral-600 dark:text-neutral-300" />
+      </button>
 
-        <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-navy-800/40 border border-navy-700/60">
-          <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0 border border-purple-500/20">
-            <Headphones className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-xs font-bold text-white">24/7 Dedicated Support</h3>
-            <p className="text-[11px] text-gray-400 mt-0.5">Instant live chat assistance</p>
-          </div>
-        </div>
-      </section>
+      {/* Scrollable row */}
+      <div
+        ref={rowRef}
+        className="flex gap-3 overflow-x-auto pb-1 scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {loading
+          ? Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="flex-shrink-0 w-40 md:w-48">
+                <ProductCardSkeleton />
+              </div>
+            ))
+          : products.map(p => (
+              <div key={p.id} className="flex-shrink-0 w-40 md:w-48">
+                <ProductCard product={p} compact />
+              </div>
+            ))
+        }
+      </div>
 
+      {/* Right arrow */}
+      <button
+        onClick={() => scroll('r')}
+        aria-label="Scroll right"
+        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-white dark:bg-navy-800 border border-surface-border dark:border-white/10 rounded-full shadow-card flex items-center justify-center opacity-0 group-hover:opacity-100 transition translate-x-3 hover:border-primary"
+      >
+        <ChevronRight className="w-4 h-4 text-neutral-600 dark:text-neutral-300" />
+      </button>
+    </div>
+  );
+}
+
+function InfoItem({
+  icon: Icon,
+  title,
+  sub,
+}: {
+  icon: React.ElementType;
+  title: string;
+  sub: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 p-3 rounded-card bg-white dark:bg-navy-800 border border-surface-border dark:border-white/10">
+      <Icon className="w-5 h-5 text-primary shrink-0" strokeWidth={1.75} />
+      <div>
+        <p className="text-xs font-semibold text-neutral-900 dark:text-white">{title}</p>
+        <p className="text-[11px] text-neutral-500 dark:text-neutral-400">{sub}</p>
+      </div>
     </div>
   );
 }

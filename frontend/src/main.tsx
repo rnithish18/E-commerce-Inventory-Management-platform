@@ -6,13 +6,12 @@ import { Toaster } from 'react-hot-toast'
 import './index.css'
 import App from './App'
 
-// Apply saved theme BEFORE React mounts to prevent flash
+// Apply saved theme BEFORE React mounts — DEFAULT IS LIGHT
 const savedTheme = (() => { try { return localStorage.getItem('shopnest_theme'); } catch { return null; } })();
-// Default to dark; only switch to light if explicitly saved as 'light'
-if (savedTheme === 'light') {
-  document.documentElement.classList.remove('dark');
-} else {
+if (savedTheme === 'dark') {
   document.documentElement.classList.add('dark');
+} else {
+  document.documentElement.classList.remove('dark');
 }
 
 const queryClient = new QueryClient({
@@ -30,10 +29,11 @@ createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
         <App />
         <Toaster
-          position="top-right"
+          position="bottom-right"
           toastOptions={{
-            style: { background: '#1e293b', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' },
-            success: { iconTheme: { primary: '#f97316', secondary: '#fff' } },
+            duration: 3000,
+            style: { background: '#fff', color: '#111827', border: '1px solid #e5e7eb', fontSize: '13px' },
+            success: { iconTheme: { primary: '#ea580c', secondary: '#fff' } },
           }}
         />
       </QueryClientProvider>

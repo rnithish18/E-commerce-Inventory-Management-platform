@@ -1,155 +1,131 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Sparkles, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Slide {
-  badge: string;
-  badgeIcon: React.ReactNode;
+  id: number;
   title: string;
   subtitle: string;
+  cta: string;
+  to: string;
   discount: string;
-  category: string;
-  bgGradient: string;
+  bgColor: string;
   image: string;
 }
 
 const SLIDES: Slide[] = [
   {
-    badge: 'CURATED ELECTRONICS',
-    badgeIcon: <Zap className="w-3.5 h-3.5 text-yellow-400" />,
-    title: 'Flagship Performance. Honest Pricing.',
-    subtitle: 'Explore authentic flagship smartphones, noise-cancelling acoustics, and wearable tech with manufacturer warranty.',
-    discount: 'Up to 35% OFF',
-    category: 'electronics',
-    bgGradient: 'from-navy-800 via-navy-900 to-navy-950',
-    image: '/products/samsung-galaxy-s24-ultra/image-0-640.webp',
+    id: 1,
+    title: 'Electronics Sale',
+    subtitle: 'Up to 30% off on smartphones, earphones, laptops and accessories.',
+    cta: 'Shop Electronics',
+    to: '/shop?category=electronics',
+    discount: 'Up to 30% off',
+    bgColor: '#1e3a8a',
+    image: '/uploads/products/banner-electronics.jpg',
   },
   {
-    badge: 'AUTHENTIC FOOTWEAR',
-    badgeIcon: <Sparkles className="w-3.5 h-3.5 text-orange-400" />,
-    title: 'Iconic Silhouettes & Street Classics',
-    subtitle: 'Step into genuine, verified sneakers and apparel inspected for physical authenticity and build quality.',
-    discount: 'Starting at ₹2,499',
-    category: 'fashion',
-    bgGradient: 'from-navy-800 via-navy-900 to-navy-950',
-    image: '/products/nike-air-force-1-low-white-sneakers/image-0-640.webp',
+    id: 2,
+    title: 'Fashion & Style',
+    subtitle: 'New season styles for men, women and kids. Flat prices, no surprises.',
+    cta: 'Shop Fashion',
+    to: '/shop?category=fashion',
+    discount: 'New arrivals',
+    bgColor: '#7f1d1d',
+    image: '/uploads/products/banner-fashion.jpg',
   },
   {
-    badge: 'PRECISION CREATOR GEAR',
-    badgeIcon: <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />,
-    title: 'High-Speed Mirrorless Systems',
-    subtitle: 'Next-generation optical sensor bodies, stabilization lenses, and creator optics ready for same-day dispatch.',
-    discount: 'Flat 15% OFF',
-    category: 'electronics',
-    bgGradient: 'from-navy-800 via-navy-900 to-navy-950',
-    image: '/products/canon-eos-r50-mirrorless-camera/image-0-640.webp',
+    id: 3,
+    title: 'Home & Living',
+    subtitle: 'Kitchen, décor, storage and lifestyle essentials. Starting ₹199.',
+    cta: 'Shop Home',
+    to: '/shop?category=home-living',
+    discount: 'Starting ₹199',
+    bgColor: '#064e3b',
+    image: '/uploads/products/banner-home.jpg',
   },
 ];
 
 export function HeroBanner() {
   const [current, setCurrent] = useState(0);
+  const total = SLIDES.length;
 
+  // Auto-advance every 5 s
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % SLIDES.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, []);
+    const t = setTimeout(() => setCurrent(c => (c + 1) % total), 5000);
+    return () => clearTimeout(t);
+  }, [current, total]);
 
   const slide = SLIDES[current];
 
   return (
-    <div className="relative rounded-3xl overflow-hidden border border-navy-700/80 shadow-2xl bg-navy-800 transition-all mb-8 min-h-[280px] sm:min-h-[320px]">
-      {/* Background Gradient & Effects */}
-      <div className={`absolute inset-0 bg-gradient-to-r ${slide.bgGradient} transition-all duration-700`} />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
+    <div
+      className="relative w-full h-44 sm:h-52 md:h-60 lg:h-72 rounded-card overflow-hidden select-none"
+      style={{ backgroundColor: slide.bgColor }}
+      role="banner"
+    >
+      {/* Product image — RIGHT column only, never overlaps text */}
+      <div
+        className="absolute right-0 top-0 bottom-0 w-[42%] pointer-events-none"
+        aria-hidden="true"
+      >
+        <img
+          src={slide.image}
+          alt=""
+          className="w-full h-full object-contain object-right p-4 sm:p-6"
+          onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+          loading="eager"
+        />
+      </div>
 
-      {/* Content */}
-      <div className="relative z-10 px-6 sm:px-10 py-10 sm:py-14 max-w-[55%] md:max-w-lg lg:max-w-xl">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white text-xs font-bold mb-4 shadow-sm">
-          {slide.badgeIcon}
-          <span>{slide.badge}</span>
-        </div>
-
-        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black font-display text-white tracking-tight leading-tight">
+      {/* Text content — LEFT 55%, guaranteed no overlap */}
+      <div className="relative z-10 h-full flex flex-col justify-center px-5 sm:px-8 md:px-10 max-w-[57%]">
+        <span className="inline-block self-start bg-white/20 text-white text-[11px] font-semibold px-2.5 py-1 rounded-chip mb-3">
+          {slide.discount}
+        </span>
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white leading-tight mb-2">
           {slide.title}
-        </h1>
-
-        <p className="mt-3 text-xs sm:text-sm text-gray-200 font-normal leading-relaxed line-clamp-2 hidden sm:block">
+        </h2>
+        <p className="text-xs sm:text-sm text-white/80 mb-4 line-clamp-2 leading-relaxed">
           {slide.subtitle}
         </p>
-
-        <div className="mt-5 flex flex-wrap items-center gap-3">
-          <Link
-            to={`/shop?category=${slide.category}`}
-            className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-lg shadow-orange-500/30 transition-all hover:scale-[1.02]"
-          >
-            <span>Shop Now ({slide.discount})</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-
-          <Link
-            to="/shop"
-            className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold text-sm px-4 py-2.5 rounded-xl backdrop-blur-md border border-white/10 transition-colors"
-          >
-            Browse All
-          </Link>
-        </div>
-      </div>
-
-      {/* Featured Product Image — right side, contained within banner */}
-      <div className="absolute right-0 top-0 bottom-0 w-[42%] md:w-[40%] flex items-center justify-center pointer-events-none z-0">
-        <div className="relative w-full h-full flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-orange-500/10 blur-3xl animate-pulse rounded-full scale-75" />
-          <img
-            src={slide.image}
-            alt={slide.title}
-            className="max-h-[85%] max-w-full object-contain filter drop-shadow-2xl transition-all duration-700 hover:scale-105 relative z-10"
-            loading="eager"
-            // @ts-expect-error fetchpriority
-            fetchpriority="high"
-          />
-        </div>
-      </div>
-
-      {/* Carousel navigation buttons */}
-      <div className="absolute right-4 bottom-4 z-20 flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => setCurrent((prev) => (prev - 1 + SLIDES.length) % SLIDES.length)}
-          className="p-2 rounded-xl bg-black/40 hover:bg-black/60 text-white border border-white/10 backdrop-blur-md transition-colors"
-          aria-label="Previous Slide"
+        <Link
+          to={slide.to}
+          className="self-start inline-flex items-center gap-2 bg-white text-neutral-900 font-semibold text-xs sm:text-sm px-4 py-2 rounded-btn hover:bg-neutral-100 transition-colors"
         >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => setCurrent((prev) => (prev + 1) % SLIDES.length)}
-          className="p-2 rounded-xl bg-black/40 hover:bg-black/60 text-white border border-white/10 backdrop-blur-md transition-colors"
-          aria-label="Next Slide"
-        >
-          <ChevronRight className="w-4 h-4" />
-        </button>
+          {slide.cta}
+        </Link>
       </div>
 
-      {/* Slide indicators */}
-      <div className="absolute left-6 sm:left-10 bottom-3 z-20 flex items-center gap-1">
+      {/* Navigation dots */}
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
         {SLIDES.map((_, i) => (
           <button
             key={i}
-            type="button"
             onClick={() => setCurrent(i)}
-            className="p-2 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-orange-400 rounded-full"
             aria-label={`Go to slide ${i + 1}`}
-          >
-            <span
-              className={`h-2 rounded-full transition-all block ${
-                i === current ? 'w-6 bg-orange-400' : 'w-2 bg-white/40 hover:bg-white/70'
-              }`}
-            />
-          </button>
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              i === current ? 'w-5 bg-white' : 'w-1.5 bg-white/40'
+            }`}
+          />
         ))}
       </div>
+
+      {/* Prev/Next arrows */}
+      <button
+        onClick={() => setCurrent(c => (c - 1 + total) % total)}
+        aria-label="Previous slide"
+        className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center transition"
+      >
+        <ChevronLeft className="w-4 h-4" />
+      </button>
+      <button
+        onClick={() => setCurrent(c => (c + 1) % total)}
+        aria-label="Next slide"
+        className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center transition"
+      >
+        <ChevronRight className="w-4 h-4" />
+      </button>
     </div>
   );
 }
