@@ -13,7 +13,7 @@ interface DashboardKpi {
 // GET /api/v1/admin/dashboard
 router.get('/', async (_req: Request, res: Response, next: NextFunction) => {
   try {
-    const [ordersRes, customersRes, lowStockRes, lowStockListRes, topProductsRes] = await Promise.all([
+    const [ordersRes, customersRes, lowStockRes, lowStockListRes, topProductsRes, pendingRes] = await Promise.all([
       query<DashboardKpi>(
         `SELECT COUNT(*) as total_orders,
                 COALESCE(SUM(CASE WHEN status NOT IN ('PENDING_PAYMENT','CANCELLED') THEN total_paise END), 0)::bigint as total_sales_paise
@@ -38,7 +38,10 @@ router.get('/', async (_req: Request, res: Response, next: NextFunction) => {
          WHERE p.is_active = true
          ORDER BY p.average_rating DESC NULLS LAST
          LIMIT 6`
-      )
+      ),
+      query<{ pending_count: string }>(
+        `SELECT COUNT(*) as pending_count FROM orders WHERE status IN ('PAID','PROCESSING')`
+      ),
     ]);
 
     res.json({
@@ -48,6 +51,7 @@ router.get('/', async (_req: Request, res: Response, next: NextFunction) => {
       low_stock_count: parseInt(lowStockRes.rows[0]?.low_stock_count ?? '0', 10),
       low_stock_items: lowStockListRes.rows,
       top_products: topProductsRes.rows,
+      pending_orders_count: parseInt(pendingRes.rows[0]?.pending_count ?? '0', 10),
     });
   } catch (err) {
     next(err);

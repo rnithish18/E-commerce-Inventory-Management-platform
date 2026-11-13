@@ -219,11 +219,11 @@ export function AdminProducts() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
+          <h1 className="text-xl sm:text-2xl font-black text-[var(--adm-text-1)] tracking-tight flex items-center gap-2.5">
             <Package className="w-6 h-6 text-orange-500" />
             <span>Product Catalog Management</span>
           </h1>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-[var(--adm-text-2)] mt-1">
             Create products, upload controlled images, manage pricing in paise, and configure stock
           </p>
         </div>
@@ -238,36 +238,36 @@ export function AdminProducts() {
       </div>
 
       {/* Search */}
-      <div className="card p-4 flex items-center justify-between gap-3">
+      <div className="adm-adm-card p-4 flex items-center justify-between gap-3">
         <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-[var(--adm-text-3)] absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search products by name, brand, or category..."
-            className="input-field pl-9 py-2 text-xs w-full"
+            className="adm-input pl-9 py-2 text-xs w-full"
           />
         </div>
-        <span className="text-xs text-gray-400 font-mono">
+        <span className="text-xs text-[var(--adm-text-2)] font-mono">
           Showing {filteredProducts.length} of {products.length} products
         </span>
       </div>
 
       {/* Products Table */}
-      <div className="card overflow-hidden">
+      <div className="adm-adm-card overflow-hidden">
         {loading ? (
           <div className="py-20 flex justify-center">
             <FullPageSpinner />
           </div>
         ) : filteredProducts.length === 0 ? (
-          <div className="py-16 text-center text-gray-400 text-xs">
+          <div className="py-16 text-center text-[var(--adm-text-3)] text-xs">
             No products found matching your search.
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-gray-300">
-              <thead className="bg-navy-900/80 text-gray-400 font-bold uppercase text-[10px] tracking-wider border-b border-navy-700">
+            <table className="adm-table">
+              <thead className="">
                 <tr>
                   <th className="py-3 px-4">Product</th>
                   <th className="py-3 px-4">Category</th>
@@ -278,12 +278,12 @@ export function AdminProducts() {
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-navy-700/60">
+              <tbody className="">
                 {filteredProducts.map((p) => (
-                  <tr key={p.id} className="hover:bg-navy-700/40 transition-colors">
+                  <tr key={p.id} className="hover:bg-[var(--adm-row-hover)] transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-navy-900 border border-navy-700 overflow-hidden flex items-center justify-center shrink-0">
+                        <div className="w-10 h-10 rounded-lg bg-navy-900 border border-[var(--adm-border)] overflow-hidden flex items-center justify-center shrink-0">
                           {p.image_url ? (
                             <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />
                           ) : (
@@ -291,9 +291,9 @@ export function AdminProducts() {
                           )}
                         </div>
                         <div>
-                          <div className="font-semibold text-white truncate max-w-xs">{p.name}</div>
+                          <div className="font-semibold text-[var(--adm-text-1)] truncate max-w-xs">{p.name}</div>
                           <div className="flex items-center gap-2 mt-0.5">
-                            {p.brand && <span className="text-[11px] text-gray-400">{p.brand}</span>}
+                            {p.brand && <span className="text-[11px] text-[var(--adm-text-3)]">{p.brand}</span>}
                             {(p.needs_image || !p.image_url || p.image_url.includes('coming-soon')) && (
                               <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 px-1.5 py-0.2 rounded">
                                 <AlertCircle className="w-2.5 h-2.5" />
@@ -304,11 +304,11 @@ export function AdminProducts() {
                         </div>
                       </div>
                     </td>
-                    <td className="py-3.5 px-4 text-gray-300">
+                    <td className="py-3.5 px-4 text-[var(--adm-text-2)]">
                       {p.category_name}
                     </td>
                     <td className="py-3.5 px-4 font-mono">
-                      <span className="font-bold text-white">{formatPaise(p.price_paise)}</span>
+                      <span className="font-bold text-[var(--adm-text-1)]">{formatPaise(p.price_paise)}</span>
                       <span className="text-[11px] text-gray-500 line-through ml-1.5">{formatPaise(p.mrp_paise)}</span>
                     </td>
                     <td className="py-3.5 px-4 text-center">
@@ -320,7 +320,7 @@ export function AdminProducts() {
                         <span className="text-gray-500 text-[10px]">—</span>
                       )}
                     </td>
-                    <td className="py-3.5 px-4 text-center font-mono font-bold text-white">
+                    <td className="py-3.5 px-4 text-center adm-mono font-semibold">
                       {p.total_stock}
                     </td>
                     <td className="py-3.5 px-4 text-center">
@@ -371,25 +371,25 @@ export function AdminProducts() {
       {/* Add Product Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="card w-full max-w-xl p-6 border-navy-600 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+          <div className="adm-card w-full max-w-xl p-6 border-navy-600 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setShowModal(false)}
-              className="absolute right-4 top-4 text-gray-400 hover:text-white"
+              className="absolute right-4 top-4 text-[var(--adm-text-3)] hover:text-[var(--adm-text-1)]"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-base font-bold text-white mb-1">
+            <h3 className="text-base font-bold text-[var(--adm-text-1)] mb-1">
               Add New Product to Storefront
             </h3>
-            <p className="text-xs text-gray-400 mb-4">
+            <p className="text-xs text-[var(--adm-text-2)] mb-4">
               All prices are stored in paise and stock movements are audited upon creation
             </p>
 
             <form onSubmit={handleCreateProduct} className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--adm-text-2)] mb-1">
                     Product Title *
                   </label>
                   <input
@@ -398,12 +398,12 @@ export function AdminProducts() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Sony WH-1000XM5 Headphones"
-                    className="input-field text-xs w-full"
+                    className="adm-input text-xs w-full"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--adm-text-2)] mb-1">
                     Brand Name
                   </label>
                   <input
@@ -411,20 +411,20 @@ export function AdminProducts() {
                     value={brand}
                     onChange={(e) => setBrand(e.target.value)}
                     placeholder="e.g. Sony"
-                    className="input-field text-xs w-full"
+                    className="adm-input text-xs w-full"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--adm-text-2)] mb-1">
                     Category *
                   </label>
                   <select
                     value={categoryId}
                     onChange={(e) => setCategoryId(e.target.value)}
-                    className="input-field text-xs w-full"
+                    className="adm-input text-xs w-full"
                   >
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>{c.name}</option>
@@ -433,13 +433,13 @@ export function AdminProducts() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--adm-text-2)] mb-1">
                     Product Badge
                   </label>
                   <select
                     value={badge}
                     onChange={(e) => setBadge(e.target.value)}
-                    className="input-field text-xs w-full"
+                    className="adm-input text-xs w-full"
                   >
                     <option value="">None</option>
                     <option value="Best Seller">Best Seller</option>
@@ -453,7 +453,7 @@ export function AdminProducts() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--adm-text-2)] mb-1">
                     Selling Price (₹) *
                   </label>
                   <input
@@ -464,12 +464,12 @@ export function AdminProducts() {
                     value={priceRupees}
                     onChange={(e) => setPriceRupees(e.target.value)}
                     placeholder="e.g. 24999.00"
-                    className="input-field text-xs w-full font-mono"
+                    className="adm-input text-xs w-full font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--adm-text-2)] mb-1">
                     MRP / List Price (₹) *
                   </label>
                   <input
@@ -480,14 +480,14 @@ export function AdminProducts() {
                     value={mrpRupees}
                     onChange={(e) => setMrpRupees(e.target.value)}
                     placeholder="e.g. 29999.00"
-                    className="input-field text-xs w-full font-mono"
+                    className="adm-input text-xs w-full font-mono"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--adm-text-2)] mb-1">
                     Initial Stock Quantity
                   </label>
                   <input
@@ -495,12 +495,12 @@ export function AdminProducts() {
                     min="0"
                     value={stockQty}
                     onChange={(e) => setStockQty(e.target.value)}
-                    className="input-field text-xs w-full"
+                    className="adm-input text-xs w-full"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--adm-text-2)] mb-1">
                     Reorder Threshold Alert Level
                   </label>
                   <input
@@ -508,13 +508,13 @@ export function AdminProducts() {
                     min="0"
                     value={reorderThreshold}
                     onChange={(e) => setReorderThreshold(e.target.value)}
-                    className="input-field text-xs w-full"
+                    className="adm-input text-xs w-full"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1">
+                <label className="block text-xs font-semibold text-[var(--adm-text-2)] mb-1">
                   Product Description
                 </label>
                 <textarea
@@ -522,13 +522,13 @@ export function AdminProducts() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Comprehensive description of specifications, materials, and warranty..."
-                  className="input-field text-xs w-full resize-none"
+                  className="adm-input text-xs w-full resize-none"
                 />
               </div>
 
               {/* AI-Powered Image Uploader */}
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5 flex items-center justify-between">
+                <label className="block text-xs font-semibold text-[var(--adm-text-2)] mb-1.5 flex items-center justify-between">
                   <span>Product Images & AI Vision Analysis</span>
                   <span className="text-[10px] text-teal-400 font-bold flex items-center gap-1">
                     <Sparkles className="w-3 h-3" />
@@ -571,21 +571,21 @@ export function AdminProducts() {
       {/* Quick Image Upload Modal */}
       {quickUploadProduct && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="card w-full max-w-lg p-6 border-navy-600 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+          <div className="adm-card w-full max-w-lg p-6 border-navy-600 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => {
                 setQuickUploadProduct(null);
                 setQuickUploadedImages([]);
               }}
-              className="absolute right-4 top-4 text-gray-400 hover:text-white"
+              className="absolute right-4 top-4 text-[var(--adm-text-3)] hover:text-[var(--adm-text-1)]"
             >
               <X className="w-5 h-5" />
             </button>
-            <h3 className="text-base font-bold text-white mb-1 flex items-center gap-2">
+            <h3 className="text-base font-bold text-[var(--adm-text-1)] mb-1 flex items-center gap-2">
               <Upload className="w-5 h-5 text-amber-400" />
               Upload Product Image
             </h3>
-            <p className="text-xs text-gray-400 mb-4 truncate">
+            <p className="text-xs text-[var(--adm-text-2)] mb-4 truncate">
               {quickUploadProduct.name} ({quickUploadProduct.brand})
             </p>
 
@@ -595,7 +595,7 @@ export function AdminProducts() {
               maxImages={3}
             />
 
-            <div className="mt-5 pt-4 border-t border-navy-700 flex justify-end gap-3">
+            <div className="mt-5 pt-4 border-t border-[var(--adm-border)] flex justify-end gap-3">
               <button
                 type="button"
                 onClick={() => {

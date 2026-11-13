@@ -104,8 +104,8 @@ export function AdminAnalytics() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black text-white tracking-tight">
-              Business Analytics & Sales Engine
+            <h1 className="text-xl font-bold" style={{ color: "var(--adm-text-1)" }}>Analytics
+              Analytics
             </h1>
             <button
               onClick={() => {
@@ -113,25 +113,25 @@ export function AdminAnalytics() {
                 toast.success('Live analytics aggregates refreshed');
               }}
               title="Refresh database aggregates"
-              className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-navy-700 transition-colors"
+              className="p-1 rounded-lg text-[var(--adm-text-3)] hover:text-[var(--adm-text-1)] hover:bg-[var(--adm-raised)] transition-colors"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-orange-400' : ''}`} />
             </button>
           </div>
-          <p className="text-xs text-gray-400 mt-0.5">
-            Real-time turnover, volume metrics, and inventory exposure bucketed in Asia/Kolkata (UTC+5:30)
+          <p className="text-xs text-[var(--adm-text-2)] mt-0.5">
+            Sales, orders, and revenue trends (UTC+5:30)
           </p>
         </div>
 
         {/* Filter controls */}
         <div className="flex flex-wrap items-center gap-2">
-          <div className="bg-navy-800 border border-navy-700 rounded-xl p-1 flex items-center gap-1 text-xs font-semibold">
+          <div className="bg-[var(--adm-surface)] border border-[var(--adm-border)] rounded-xl p-1 flex items-center gap-1 text-xs font-semibold">
             <button
               onClick={() => { setPeriod('today'); setShowCustomPicker(false); }}
               className={`px-3 py-1.5 rounded-lg transition-all ${
                 period === 'today'
-                  ? 'bg-orange-500 text-white shadow-sm'
-                  : 'text-gray-400 hover:text-white hover:bg-navy-700'
+                  ? 'bg-orange-500 text-[var(--adm-text-1)] shadow-sm'
+                  : 'text-[var(--adm-text-3)] hover:text-[var(--adm-text-1)] hover:bg-[var(--adm-raised)]'
               }`}
             >
               Today
@@ -140,8 +140,8 @@ export function AdminAnalytics() {
               onClick={() => { setPeriod('7d'); setShowCustomPicker(false); }}
               className={`px-3 py-1.5 rounded-lg transition-all ${
                 period === '7d'
-                  ? 'bg-orange-500 text-white shadow-sm'
-                  : 'text-gray-400 hover:text-white hover:bg-navy-700'
+                  ? 'bg-orange-500 text-[var(--adm-text-1)] shadow-sm'
+                  : 'text-[var(--adm-text-3)] hover:text-[var(--adm-text-1)] hover:bg-[var(--adm-raised)]'
               }`}
             >
               7 Days
@@ -150,8 +150,8 @@ export function AdminAnalytics() {
               onClick={() => { setPeriod('30d'); setShowCustomPicker(false); }}
               className={`px-3 py-1.5 rounded-lg transition-all ${
                 period === '30d'
-                  ? 'bg-orange-500 text-white shadow-sm'
-                  : 'text-gray-400 hover:text-white hover:bg-navy-700'
+                  ? 'bg-orange-500 text-[var(--adm-text-1)] shadow-sm'
+                  : 'text-[var(--adm-text-3)] hover:text-[var(--adm-text-1)] hover:bg-[var(--adm-raised)]'
               }`}
             >
               30 Days
@@ -160,8 +160,8 @@ export function AdminAnalytics() {
               onClick={() => { setPeriod('custom'); setShowCustomPicker(!showCustomPicker); }}
               className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-all ${
                 period === 'custom'
-                  ? 'bg-orange-500 text-white shadow-sm'
-                  : 'text-gray-400 hover:text-white hover:bg-navy-700'
+                  ? 'bg-orange-500 text-[var(--adm-text-1)] shadow-sm'
+                  : 'text-[var(--adm-text-3)] hover:text-[var(--adm-text-1)] hover:bg-[var(--adm-raised)]'
               }`}
             >
               <Calendar className="w-3 h-3" />
@@ -171,7 +171,7 @@ export function AdminAnalytics() {
 
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 bg-navy-800 hover:bg-navy-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl border border-navy-700 transition-colors"
+            className="flex items-center gap-1.5 bg-[var(--adm-surface)] hover:bg-[var(--adm-raised)] text-[var(--adm-text-1)] font-bold text-xs px-3.5 py-2 rounded-xl border border-[var(--adm-border)] transition-colors"
           >
             <Download className="w-3.5 h-3.5 text-orange-400" />
             <span>Export CSV</span>
@@ -181,23 +181,23 @@ export function AdminAnalytics() {
 
       {/* Custom Date Pickers Drawer */}
       {showCustomPicker && (
-        <div className="card p-4 flex flex-wrap items-center gap-4 bg-navy-800/90 border-navy-700">
+        <div className="adm-adm-card p-4 flex flex-wrap items-center gap-4 bg-[var(--adm-surface)]/90 border-[var(--adm-border)]">
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-gray-400">From:</span>
+            <span className="text-[var(--adm-text-3)]">From:</span>
             <input
               type="date"
               value={customFrom}
               onChange={(e) => setCustomFrom(e.target.value)}
-              className="bg-navy-900 border border-navy-700 rounded-lg px-2.5 py-1 text-white focus:outline-none focus:border-orange-500"
+              className="bg-navy-900 border border-[var(--adm-border)] rounded-lg px-2.5 py-1 text-[var(--adm-text-1)] focus:outline-none focus:border-orange-500"
             />
           </div>
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-gray-400">To:</span>
+            <span className="text-[var(--adm-text-3)]">To:</span>
             <input
               type="date"
               value={customTo}
               onChange={(e) => setCustomTo(e.target.value)}
-              className="bg-navy-900 border border-navy-700 rounded-lg px-2.5 py-1 text-white focus:outline-none focus:border-orange-500"
+              className="bg-navy-900 border border-[var(--adm-border)] rounded-lg px-2.5 py-1 text-[var(--adm-text-1)] focus:outline-none focus:border-orange-500"
             />
           </div>
           <button
@@ -213,13 +213,13 @@ export function AdminAnalytics() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* Total Sales */}
-        <div className="card p-5 flex flex-col justify-between group hover:border-navy-600 transition-colors">
+        <div className="adm-adm-card p-5 flex flex-col justify-between group hover:border-navy-600 transition-colors">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold text-gray-400">Total Sales</span>
+              <span className="text-xs font-bold text-[var(--adm-text-3)]">Total Sales</span>
               <div className="relative group/tip cursor-help">
-                <Info className="w-3.5 h-3.5 text-gray-400 hover:text-white" />
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 hidden group-hover/tip:block w-48 p-2 bg-navy-900 border border-navy-600 text-[11px] text-gray-300 rounded-lg shadow-xl z-20 pointer-events-none">
+                <Info className="w-3.5 h-3.5 text-[var(--adm-text-3)] hover:text-[var(--adm-text-1)]" />
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 hidden group-hover/tip:block w-48 p-2 bg-navy-900 border border-navy-600 text-[11px] text-[var(--adm-text-2)] rounded-lg shadow-xl z-20 pointer-events-none">
                   Sum of integer total_paise for verified paid orders in selected period.
                 </div>
               </div>
@@ -230,7 +230,7 @@ export function AdminAnalytics() {
           </div>
 
           <div className="mt-3">
-            <h3 className="text-2xl font-black text-white tracking-tight font-mono">
+            <h3 className="text-2xl font-black text-[var(--adm-text-1)] tracking-tight font-mono">
               {formatPaise(kpis.total_sales_paise)}
             </h3>
             <div className="flex items-center gap-1.5 mt-1 text-xs">
@@ -245,19 +245,19 @@ export function AdminAnalytics() {
                   {kpis.sales_change_percent}%
                 </span>
               )}
-              <span className="text-gray-400">vs previous period</span>
+              <span className="text-[var(--adm-text-3)]">vs previous period</span>
             </div>
           </div>
         </div>
 
         {/* Total Orders */}
-        <div className="card p-5 flex flex-col justify-between group hover:border-navy-600 transition-colors">
+        <div className="adm-adm-card p-5 flex flex-col justify-between group hover:border-navy-600 transition-colors">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold text-gray-400">Total Orders</span>
+              <span className="text-xs font-bold text-[var(--adm-text-3)]">Total Orders</span>
               <div className="relative group/tip cursor-help">
-                <Info className="w-3.5 h-3.5 text-gray-400 hover:text-white" />
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 hidden group-hover/tip:block w-48 p-2 bg-navy-900 border border-navy-600 text-[11px] text-gray-300 rounded-lg shadow-xl z-20 pointer-events-none">
+                <Info className="w-3.5 h-3.5 text-[var(--adm-text-3)] hover:text-[var(--adm-text-1)]" />
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 hidden group-hover/tip:block w-48 p-2 bg-navy-900 border border-navy-600 text-[11px] text-[var(--adm-text-2)] rounded-lg shadow-xl z-20 pointer-events-none">
                   Total non-pending customer checkouts created within time bucket.
                 </div>
               </div>
@@ -268,7 +268,7 @@ export function AdminAnalytics() {
           </div>
 
           <div className="mt-3">
-            <h3 className="text-2xl font-black text-white tracking-tight font-mono">
+            <h3 className="text-2xl font-black text-[var(--adm-text-1)] tracking-tight font-mono">
               {kpis.total_orders}
             </h3>
             <div className="flex items-center gap-1.5 mt-1 text-xs">
@@ -283,19 +283,19 @@ export function AdminAnalytics() {
                   {kpis.orders_change_percent}%
                 </span>
               )}
-              <span className="text-gray-400">vs previous period</span>
+              <span className="text-[var(--adm-text-3)]">vs previous period</span>
             </div>
           </div>
         </div>
 
         {/* Total Customers */}
-        <div className="card p-5 flex flex-col justify-between group hover:border-navy-600 transition-colors">
+        <div className="adm-adm-card p-5 flex flex-col justify-between group hover:border-navy-600 transition-colors">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold text-gray-400">Total Customers</span>
+              <span className="text-xs font-bold text-[var(--adm-text-3)]">Total Customers</span>
               <div className="relative group/tip cursor-help">
-                <Info className="w-3.5 h-3.5 text-gray-400 hover:text-white" />
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 hidden group-hover/tip:block w-48 p-2 bg-navy-900 border border-navy-600 text-[11px] text-gray-300 rounded-lg shadow-xl z-20 pointer-events-none">
+                <Info className="w-3.5 h-3.5 text-[var(--adm-text-3)] hover:text-[var(--adm-text-1)]" />
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 hidden group-hover/tip:block w-48 p-2 bg-navy-900 border border-navy-600 text-[11px] text-[var(--adm-text-2)] rounded-lg shadow-xl z-20 pointer-events-none">
                   Total active customer accounts registered in PostgreSQL database.
                 </div>
               </div>
@@ -306,7 +306,7 @@ export function AdminAnalytics() {
           </div>
 
           <div className="mt-3">
-            <h3 className="text-2xl font-black text-white tracking-tight font-mono">
+            <h3 className="text-2xl font-black text-[var(--adm-text-1)] tracking-tight font-mono">
               {kpis.total_customers}
             </h3>
             <div className="flex items-center gap-1.5 mt-1 text-xs">
@@ -314,19 +314,19 @@ export function AdminAnalytics() {
                 <ArrowUpRight className="w-3 h-3" />
                 +{kpis.customers_change_percent}%
               </span>
-              <span className="text-gray-400">vs previous period</span>
+              <span className="text-[var(--adm-text-3)]">vs previous period</span>
             </div>
           </div>
         </div>
 
         {/* Low Stock Items */}
-        <div className="card p-5 flex flex-col justify-between group hover:border-navy-600 transition-colors">
+        <div className="adm-adm-card p-5 flex flex-col justify-between group hover:border-navy-600 transition-colors">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold text-gray-400">Low Stock Items</span>
+              <span className="text-xs font-bold text-[var(--adm-text-3)]">Low Stock Items</span>
               <div className="relative group/tip cursor-help">
-                <Info className="w-3.5 h-3.5 text-gray-400 hover:text-white" />
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 hidden group-hover/tip:block w-48 p-2 bg-navy-900 border border-navy-600 text-[11px] text-gray-300 rounded-lg shadow-xl z-20 pointer-events-none">
+                <Info className="w-3.5 h-3.5 text-[var(--adm-text-3)] hover:text-[var(--adm-text-1)]" />
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 hidden group-hover/tip:block w-48 p-2 bg-navy-900 border border-navy-600 text-[11px] text-[var(--adm-text-2)] rounded-lg shadow-xl z-20 pointer-events-none">
                   Count of SKU variants where stock_qty is less than or equal to reorder_threshold.
                 </div>
               </div>
@@ -337,7 +337,7 @@ export function AdminAnalytics() {
           </div>
 
           <div className="mt-3">
-            <h3 className="text-2xl font-black text-white tracking-tight font-mono">
+            <h3 className="text-2xl font-black text-[var(--adm-text-1)] tracking-tight font-mono">
               {kpis.low_stock_items}
             </h3>
             <div className="flex items-center gap-1.5 mt-1 text-xs">
@@ -352,13 +352,13 @@ export function AdminAnalytics() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Sales & Orders Combo Chart */}
-        <div className="lg:col-span-2 card p-5 flex flex-col">
+        <div className="lg:col-span-2 adm-card p-5 flex flex-col">
           <div className="flex items-center justify-between pb-3 border-b border-navy-600/60 mb-4">
             <div>
-              <h3 className="font-bold text-white text-sm">
+              <h3 className="font-bold text-[var(--adm-text-1)] text-sm">
                 Sales Revenue & Order Volume
               </h3>
-              <p className="text-[11px] text-gray-400">
+              <p className="text-[11px] text-[var(--adm-text-3)]">
                 Daily bar (₹ Turnover) paired with order volume line
               </p>
             </div>
@@ -369,16 +369,16 @@ export function AdminAnalytics() {
 
           <div className="h-72 w-full pt-2">
             {timeSeries.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-xs text-gray-400">
+              <div className="h-full flex items-center justify-center text-xs text-[var(--adm-text-2)]">
                 No orders recorded during this timeframe. Place a checkout to view live chart data!
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={timeSeries}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
-                  <XAxis dataKey="label" stroke="#64748b" fontSize={11} tickLine={false} />
-                  <YAxis yAxisId="left" stroke="#64748b" fontSize={11} tickLine={false} tickFormatter={(v) => `₹${v.toLocaleString()}`} />
-                  <YAxis yAxisId="right" orientation="right" stroke="#38bdf8" fontSize={11} tickLine={false} />
+                  <CartesianGrid strokeDasharray="0" stroke="var(--adm-border-s)" opacity={0.5} />
+                  <XAxis dataKey="label" stroke="var(--adm-text-2)" fontSize={11} tickLine={false} />
+                  <YAxis yAxisId="left" stroke="var(--adm-text-2)" fontSize={11} tickLine={false} tickFormatter={(v) => `₹${v.toLocaleString()}`} />
+                  <YAxis yAxisId="right" orientation="right" stroke="var(--adm-info)" fontSize={11} tickLine={false} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#0f172a',
@@ -400,17 +400,17 @@ export function AdminAnalytics() {
         </div>
 
         {/* Order Status Donut */}
-        <div className="card p-5 flex flex-col">
+        <div className="adm-adm-card p-5 flex flex-col">
           <div className="flex items-center justify-between pb-3 border-b border-navy-600/60 mb-2">
-            <h3 className="font-bold text-white text-sm">
+            <h3 className="font-bold text-[var(--adm-text-1)] text-sm">
               Order Fulfillment Breakdown
             </h3>
-            <span className="text-[11px] text-gray-400 font-mono">Status Distribution</span>
+            <span className="text-[11px] text-[var(--adm-text-3)] font-mono">Status Distribution</span>
           </div>
 
           <div className="h-64 w-full">
             {statusDistribution.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-xs text-gray-400">
+              <div className="h-full flex items-center justify-center text-xs text-[var(--adm-text-2)]">
                 No status events recorded
               </div>
             ) : (
@@ -442,7 +442,7 @@ export function AdminAnalytics() {
                     verticalAlign="bottom" 
                     height={36} 
                     iconSize={8}
-                    formatter={(val) => <span className="text-[11px] text-gray-300">{val}</span>} 
+                    formatter={(val) => <span className="text-[11px] text-[var(--adm-text-2)]">{val}</span>} 
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -456,19 +456,19 @@ export function AdminAnalytics() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Top Selling Products */}
-        <div className="card p-5 flex flex-col">
+        <div className="adm-adm-card p-5 flex flex-col">
           <div className="flex items-center justify-between pb-3 border-b border-navy-600/60 mb-3">
             <div className="flex items-center gap-2">
               <Boxes className="w-4 h-4 text-orange-400" />
-              <h3 className="font-bold text-white text-sm">Top Selling Products</h3>
+              <h3 className="font-bold text-[var(--adm-text-1)] text-sm">Top Selling Products</h3>
             </div>
-            <span className="text-[11px] text-gray-400 font-mono">By Units Sold</span>
+            <span className="text-[11px] text-[var(--adm-text-3)] font-mono">By Units Sold</span>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="text-gray-400 border-b border-navy-700">
+                <tr className="text-[var(--adm-text-3)] border-b border-[var(--adm-border)]">
                   <th className="pb-2 font-semibold">Product Name</th>
                   <th className="pb-2 font-semibold">SKU</th>
                   <th className="pb-2 font-semibold text-right">Units</th>
@@ -477,11 +477,11 @@ export function AdminAnalytics() {
               </thead>
               <tbody className="divide-y divide-navy-700/50">
                 {topProducts.map((p: any, idx: number) => (
-                  <tr key={idx} className="hover:bg-navy-700/30">
-                    <td className="py-2.5 font-bold text-white max-w-[200px] truncate">{p.product_name}</td>
-                    <td className="py-2.5 font-mono text-gray-400">{p.sku}</td>
+                  <tr key={idx} className="hover:bg-[var(--adm-raised)]/30">
+                    <td className="py-2.5 font-bold text-[var(--adm-text-1)] max-w-[200px] truncate">{p.product_name}</td>
+                    <td className="py-2.5 font-mono text-[var(--adm-text-3)]">{p.sku}</td>
                     <td className="py-2.5 font-bold font-mono text-orange-400 text-right">{p.units_sold}</td>
-                    <td className="py-2.5 font-bold font-mono text-white text-right">{formatPaise(p.revenue_paise)}</td>
+                    <td className="py-2.5 font-bold font-mono text-[var(--adm-text-1)] text-right">{formatPaise(p.revenue_paise)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -490,11 +490,11 @@ export function AdminAnalytics() {
         </div>
 
         {/* Low Stock Alerts */}
-        <div className="card p-5 flex flex-col">
+        <div className="adm-adm-card p-5 flex flex-col">
           <div className="flex items-center justify-between pb-3 border-b border-navy-600/60 mb-3">
             <div className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-amber-400" />
-              <h3 className="font-bold text-white text-sm">Low Stock Alerts & Reorder Needed</h3>
+              <h3 className="font-bold text-[var(--adm-text-1)] text-sm">Low Stock Alerts & Reorder Needed</h3>
             </div>
             <Link to="/admin/inventory" className="text-xs text-orange-400 hover:text-orange-300 font-semibold flex items-center gap-1">
               <span>Adjust Stock</span>
@@ -505,7 +505,7 @@ export function AdminAnalytics() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="text-gray-400 border-b border-navy-700">
+                <tr className="text-[var(--adm-text-3)] border-b border-[var(--adm-border)]">
                   <th className="pb-2 font-semibold">SKU / Item</th>
                   <th className="pb-2 font-semibold">Category</th>
                   <th className="pb-2 font-semibold text-right">Current Stock</th>
@@ -514,18 +514,18 @@ export function AdminAnalytics() {
               </thead>
               <tbody className="divide-y divide-navy-700/50">
                 {lowStockAlerts.map((item: any, idx: number) => (
-                  <tr key={idx} className="hover:bg-navy-700/30">
+                  <tr key={idx} className="hover:bg-[var(--adm-raised)]/30">
                     <td className="py-2.5">
-                      <p className="font-bold text-white max-w-[180px] truncate">{item.product_name}</p>
-                      <p className="font-mono text-[10px] text-gray-400">{item.sku}</p>
+                      <p className="font-bold text-[var(--adm-text-1)] max-w-[180px] truncate">{item.product_name}</p>
+                      <p className="font-mono text-[10px] text-[var(--adm-text-3)]">{item.sku}</p>
                     </td>
-                    <td className="py-2.5 text-gray-300">{item.category}</td>
+                    <td className="py-2.5 text-[var(--adm-text-2)]">{item.category}</td>
                     <td className="py-2.5 text-right">
                       <span className="font-mono font-bold text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20">
                         {item.stock_qty} units
                       </span>
                     </td>
-                    <td className="py-2.5 font-mono text-gray-400 text-right">{item.reorder_threshold}</td>
+                    <td className="py-2.5 font-mono text-[var(--adm-text-3)] text-right">{item.reorder_threshold}</td>
                   </tr>
                 ))}
               </tbody>

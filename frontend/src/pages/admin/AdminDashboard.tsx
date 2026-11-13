@@ -1,414 +1,439 @@
 import React, { useState } from 'react';
-import { 
-  TrendingUp, 
-  ShoppingCart, 
-  Users, 
-  AlertTriangle, 
-  ArrowUpRight, 
-  Download, 
-  Plus, 
-  Boxes, 
-  Ticket, 
-  CheckCircle2, 
-  RefreshCw 
+import {
+  TrendingUp,
+  ShoppingCart,
+  Users,
+  AlertTriangle,
+  Download,
+  Boxes,
+  RefreshCw,
+  TrendingDown,
+  Minus,
 } from 'lucide-react';
-import { 
-  ResponsiveContainer, 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  Tooltip, 
-  CartesianGrid, 
-  PieChart, 
-  Pie, 
-  Cell 
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
 } from 'recharts';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
 import { formatPaise } from '../../lib/utils';
 import toast from 'react-hot-toast';
 
-const SALES_DATA = [
-  { day: 'Mon', sales: 42000, orders: 18 },
-  { day: 'Tue', sales: 58000, orders: 24 },
-  { day: 'Wed', sales: 51000, orders: 21 },
-  { day: 'Thu', sales: 69000, orders: 29 },
-  { day: 'Fri', sales: 84000, orders: 36 },
-  { day: 'Sat', sales: 112000, orders: 48 },
-  { day: 'Sun', sales: 96000, orders: 41 },
-];
+const STATUS_COLOURS: Record<string, string> = {
+  DELIVERED:        '#22c55e',
+  SHIPPED:          '#3b82f6',
+  OUT_FOR_DELIVERY: '#8b5cf6',
+  PROCESSING:       '#f59e0b',
+  PAID:             '#06b6d4',
+  PENDING_PAYMENT:  '#94a3b8',
+  CANCELLED:        '#ef4444',
+  REFUNDED:         '#f97316',
+};
 
-const ORDER_STATUS_DATA = [
-  { name: 'Delivered', value: 68, color: '#22c55e' },
-  { name: 'Shipped', value: 16, color: '#3b82f6' },
-  { name: 'Processing', value: 11, color: '#f59e0b' },
-  { name: 'Cancelled', value: 5, color: '#ef4444' },
-];
+function ChangeChip({ value }: { value: number | undefined }) {
+  if (value === undefined || value === null) return null;
+  const up = value > 0;
+  const flat = value === 0;
+  return (
+    <span
+      className="inline-flex items-center gap-1 text-[11px] font-semibold"
+      style={{ color: flat ? 'var(--adm-text-3)' : up ? 'var(--adm-success)' : 'var(--adm-danger)' }}
+    >
+      {flat ? <Minus className="w-3 h-3" /> : up ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+      {flat ? 'No change' : `${up ? '+' : ''}${value}% vs prior period`}
+    </span>
+  );
+}
 
 export function AdminDashboard() {
   const [dateRange, setDateRange] = useState('30d');
+  const queryClient = useQueryClient();
 
-  const { data: kpi, isLoading, refetch } = useQuery({
+  const { data: kpi, isLoading: kpiLoading, refetch: refetchKpi } = useQuery({
     queryKey: ['admin-dashboard-kpi'],
     queryFn: async () => {
       const res = await api.get('/admin/dashboard');
       return res.data;
     },
-    staleTime: 10000,
+    staleTime: 30000,
   });
 
-  const exportReport = () => {
-    toast.success('Downloading Sales & Inventory Report (CSV)...');
+  const { data: analytics, isLoading: analyticsLoading } = useQuery({
+    queryKey: ['admin-analytics', dateRange],
+    queryFn: async () => {
+      const res = await api.get(`/admin/analytics?period=${dateRange}`);
+      return res.data;
+    },
+    staleTime: 60000,
+  });
+
+  const isLoading = kpiLoading || analyticsLoading;
+
+  const refresh = async () => {
+    await Promise.all([refetchKpi(), queryClient.invalidateQueries({ queryKey: ['admin-analytics'] })]);
   };
 
-  const totalSales = kpi ? formatPaise(kpi.total_sales_paise) : '₹0';
-  const totalOrders = kpi?.total_orders ?? 0;
-  const totalCustomers = kpi?.total_customers ?? 10;
-  const lowStockCount = kpi?.low_stock_count ?? 4;
-  const lowStockItems = kpi?.low_stock_items || [
-    { name: 'Canon EOS R50 Camera', sku: 'canon-r50', stock: 6, threshold: 10, category: 'Electronics' },
-    { name: 'Samsung S24 Ultra', sku: 'samsung-s24', stock: 8, threshold: 15, category: 'Electronics' },
+  const exportReport = () => {
+    toast.success('Preparing CSV export...');
+  };
+
+  // KPI values from dashboard endpoint (all-time)
+  const totalSales   = kpi ? formatPaise(kpi.total_sales_paise) : '—';
+  const totalOrders  = kpi?.total_orders ?? 0;
+  const totalCustomers = kpi?.total_customers ?? 0;
+  const lowStockCount = kpi?.low_stock_count ?? 0;
+  const lowStockItems = kpi?.low_stock_items || [];
+  const topProducts   = kpi?.top_products || [];
+
+  // Chart data from analytics endpoint
+  const chartData = (analytics?.time_series || []).map((r: any) => ({
+    day: r.day || r.date || r.label || '',
+    sales: Math.round((r.revenue_paise || 0) / 100),
+    orders: r.order_count || r.orders || 0,
+  }));
+
+  const statusData = (analytics?.status_distribution || []).map((r: any) => ({
+    name: r.status || r.name || '',
+    value: parseInt(r.count ?? r.value ?? '0', 10),
+    color: STATUS_COLOURS[r.status || r.name] || '#94a3b8',
+  })).filter((d: any) => d.value > 0);
+
+  const aovPaise = analytics?.kpis?.aov_paise ?? 0;
+  const salesChange = analytics?.kpis?.sales_change_percent;
+  const ordersChange = analytics?.kpis?.orders_change_percent;
+
+  const totalStatusOrders = statusData.reduce((s: number, d: any) => s + d.value, 0);
+
+  const kpiCards = [
+    {
+      label: 'Total revenue',
+      value: totalSales,
+      icon: <TrendingUp className="w-4 h-4" />,
+      change: salesChange,
+      colour: 'var(--adm-accent)',
+    },
+    {
+      label: 'Orders placed',
+      value: totalOrders.toLocaleString('en-IN'),
+      icon: <ShoppingCart className="w-4 h-4" />,
+      change: ordersChange,
+      colour: 'var(--adm-info)',
+    },
+    {
+      label: 'Customer accounts',
+      value: totalCustomers.toLocaleString('en-IN'),
+      icon: <Users className="w-4 h-4" />,
+      change: undefined,
+      colour: '#8b5cf6',
+    },
+    {
+      label: 'SKUs below reorder level',
+      value: lowStockCount.toLocaleString('en-IN'),
+      icon: <AlertTriangle className="w-4 h-4" />,
+      change: undefined,
+      colour: lowStockCount > 0 ? 'var(--adm-warning)' : 'var(--adm-success)',
+      warn: lowStockCount > 0,
+    },
   ];
-  const topProducts = kpi?.top_products || [];
+
+  const LoadingSkeleton = () => (
+    <div className="animate-pulse">
+      <div className="h-6 w-24 rounded mb-2" style={{ background: 'var(--adm-raised)' }} />
+      <div className="h-8 w-32 rounded" style={{ background: 'var(--adm-raised)' }} />
+    </div>
+  );
 
   return (
-    <div className="flex flex-col gap-6 max-w-[1600px] mx-auto pb-12">
-      
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="flex flex-col gap-5 max-w-[1600px] mx-auto pb-10">
+
+      {/* Page header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black text-white tracking-tight">
-              Dashboard Overview
-            </h1>
-            <button
-              onClick={() => {
-                refetch();
-                toast.success('Live database metrics refreshed');
-              }}
-              title="Refresh database metrics"
-              className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-navy-700 transition-colors"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-orange-400' : ''}`} />
-            </button>
-          </div>
-          <p className="text-xs text-gray-400 mt-0.5">
-            Real-time live database metrics, inventory thresholds, and customer orders
+          <h1 className="text-xl font-bold" style={{ color: 'var(--adm-text-1)' }}>Dashboard</h1>
+          <p className="text-sm mt-0.5" style={{ color: 'var(--adm-text-2)' }}>
+            Sales and order activity for the selected period
           </p>
         </div>
-
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
-            className="bg-navy-800 border border-navy-700 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-orange-500 cursor-pointer"
+            className="adm-select text-xs rounded-lg px-3 py-2"
+            aria-label="Date range"
+            data-testid="dashboard-date-range"
           >
             <option value="today">Today</option>
-            <option value="7d">Last 7 Days</option>
-            <option value="30d">Last 30 Days</option>
-            <option value="90d">Last Quarter</option>
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+            <option value="90d">Last 90 days</option>
           </select>
-
+          <button
+            onClick={refresh}
+            title="Refresh"
+            aria-label="Refresh dashboard"
+            className="p-2 rounded-lg transition-colors"
+            style={{ color: 'var(--adm-text-2)', background: 'var(--adm-raised)' }}
+            data-testid="dashboard-refresh"
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[var(--adm-accent)]' : ''}`} />
+          </button>
           <button
             onClick={exportReport}
-            className="flex items-center gap-1.5 bg-navy-800 hover:bg-navy-700 text-gray-200 hover:text-white px-3 py-2 rounded-xl border border-navy-700 text-xs font-semibold transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-colors"
+            style={{ background: 'var(--adm-raised)', color: 'var(--adm-text-1)', border: '1px solid var(--adm-border)' }}
+            data-testid="dashboard-export"
           >
-            <Download className="w-3.5 h-3.5 text-orange-400" />
-            <span>Export CSV</span>
+            <Download className="w-3.5 h-3.5" style={{ color: 'var(--adm-accent)' }} />
+            Export CSV
           </button>
         </div>
       </div>
 
-      {/* 4 KPI Cards connected directly to DB */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        
-        {/* Total Sales */}
-        <div className="card p-5 flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Sales</span>
-            <div className="w-8 h-8 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center border border-orange-500/20">
-              <TrendingUp className="w-4 h-4" />
+      {/* KPI cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-testid="kpi-cards">
+        {kpiCards.map((card) => (
+          <div
+            key={card.label}
+            className="adm-card p-5 flex flex-col gap-3"
+            style={card.warn ? { borderColor: 'var(--adm-warning)', background: 'rgba(245,158,11,0.05)' } : {}}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium" style={{ color: 'var(--adm-text-2)' }}>{card.label}</span>
+              <span style={{ color: card.colour, opacity: 0.8 }}>{card.icon}</span>
             </div>
+            {isLoading ? (
+              <LoadingSkeleton />
+            ) : (
+              <>
+                <span className="text-3xl font-bold leading-none" style={{ color: card.warn && lowStockCount > 0 ? 'var(--adm-warning)' : 'var(--adm-text-1)' }}>
+                  {card.value}
+                </span>
+                <ChangeChip value={card.change} />
+              </>
+            )}
           </div>
-          <div className="mt-4">
-            <span className="text-2xl font-black text-white">{totalSales}</span>
-            <div className="flex items-center gap-1.5 mt-1 text-xs">
-              <span className="flex items-center text-green-400 font-bold">
-                <ArrowUpRight className="w-3.5 h-3.5" /> Live DB
-              </span>
-              <span className="text-gray-400 text-[11px]">aggregate from orders</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Total Orders */}
-        <div className="card p-5 flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Orders</span>
-            <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center border border-blue-500/20">
-              <ShoppingCart className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="mt-4">
-            <span className="text-2xl font-black text-white">{totalOrders}</span>
-            <div className="flex items-center gap-1.5 mt-1 text-xs">
-              <span className="flex items-center text-green-400 font-bold">
-                <ArrowUpRight className="w-3.5 h-3.5" /> Real-time
-              </span>
-              <span className="text-gray-400 text-[11px]">orders in system</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Total Customers */}
-        <div className="card p-5 flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Customers</span>
-            <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center border border-purple-500/20">
-              <Users className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="mt-4">
-            <span className="text-2xl font-black text-white">{totalCustomers}</span>
-            <div className="flex items-center gap-1.5 mt-1 text-xs">
-              <span className="flex items-center text-green-400 font-bold">
-                <ArrowUpRight className="w-3.5 h-3.5" /> 10 Seeded
-              </span>
-              <span className="text-gray-400 text-[11px]">registered customers</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Low Stock Items */}
-        <div className="card p-5 flex flex-col justify-between border-amber-500/30 bg-amber-500/5">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Low Stock Exposure</span>
-            <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
-              <AlertTriangle className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="mt-4">
-            <span className="text-2xl font-black text-amber-400">{lowStockCount} SKUs</span>
-            <div className="flex items-center gap-1.5 mt-1 text-xs">
-              <span className="text-amber-300 font-bold">≤ Reorder Threshold</span>
-              <span className="text-gray-400 text-[11px]">from product_variants</span>
-            </div>
-          </div>
-        </div>
-
+        ))}
       </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Sales & Orders Area Chart */}
-        <div className="card p-5 lg:col-span-2 flex flex-col">
+      {/* Charts row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+        {/* Area chart: revenue trend */}
+        <div className="adm-card p-5 lg:col-span-2" data-testid="revenue-chart">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-sm font-bold text-white">Revenue & Order Trend</h3>
-              <p className="text-xs text-gray-400">Daily gross turnover in ₹ for current week</p>
+              <h3 className="text-sm font-semibold" style={{ color: 'var(--adm-text-1)' }}>Revenue trend</h3>
+              <p className="text-xs" style={{ color: 'var(--adm-text-2)' }}>Daily revenue for the selected period</p>
             </div>
-            <span className="text-xs font-mono font-bold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-lg border border-orange-500/20">
-              Avg AOV: ₹2,450
-            </span>
+            {aovPaise > 0 && (
+              <span className="adm-badge adm-badge-accent text-xs">
+                Avg order: {formatPaise(aovPaise)}
+              </span>
+            )}
           </div>
 
-          <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={SALES_DATA}>
+          {chartData.length === 0 ? (
+            <div className="h-48 flex items-center justify-center">
+              <p className="text-sm" style={{ color: 'var(--adm-text-3)' }}>
+                {analyticsLoading ? 'Loading...' : 'No orders in this period'}
+              </p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={200}>
+              <AreaChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
                 <defs>
-                  <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f97316" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#f97316" stopOpacity={0.0}/>
+                  <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#ea580c" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#ea580c" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="day" stroke="#64748b" fontSize={11} tickLine={false} />
-                <YAxis stroke="#64748b" fontSize={11} tickLine={false} tickFormatter={(v) => `₹${v/1000}k`} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', fontSize: '12px', color: '#fff' }}
-                  formatter={(val: any) => [`₹${val.toLocaleString('en-IN')}`, 'Sales']}
+                <CartesianGrid stroke="var(--adm-border-s)" strokeDasharray="0" strokeOpacity={0.4} />
+                <XAxis
+                  dataKey="day"
+                  tick={{ fill: 'var(--adm-text-2)', fontSize: 11 }}
+                  axisLine={false}
+                  tickLine={false}
                 />
-                <Area type="monotone" dataKey="sales" stroke="#f97316" strokeWidth={2.5} fillOpacity={1} fill="url(#salesGradient)" />
+                <YAxis
+                  tick={{ fill: 'var(--adm-text-2)', fontSize: 11 }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(v) => `\u20B9${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
+                  width={52}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: 'var(--adm-raised)',
+                    border: '1px solid var(--adm-border-s)',
+                    borderRadius: 8,
+                    color: 'var(--adm-text-1)',
+                    fontSize: 12,
+                  }}
+                  formatter={(val: any) => [`\u20B9${Number(val).toLocaleString('en-IN')}`, 'Revenue']}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="sales"
+                  stroke="#ea580c"
+                  strokeWidth={2}
+                  fill="url(#salesGrad)"
+                  dot={false}
+                  activeDot={{ r: 4, fill: '#ea580c' }}
+                />
               </AreaChart>
             </ResponsiveContainer>
-          </div>
+          )}
         </div>
 
-        {/* Order Fulfillment Status Donut */}
-        <div className="card p-5 flex flex-col justify-between">
-          <div>
-            <h3 className="text-sm font-bold text-white">Order Status Ratio</h3>
-            <p className="text-xs text-gray-400">Distribution across active states</p>
+        {/* Donut: order status distribution */}
+        <div className="adm-card p-5" data-testid="status-chart">
+          <div className="mb-4">
+            <h3 className="text-sm font-semibold" style={{ color: 'var(--adm-text-1)' }}>Order status</h3>
+            <p className="text-xs" style={{ color: 'var(--adm-text-2)' }}>Distribution for selected period</p>
           </div>
 
-          <div className="h-48 w-full my-auto flex items-center justify-center">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={ORDER_STATUS_DATA}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={75}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {ORDER_STATUS_DATA.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', fontSize: '11px' }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 pt-2 border-t border-navy-600/60 text-xs">
-            {ORDER_STATUS_DATA.map((item) => (
-              <div key={item.name} className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-                <span className="text-gray-300">{item.name} ({item.value}%)</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-      </div>
-
-      {/* Tables: Top Selling Products & Low Stock Alerts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Top Products Table */}
-        <div className="card p-5 lg:col-span-2 overflow-x-auto">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-white">Catalog Products</h3>
-            <span className="text-xs text-gray-400">Seeded live items</span>
-          </div>
-
-          <table className="w-full text-left text-xs">
-            <thead>
-              <tr className="border-b border-navy-600/60 text-gray-400">
-                <th className="pb-2.5 font-semibold">Product Name</th>
-                <th className="pb-2.5 font-semibold">Category</th>
-                <th className="pb-2.5 font-semibold">Price</th>
-                <th className="pb-2.5 font-semibold">Stock</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-navy-600/40">
-              {(topProducts.length > 0 ? topProducts : [
-                { name: 'Noise ColorFit Pro 5', category: 'Electronics', price_paise: 299900, stock: 85 },
-                { name: 'Sony WH-1000XM5', category: 'Electronics', price_paise: 2499900, stock: 23 },
-                { name: 'Nike Air Force 1', category: 'Fashion', price_paise: 549900, stock: 234 },
-                { name: 'Apple iPhone 15', category: 'Electronics', price_paise: 6999900, stock: 12 },
-              ]).map((prod: any, i: number) => (
-                <tr key={i} className="hover:bg-navy-600/30">
-                  <td className="py-2.5 font-semibold text-white">{prod.name}</td>
-                  <td className="py-2.5 text-gray-400">{prod.category}</td>
-                  <td className="py-2.5 font-mono text-gray-200">{formatPaise(prod.price_paise)}</td>
-                  <td className="py-2.5">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                      prod.stock < 20 ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'bg-green-500/10 text-green-400'
-                    }`}>
-                      {prod.stock} left
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Low Stock Alerts */}
-        <div className="card p-5 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-bold text-white">Low Stock Warnings</h3>
-              <span className="text-[10px] font-bold text-red-400 bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20">
-                Action Required
-              </span>
+          {statusData.length === 0 ? (
+            <div className="h-48 flex items-center justify-center">
+              <p className="text-sm" style={{ color: 'var(--adm-text-3)' }}>
+                {analyticsLoading ? 'Loading...' : 'No data for this period'}
+              </p>
             </div>
-            <p className="text-xs text-gray-400 mb-3">Live items with stock ≤ reorder_threshold</p>
-          </div>
-
-          <div className="flex flex-col gap-2.5 overflow-y-auto max-h-56">
-            {lowStockItems.map((item: any, i: number) => (
-              <div key={i} className="p-2.5 rounded-xl bg-navy-800/80 border border-navy-600 flex items-center justify-between text-xs">
-                <div>
-                  <p className="font-semibold text-white leading-tight">{item.name}</p>
-                  <p className="text-[10px] text-gray-400">SKU: {item.sku}</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-xs font-black text-amber-400">{item.stock}</span>
-                  <span className="text-[10px] text-gray-400"> / {item.threshold} min</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <button
-            onClick={() => toast.success('Triggered automatic restock advisory!')}
-            className="mt-4 w-full py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-bold transition-colors shadow-md shadow-orange-500/20"
-          >
-            Create Restock Purchase Order
-          </button>
+          ) : (
+            <>
+              <ResponsiveContainer width="100%" height={160}>
+                <PieChart>
+                  <Pie
+                    data={statusData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={45}
+                    outerRadius={72}
+                    paddingAngle={2}
+                    dataKey="value"
+                    aria-label="Order status distribution"
+                  >
+                    {statusData.map((entry: any, i: number) => (
+                      <Cell key={i} fill={entry.color} stroke="none" />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      background: 'var(--adm-raised)',
+                      border: '1px solid var(--adm-border-s)',
+                      borderRadius: 8,
+                      color: 'var(--adm-text-1)',
+                      fontSize: 12,
+                    }}
+                    formatter={(val: any, name: any) => [
+                      `${val} orders (${totalStatusOrders > 0 ? Math.round((val / totalStatusOrders) * 100) : 0}%)`,
+                      name,
+                    ]}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              {/* Legend */}
+              <ul className="flex flex-col gap-1.5 mt-2" aria-label="Status legend">
+                {statusData.map((d: any) => (
+                  <li key={d.name} className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: d.color }} />
+                      <span style={{ color: 'var(--adm-text-2)' }}>
+                        {d.name.charAt(0) + d.name.slice(1).toLowerCase().replace(/_/g, ' ')}
+                      </span>
+                    </span>
+                    <span className="font-semibold tabular-nums" style={{ color: 'var(--adm-text-1)' }}>
+                      {d.value}
+                      <span className="font-normal ml-1" style={{ color: 'var(--adm-text-3)' }}>
+                        ({totalStatusOrders > 0 ? Math.round((d.value / totalStatusOrders) * 100) : 0}%)
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
-
       </div>
 
-      {/* Quick Action Shortcuts */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-        <button
-          onClick={() => toast('Product CRUD modal will be configured for Week 3.')}
-          className="card p-4 flex items-center gap-3 hover:border-orange-500/40 transition-colors text-left"
-        >
-          <div className="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0">
-            <Plus className="w-4 h-4" />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-white">Add Product</p>
-            <p className="text-[10px] text-gray-400">Catalog entry</p>
-          </div>
-        </button>
+      {/* Bottom row: low stock + top products */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-        <button
-          onClick={() => toast('Stock movements audit viewer is available in backend DB.')}
-          className="card p-4 flex items-center gap-3 hover:border-orange-500/40 transition-colors text-left"
-        >
-          <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
-            <Boxes className="w-4 h-4" />
+        {/* Low stock */}
+        <div className="adm-card overflow-hidden" data-testid="low-stock-panel">
+          <div
+            className="px-5 py-3 flex items-center justify-between"
+            style={{ borderBottom: '1px solid var(--adm-border)', background: 'var(--adm-raised)' }}
+          >
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4" style={{ color: 'var(--adm-warning)' }} />
+              <span className="text-sm font-semibold" style={{ color: 'var(--adm-text-1)' }}>Low stock</span>
+            </div>
+            {lowStockCount > 0 && (
+              <span className="adm-badge adm-badge-warning">{lowStockCount} SKUs</span>
+            )}
           </div>
-          <div>
-            <p className="text-xs font-bold text-white">Adjust Stock</p>
-            <p className="text-[10px] text-gray-400">Inventory audit</p>
-          </div>
-        </button>
+          {lowStockItems.length === 0 ? (
+            <div className="p-6 text-center">
+              <p className="text-sm" style={{ color: 'var(--adm-text-3)' }}>All SKUs are above reorder levels.</p>
+            </div>
+          ) : (
+            <div className="divide-y" style={{ borderColor: 'var(--adm-border)' }}>
+              {lowStockItems.map((item: any, i: number) => (
+                <div key={i} className="px-5 py-3 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium truncate" style={{ color: 'var(--adm-text-1)' }}>{item.name}</p>
+                    <p className="text-xs adm-mono" style={{ color: 'var(--adm-text-3)' }}>{item.sku} &bull; {item.category}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="text-sm font-semibold" style={{ color: 'var(--adm-danger)' }}>{item.stock} left</span>
+                    <p className="text-xs" style={{ color: 'var(--adm-text-3)' }}>reorder &le; {item.threshold}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-        <button
-          onClick={() => toast('WELCOME10 active coupon: 10% off on ₹500+')}
-          className="card p-4 flex items-center gap-3 hover:border-orange-500/40 transition-colors text-left"
-        >
-          <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
-            <Ticket className="w-4 h-4" />
+        {/* Top products */}
+        <div className="adm-card overflow-hidden" data-testid="top-products-panel">
+          <div
+            className="px-5 py-3"
+            style={{ borderBottom: '1px solid var(--adm-border)', background: 'var(--adm-raised)' }}
+          >
+            <span className="text-sm font-semibold" style={{ color: 'var(--adm-text-1)' }}>Top products by rating</span>
           </div>
-          <div>
-            <p className="text-xs font-bold text-white">Coupon Rules</p>
-            <p className="text-[10px] text-gray-400">WELCOME10</p>
-          </div>
-        </button>
-
-        <button
-          onClick={() => toast.success('Database verified: 42 products, 19 tables in sync.')}
-          className="card p-4 flex items-center gap-3 hover:border-orange-500/40 transition-colors text-left"
-        >
-          <div className="w-9 h-9 rounded-xl bg-green-500/10 text-green-400 flex items-center justify-center shrink-0">
-            <CheckCircle2 className="w-4 h-4" />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-white">System Status</p>
-            <p className="text-[10px] text-green-400">Live PostgreSQL 18.4</p>
-          </div>
-        </button>
+          {topProducts.length === 0 ? (
+            <div className="p-6 text-center">
+              <p className="text-sm" style={{ color: 'var(--adm-text-3)' }}>No products found.</p>
+            </div>
+          ) : (
+            <div className="divide-y" style={{ borderColor: 'var(--adm-border)' }}>
+              {topProducts.map((p: any, i: number) => (
+                <div key={i} className="px-5 py-3 flex items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium truncate" style={{ color: 'var(--adm-text-1)' }}>{p.name}</p>
+                    <p className="text-xs" style={{ color: 'var(--adm-text-3)' }}>{p.category}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-semibold" style={{ color: 'var(--adm-text-1)' }}>
+                      {formatPaise(p.price_paise)}
+                    </p>
+                    <p className="text-xs" style={{ color: 'var(--adm-text-3)' }}>{p.stock} in stock</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
     </div>

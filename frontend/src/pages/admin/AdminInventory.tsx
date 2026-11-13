@@ -158,17 +158,17 @@ export function AdminInventory() {
   const totalStockUnits = inventory.reduce((acc, i) => acc + i.stock_qty, 0);
 
   return (
-    <div className="flex flex-col gap-6 pb-12">
+    <div className="flex flex-col gap-5 pb-10">
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
-            <Boxes className="w-6 h-6 text-orange-500" />
+          <h1 className="text-xl font-bold">
+            
             <span>Inventory & Stock Management</span>
           </h1>
-          <p className="text-xs text-gray-400 mt-1">
-            Real-time stock ledger, ACID row-locked adjustments, and reorder threshold monitoring
+          <p className="text-xs text-[var(--adm-text-2)] mt-1">
+            Track stock levels and record adjustments
           </p>
         </div>
 
@@ -183,27 +183,27 @@ export function AdminInventory() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="card p-4 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-navy-700 flex items-center justify-center text-orange-400">
+        <div className="adm-adm-card p-4 flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-\[var\(--adm-raised\)\] flex items-center justify-center text-orange-400">
             <Boxes className="w-5 h-5" />
           </div>
           <div>
             <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Total SKUs</span>
-            <p className="text-xl font-black text-white">{totalSKUs}</p>
+            <p className="text-xl font-black text-[var(--adm-text-1)]">{totalSKUs}</p>
           </div>
         </div>
 
-        <div className="card p-4 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-navy-700 flex items-center justify-center text-blue-400">
+        <div className="adm-adm-card p-4 flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-\[var\(--adm-raised\)\] flex items-center justify-center text-blue-400">
             <TrendingDown className="w-5 h-5" />
           </div>
           <div>
             <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Total Units in Stock</span>
-            <p className="text-xl font-black text-white">{totalStockUnits.toLocaleString()}</p>
+            <p className="text-xl font-black text-[var(--adm-text-1)]">{totalStockUnits.toLocaleString()}</p>
           </div>
         </div>
 
-        <div className="card p-4 flex items-center gap-4 border-amber-500/30">
+        <div className="adm-adm-card p-4 flex items-center gap-4 border-amber-500/30">
           <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400">
             <AlertTriangle className="w-5 h-5" />
           </div>
@@ -215,7 +215,7 @@ export function AdminInventory() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="card p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="adm-adm-card p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
         <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-80">
           <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -223,40 +223,40 @@ export function AdminInventory() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by SKU or product name..."
-            className="input-field pl-9 py-2 text-xs w-full"
+            className="adm-input pl-9 py-2 text-xs w-full"
           />
         </form>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-gray-300">
+          <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-[var(--adm-text-1)]">
             <input
               type="checkbox"
               checked={lowStockOnly}
               onChange={(e) => setLowStockOnly(e.target.checked)}
-              className="rounded bg-navy-700 border-navy-600 text-orange-500 focus:ring-orange-500"
+              className="rounded accent-[var(--adm-accent)]"
             />
             <span className="flex items-center gap-1.5">
               <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-              <span>Show Low Stock Only</span>
+              <span>Low stock only</span>
             </span>
           </label>
         </div>
       </div>
 
       {/* Inventory Table */}
-      <div className="card overflow-hidden">
+      <div className="adm-adm-card overflow-hidden">
         {loading ? (
           <div className="py-20 flex justify-center">
             <FullPageSpinner />
           </div>
         ) : inventory.length === 0 ? (
-          <div className="py-16 text-center text-gray-400 text-xs">
+          <div className="py-16 text-center text-sm text-[var(--adm-text-3)]">
             No inventory records found matching your filters.
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-gray-300">
-              <thead className="bg-navy-900/80 text-gray-400 font-bold uppercase text-[10px] tracking-wider border-b border-navy-700">
+            <table className="adm-table">
+              <thead className="">
                 <tr>
                   <th className="py-3 px-4">SKU / Variant</th>
                   <th className="py-3 px-4">Product Name</th>
@@ -268,19 +268,19 @@ export function AdminInventory() {
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-navy-700/60">
+              <tbody className="">
                 {inventory.map((item) => {
                   const available = Math.max(0, item.stock_qty - item.reserved_qty);
                   return (
-                    <tr key={item.id} className="hover:bg-navy-700/40 transition-colors">
-                      <td className="py-3.5 px-4 font-mono font-bold text-white">
+                    <tr key={item.id} className="hover:bg-\[var\(--adm-row-hover\)\] transition-colors">
+                      <td className="py-3.5 px-4 adm-mono font-semibold">
                         {item.sku}
                       </td>
                       <td className="py-3.5 px-4">
-                        <div className="font-semibold text-white truncate max-w-xs">{item.product_name}</div>
-                        <div className="text-[11px] text-gray-400">{item.category_name}</div>
+                        <div className="font-medium truncate max-w-xs">{item.product_name}</div>
+                        <div className="text-[11px] text-[var(--adm-text-3)]">{item.category_name}</div>
                       </td>
-                      <td className="py-3.5 px-4 text-center font-mono font-bold text-white">
+                      <td className="py-3.5 px-4 text-center adm-mono font-semibold">
                         {item.stock_qty}
                       </td>
                       <td className="py-3.5 px-4 text-center font-mono text-amber-400">
@@ -307,7 +307,7 @@ export function AdminInventory() {
                             </button>
                             <button
                               onClick={() => setEditingThresholdId(null)}
-                              className="p-1 rounded bg-navy-700 text-gray-400 hover:bg-navy-600"
+                              className="p-1 rounded bg-\[var\(--adm-raised\)\] text-gray-400 hover:bg-navy-600"
                             >
                               <X className="w-3.5 h-3.5" />
                             </button>
@@ -320,7 +320,7 @@ export function AdminInventory() {
                                 setEditingThresholdId(item.id);
                                 setTempThreshold(item.reorder_threshold);
                               }}
-                              className="opacity-0 group-hover:opacity-100 p-0.5 text-gray-400 hover:text-white"
+                              className="opacity-0 group-hover:opacity-100 p-0.5 text-gray-400 hover:text-[var(--adm-text-1)]"
                               title="Edit Reorder Threshold"
                             >
                               <Edit3 className="w-3 h-3" />
@@ -375,30 +375,30 @@ export function AdminInventory() {
       {/* Adjust Stock Modal */}
       {selectedVariant && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="card w-full max-w-md p-6 border-navy-600 shadow-2xl relative">
+          <div className="adm-card w-full max-w-md p-6 border-navy-600 shadow-2xl relative">
             <button
               onClick={() => setSelectedVariant(null)}
-              className="absolute right-4 top-4 text-gray-400 hover:text-white"
+              className="absolute right-4 top-4 text-gray-400 hover:text-[var(--adm-text-1)]"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-base font-bold text-white mb-1">
+            <h3 className="text-base font-bold text-[var(--adm-text-1)] mb-1">
               Adjust Inventory Stock
             </h3>
-            <p className="text-xs text-gray-400 mb-4 font-mono">
+            <p className="text-xs text-[var(--adm-text-2)] mb-4 font-mono">
               SKU: {selectedVariant.sku} — {selectedVariant.product_name}
             </p>
 
             <form onSubmit={handleAdjustSubmit} className="flex flex-col gap-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1">
+                <label className="block text-xs font-medium text-[var(--adm-text-1)] mb-1">
                   Movement Type
                 </label>
                 <select
                   value={adjustType}
                   onChange={(e) => setAdjustType(e.target.value as any)}
-                  className="input-field text-xs w-full"
+                  className="adm-input text-xs w-full"
                 >
                   <option value="PURCHASE_IN">PURCHASE_IN (Inward Procurement)</option>
                   <option value="ADJUSTMENT">ADJUSTMENT (Cycle Count / Correction)</option>
@@ -407,7 +407,7 @@ export function AdminInventory() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1">
+                <label className="block text-xs font-medium text-[var(--adm-text-1)] mb-1">
                   Quantity Change
                 </label>
                 <input
@@ -415,16 +415,16 @@ export function AdminInventory() {
                   required
                   value={adjustQty}
                   onChange={(e) => setAdjustQty(e.target.value)}
-                  className="input-field text-xs w-full"
+                  className="adm-input text-xs w-full"
                   placeholder="e.g. 10 (or -5 for negative adjustment)"
                 />
-                <span className="text-[11px] text-gray-400 mt-1 block">
+                <span className="text-[11px] text-[var(--adm-text-3)] mt-1 block">
                   Current Stock: {selectedVariant.stock_qty} | Available: {Math.max(0, selectedVariant.stock_qty - selectedVariant.reserved_qty)}
                 </span>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1">
+                <label className="block text-xs font-medium text-[var(--adm-text-1)] mb-1">
                   Mandatory Reason / Notes
                 </label>
                 <textarea
@@ -433,7 +433,7 @@ export function AdminInventory() {
                   value={adjustReason}
                   onChange={(e) => setAdjustReason(e.target.value)}
                   placeholder="e.g. Inward PO #9482 from supplier, physical count discrepancy, damaged box write-off..."
-                  className="input-field text-xs w-full resize-none"
+                  className="adm-input text-xs w-full resize-none"
                 />
               </div>
 
@@ -461,28 +461,28 @@ export function AdminInventory() {
       {/* Movement History Drawer / Modal */}
       {historyVariant && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="card w-full max-w-2xl p-6 border-navy-600 shadow-2xl relative max-h-[85vh] flex flex-col">
+          <div className="adm-card w-full max-w-2xl p-6 border-navy-600 shadow-2xl relative max-h-[85vh] flex flex-col">
             <button
               onClick={() => setHistoryVariant(null)}
-              className="absolute right-4 top-4 text-gray-400 hover:text-white"
+              className="absolute right-4 top-4 text-gray-400 hover:text-[var(--adm-text-1)]"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-base font-bold text-white mb-1">
+            <h3 className="text-base font-bold text-[var(--adm-text-1)] mb-1">
               Stock Movement Audit Trail
             </h3>
-            <p className="text-xs text-gray-400 mb-4 font-mono">
+            <p className="text-xs text-[var(--adm-text-2)] mb-4 font-mono">
               SKU: {historyVariant.sku} — {historyVariant.product_name}
             </p>
 
-            <div className="flex-1 overflow-y-auto divide-y divide-navy-700/60 pr-1">
+            <div className="flex-1 overflow-y-auto  pr-1">
               {historyLoading ? (
                 <div className="py-12 flex justify-center">
                   <FullPageSpinner />
                 </div>
               ) : movements.length === 0 ? (
-                <div className="py-8 text-center text-xs text-gray-400">
+                <div className="py-8 text-center text-xs text-[var(--adm-text-2)]">
                   No historical movements logged for this SKU yet.
                 </div>
               ) : (
@@ -490,7 +490,7 @@ export function AdminInventory() {
                   <div key={m.id} className="py-3 flex items-start justify-between gap-4 text-xs">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-white font-mono uppercase bg-navy-900 px-2 py-0.5 rounded border border-navy-700">
+                        <span className="font-bold text-[var(--adm-text-1)] font-mono uppercase bg-navy-900 px-2 py-0.5 rounded border border-\[var\(--adm-border\)\]">
                           {m.type}
                         </span>
                         <span className={`font-mono font-black ${m.quantity_change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
@@ -513,15 +513,15 @@ export function AdminInventory() {
                     </div>
 
                     <div className="text-right font-mono text-[11px] shrink-0 text-gray-400">
-                      <div>Before: <span className="text-white font-bold">{m.stock_before}</span></div>
-                      <div>After: <span className="text-white font-bold">{m.stock_after}</span></div>
+                      <div>Before: <span className="text-[var(--adm-text-1)] font-bold">{m.stock_before}</span></div>
+                      <div>After: <span className="text-[var(--adm-text-1)] font-bold">{m.stock_after}</span></div>
                     </div>
                   </div>
                 ))
               )}
             </div>
 
-            <div className="mt-4 pt-3 border-t border-navy-700 flex justify-end">
+            <div className="mt-4 pt-3 border-t border-\[var\(--adm-border\)\] flex justify-end">
               <button
                 onClick={() => setHistoryVariant(null)}
                 className="btn-secondary text-xs"

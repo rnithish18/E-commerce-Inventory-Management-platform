@@ -68,11 +68,11 @@ export function AdminReviews() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
+          <h1 className="text-xl sm:text-2xl font-black text-[var(--adm-text-1)] tracking-tight flex items-center gap-2.5">
             <Star className="w-6 h-6 text-orange-500 fill-orange-500/20" />
             <span>Product Reviews & Moderation</span>
           </h1>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-[var(--adm-text-2)] mt-1">
             Moderate customer feedback, approve genuine reviews, and update product aggregate ratings
           </p>
         </div>
@@ -86,9 +86,9 @@ export function AdminReviews() {
       </div>
 
       {/* Filter Bar */}
-      <div className="card p-3 flex items-center justify-between gap-3">
+      <div className="adm-card p-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-400 font-semibold flex items-center gap-1">
+          <span className="text-xs text-[var(--adm-text-2)] font-semibold flex items-center gap-1">
             <Filter className="w-3.5 h-3.5" /> Filter by:
           </span>
           {['', 'pending', 'approved', 'hidden'].map((status) => (
@@ -97,8 +97,8 @@ export function AdminReviews() {
               onClick={() => setFilterStatus(status)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 filterStatus === status
-                  ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25'
-                  : 'bg-navy-700/60 text-gray-300 hover:text-white hover:bg-navy-700'
+                  ? 'bg-orange-500 text-[var(--adm-text-1)] shadow-md shadow-orange-500/25'
+                  : 'bg-[var(--adm-raised)]/60 text-[var(--adm-text-2)] hover:text-[var(--adm-text-1)] hover:bg-[var(--adm-raised)]'
               }`}
             >
               {status === '' ? 'All Reviews' : status.charAt(0).toUpperCase() + status.slice(1)}
@@ -108,28 +108,28 @@ export function AdminReviews() {
       </div>
 
       {/* Reviews List */}
-      <div className="card overflow-hidden">
+      <div className="adm-adm-card overflow-hidden">
         {loading ? (
           <div className="py-20 flex justify-center">
             <FullPageSpinner />
           </div>
         ) : reviews.length === 0 ? (
-          <div className="py-16 text-center text-gray-400 text-xs">
+          <div className="py-16 text-center text-[var(--adm-text-3)] text-xs">
             No customer reviews found matching filter.
           </div>
         ) : (
-          <div className="divide-y divide-navy-700/60">
+          <div className="">
             {reviews.map((r) => (
-              <div key={r.id} className="p-5 flex flex-col sm:flex-row items-start justify-between gap-4 hover:bg-navy-700/30 transition-colors">
+              <div key={r.id} className="p-5 flex flex-col sm:flex-row items-start justify-between gap-4 hover:bg-[var(--adm-raised)]/30 transition-colors">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-1">
-                    <span className="font-bold text-white text-sm">{r.product_name}</span>
+                    <span className="font-bold text-[var(--adm-text-1)] text-sm">{r.product_name}</span>
                     <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${
                       r.status === 'approved' 
                         ? 'bg-green-500/10 text-green-400 border-green-500/30'
                         : r.status === 'pending'
                         ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
-                        : 'bg-gray-500/10 text-gray-400 border-gray-500/30'
+                        : 'bg-gray-500/10 text-[var(--adm-text-3)] border-gray-500/30'
                     }`}>
                       {r.status}
                     </span>
@@ -147,14 +147,14 @@ export function AdminReviews() {
                         }`}
                       />
                     ))}
-                    <span className="text-xs font-bold text-white ml-1.5">{r.title}</span>
+                    <span className="text-xs font-bold text-[var(--adm-text-1)] ml-1.5">{r.title}</span>
                   </div>
 
-                  <p className="text-xs text-gray-300 leading-relaxed mb-3">
+                  <p className="text-xs text-[var(--adm-text-2)] leading-relaxed mb-3">
                     {r.body}
                   </p>
 
-                  <div className="flex items-center gap-4 text-[11px] text-gray-400">
+                  <div className="flex items-center gap-4 text-[11px] text-[var(--adm-text-3)]">
                     <span className="flex items-center gap-1">
                       <User className="w-3.5 h-3.5 text-gray-500" />
                       <span>{r.reviewer_name} ({r.reviewer_email})</span>
@@ -181,7 +181,7 @@ export function AdminReviews() {
                   {r.status !== 'hidden' && (
                     <button
                       onClick={() => handleModerate(r.id, 'hidden')}
-                      className="btn-secondary py-1.5 px-3 text-xs flex items-center gap-1 text-gray-300 hover:text-white"
+                      className="btn-secondary py-1.5 px-3 text-xs flex items-center gap-1 text-[var(--adm-text-2)] hover:text-[var(--adm-text-1)]"
                     >
                       <EyeOff className="w-3.5 h-3.5" />
                       <span>Hide</span>

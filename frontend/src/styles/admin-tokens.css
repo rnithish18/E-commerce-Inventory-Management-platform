@@ -1,0 +1,135 @@
+/* =========================================================
+   Admin-scoped design tokens — independent of storefront
+   Applied via .admin-root wrapper in AdminLayout.tsx
+   Toggle admin-light class for light variant
+   ========================================================= */
+
+.admin-root {
+  /* ── Dark (default) ── */
+  --adm-bg:            #090e1a;
+  --adm-surface:       #0f1e33;
+  --adm-raised:        #172d4a;
+  --adm-border:        rgba(255,255,255,0.07);
+  --adm-border-s:      #1e3a5f;
+  --adm-text-1:        #f1f5f9;
+  --adm-text-2:        #94a3b8;
+  --adm-text-3:        #64748b;
+  --adm-accent:        #ea580c;
+  --adm-accent-h:      #c2410c;
+  --adm-success:       #22c55e;
+  --adm-warning:       #f59e0b;
+  --adm-danger:        #ef4444;
+  --adm-info:          #3b82f6;
+  --adm-th-bg:         #172d4a;
+  --adm-row-hover:     rgba(30,58,95,0.4);
+  --adm-input-bg:      #172d4a;
+  --adm-scroll-thumb:  #3f3f46;
+  color-scheme: dark;
+  min-height: 100vh;
+  background: var(--adm-bg);
+  color: var(--adm-text-1);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* ── Light variant ── */
+.admin-root.admin-light {
+  --adm-bg:            #f1f5f9;
+  --adm-surface:       #ffffff;
+  --adm-raised:        #f8fafc;
+  --adm-border:        rgba(0,0,0,0.07);
+  --adm-border-s:      #e2e8f0;
+  --adm-text-1:        #0f172a;
+  --adm-text-2:        #475569;
+  --adm-text-3:        #94a3b8;
+  --adm-accent:        #ea580c;
+  --adm-accent-h:      #c2410c;
+  --adm-success:       #16a34a;
+  --adm-warning:       #d97706;
+  --adm-danger:        #dc2626;
+  --adm-info:          #2563eb;
+  --adm-th-bg:         #f1f5f9;
+  --adm-row-hover:     #f8fafc;
+  --adm-input-bg:      #ffffff;
+  --adm-scroll-thumb:  #cbd5e1;
+  color-scheme: light;
+}
+
+/* ── Admin card ── */
+.adm-card {
+  background: var(--adm-surface);
+  border: 1px solid var(--adm-border);
+  border-radius: 12px;
+  color: var(--adm-text-1);
+}
+
+/* ── Admin table ── */
+.adm-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+.adm-table th {
+  background: var(--adm-th-bg);
+  color: var(--adm-text-2);
+  font-weight: 600;
+  font-size: 0.6875rem;
+  letter-spacing: 0.03em;
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--adm-border);
+  white-space: nowrap;
+  user-select: none;
+}
+.adm-table th.num, .adm-table td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.adm-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--adm-border);
+  color: var(--adm-text-1);
+  vertical-align: middle;
+  line-height: 1.4;
+}
+.adm-table tr:last-child td { border-bottom: none; }
+.adm-table tr:hover td { background: var(--adm-row-hover); }
+
+/* ── Admin form controls ── */
+.adm-input, .adm-select, .adm-textarea {
+  background: var(--adm-input-bg);
+  border: 1px solid var(--adm-border-s);
+  border-radius: 8px;
+  color: var(--adm-text-1);
+  padding: 8px 12px;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.adm-input::placeholder, .adm-textarea::placeholder { color: var(--adm-text-3); }
+.adm-input:focus, .adm-select:focus, .adm-textarea:focus {
+  outline: none;
+  border-color: var(--adm-accent);
+  box-shadow: 0 0 0 3px rgba(234,88,12,0.15);
+}
+.adm-select { cursor: pointer; }
+.adm-textarea { resize: vertical; min-height: 80px; }
+
+/* ── Status badges ── */
+.adm-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 999px;
+  font-size: 0.6875rem; font-weight: 600; line-height: 1.6;
+  white-space: nowrap;
+}
+.adm-badge-success  { background: rgba(34,197,94,0.12);   color: var(--adm-success); }
+.adm-badge-warning  { background: rgba(245,158,11,0.12);  color: var(--adm-warning); }
+.adm-badge-danger   { background: rgba(239,68,68,0.12);   color: var(--adm-danger); }
+.adm-badge-info     { background: rgba(59,130,246,0.12);  color: var(--adm-info); }
+.adm-badge-neutral  { background: var(--adm-raised);      color: var(--adm-text-2); }
+.adm-badge-accent   { background: rgba(234,88,12,0.12);   color: var(--adm-accent); }
+
+/* ── Tabular nums for numbers, mono only for IDs/SKUs ── */
+.admin-root { font-variant-numeric: tabular-nums; }
+.adm-mono { font-family: ui-monospace, 'Cascadia Code', 'Fira Code', monospace; font-size: 0.75rem; }
+
+/* ── Scrollbar ── */
+.admin-root ::-webkit-scrollbar       { width: 5px; height: 5px; }
+.admin-root ::-webkit-scrollbar-track { background: var(--adm-bg); }
+.admin-root ::-webkit-scrollbar-thumb { background: var(--adm-scroll-thumb); border-radius: 3px; }

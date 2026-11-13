@@ -1,21 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  ShoppingCart, 
-  Search, 
-  Filter, 
-  ArrowRight, 
-  CheckCircle2, 
-  Clock, 
-  Truck, 
-  XCircle, 
-  AlertCircle, 
-  RotateCcw, 
-  Eye, 
-  X, 
-  ShieldCheck, 
-  User, 
-  MapPin, 
-  CreditCard 
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  ShoppingCart,
+  Search,
+  CheckCircle2,
+  Clock,
+  Truck,
+  XCircle,
+  AlertCircle,
+  RotateCcw,
+  Eye,
+  X,
+  User,
+  MapPin,
+  MoreVertical,
 } from 'lucide-react';
 import api from '../../lib/api';
 import { formatPaise, formatDateTime } from '../../lib/utils';
@@ -46,17 +43,88 @@ const STATUS_FILTERS = [
   'REFUNDED',
 ];
 
-const STATUS_COLORS: Record<string, string> = {
-  'PENDING_PAYMENT': 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-  'PAID': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
-  'PROCESSING': 'bg-blue-500/10 text-blue-400 border-blue-500/30',
-  'SHIPPED': 'bg-purple-500/10 text-purple-400 border-purple-500/30',
-  'OUT_FOR_DELIVERY': 'bg-orange-500/10 text-orange-400 border-orange-500/30',
-  'DELIVERED': 'bg-green-500/10 text-green-400 border-green-500/30',
-  'CANCELLED': 'bg-red-500/10 text-red-400 border-red-500/30',
-  'REFUND_REQUESTED': 'bg-rose-500/10 text-rose-400 border-rose-500/30',
-  'REFUNDED': 'bg-gray-500/10 text-gray-400 border-gray-500/30',
+const STATUS_LABEL: Record<string, string> = {
+  PENDING_PAYMENT: 'Pending payment',
+  PAID: 'Paid',
+  PROCESSING: 'Processing',
+  SHIPPED: 'Shipped',
+  OUT_FOR_DELIVERY: 'Out for delivery',
+  DELIVERED: 'Delivered',
+  CANCELLED: 'Cancelled',
+  REFUND_REQUESTED: 'Refund requested',
+  REFUNDED: 'Refunded',
 };
+
+function statusBadgeClass(status: string): string {
+  const map: Record<string, string> = {
+    PENDING_PAYMENT:  'adm-badge adm-badge-warning',
+    PAID:             'adm-badge adm-badge-info',
+    PROCESSING:       'adm-badge adm-badge-info',
+    SHIPPED:          'adm-badge adm-badge-neutral',
+    OUT_FOR_DELIVERY: 'adm-badge adm-badge-accent',
+    DELIVERED:        'adm-badge adm-badge-success',
+    CANCELLED:        'adm-badge adm-badge-danger',
+    REFUND_REQUESTED: 'adm-badge adm-badge-danger',
+    REFUNDED:         'adm-badge adm-badge-neutral',
+  };
+  return map[status] || 'adm-badge adm-badge-neutral';
+}
+
+function KebabMenu({ order, onView, onCancel }: { order: AdminOrderSummary; onView: () => void; onCancel: () => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="p-1.5 rounded-lg transition-colors"
+        style={{ color: 'var(--adm-text-2)' }}
+        aria-label="Order actions"
+        aria-haspopup="true"
+        aria-expanded={open}
+      >
+        <MoreVertical className="w-4 h-4" />
+      </button>
+      {open && (
+        <div
+          className="absolute right-0 top-full mt-1 w-40 rounded-lg shadow-xl z-20 py-1"
+          style={{ background: 'var(--adm-raised)', border: '1px solid var(--adm-border)' }}
+          role="menu"
+        >
+          <button
+            onClick={() => { onView(); setOpen(false); }}
+            className="w-full px-3 py-2 text-left text-xs font-medium flex items-center gap-2 hover:bg-[var(--adm-surface)] transition-colors"
+            style={{ color: 'var(--adm-text-1)' }}
+            role="menuitem"
+          >
+            <Eye className="w-3.5 h-3.5" style={{ color: 'var(--adm-accent)' }} />
+            View details
+          </button>
+          {['PAID', 'PROCESSING'].includes(order.status) && (
+            <button
+              onClick={() => { onCancel(); setOpen(false); }}
+              className="w-full px-3 py-2 text-left text-xs font-medium flex items-center gap-2 hover:bg-[var(--adm-surface)] transition-colors"
+              style={{ color: 'var(--adm-danger)' }}
+              role="menuitem"
+            >
+              <XCircle className="w-3.5 h-3.5" />
+              Cancel order
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function AdminOrders() {
   const [orders, setOrders] = useState<AdminOrderSummary[]>([]);
@@ -64,12 +132,10 @@ export function AdminOrders() {
   const [selectedStatus, setSelectedStatus] = useState('ALL');
   const [search, setSearch] = useState('');
 
-  // Order detail drawer state
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [orderDetail, setOrderDetail] = useState<any>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
-  // Tracking form state
   const [showTrackingForm, setShowTrackingForm] = useState(false);
   const [trackingStatus, setTrackingStatus] = useState('IN_TRANSIT');
   const [trackingLocation, setTrackingLocation] = useState('');
@@ -81,7 +147,6 @@ export function AdminOrders() {
       const params = new URLSearchParams();
       if (selectedStatus !== 'ALL') params.set('status', selectedStatus);
       if (search) params.set('search', search);
-
       const res = await api.get(`/admin/orders?${params.toString()}`);
       setOrders(res.data.orders);
     } catch {
@@ -91,9 +156,7 @@ export function AdminOrders() {
     }
   };
 
-  useEffect(() => {
-    fetchOrders();
-  }, [selectedStatus]);
+  useEffect(() => { fetchOrders(); }, [selectedStatus]);
 
   const fetchOrderDetail = async (id: string) => {
     try {
@@ -119,23 +182,23 @@ export function AdminOrders() {
         status: toStatus,
         note: note || `Admin moved to ${toStatus}`,
       });
-      toast.success(`Order state transitioned to ${toStatus}`);
+      toast.success(`Order updated to ${STATUS_LABEL[toStatus] || toStatus}`);
       fetchOrderDetail(selectedOrderId);
       fetchOrders();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Transition rejected');
+      toast.error(err.response?.data?.message || 'Update rejected');
     }
   };
 
-  const handleCancelOrder = async () => {
-    if (!selectedOrderId) return;
-    const reason = prompt('Enter reason for cancellation (stock will be released):');
+  const handleCancelOrder = async (id?: string) => {
+    const oid = id || selectedOrderId;
+    if (!oid) return;
+    const reason = prompt('Reason for cancellation (stock will be released):');
     if (!reason) return;
-
     try {
-      await api.post(`/admin/orders/${selectedOrderId}/cancel`, { reason });
-      toast.success('Order cancelled and reserved stock released');
-      fetchOrderDetail(selectedOrderId);
+      await api.post(`/admin/orders/${oid}/cancel`, { reason });
+      toast.success('Order cancelled and stock released');
+      if (selectedOrderId === oid) fetchOrderDetail(oid);
       fetchOrders();
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Cancellation failed');
@@ -144,8 +207,7 @@ export function AdminOrders() {
 
   const handleApproveRefund = async () => {
     if (!selectedOrderId) return;
-    if (!confirm('Approve refund? This will restock items via RETURN_IN and mark order REFUNDED.')) return;
-
+    if (!confirm('Approve refund? This will return stock and mark the order as refunded.')) return;
     try {
       await api.post(`/admin/orders/${selectedOrderId}/approve-refund`);
       toast.success('Refund approved and stock returned');
@@ -159,14 +221,13 @@ export function AdminOrders() {
   const handleAddTracking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedOrderId) return;
-
     try {
       await api.post(`/admin/orders/${selectedOrderId}/tracking`, {
         status: trackingStatus,
         location: trackingLocation,
         description: trackingDescription,
       });
-      toast.success('Tracking event added to timeline');
+      toast.success('Tracking event added');
       setShowTrackingForm(false);
       setTrackingLocation('');
       setTrackingDescription('');
@@ -176,106 +237,135 @@ export function AdminOrders() {
     }
   };
 
+  // Close drawer on Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') setSelectedOrderId(null); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, []);
+
+  const statusCounts = orders.reduce((acc: Record<string, number>, o) => {
+    acc[o.status] = (acc[o.status] || 0) + 1;
+    return acc;
+  }, {});
+
   return (
-    <div className="flex flex-col gap-6 pb-12">
-      
-      {/* Page Header */}
+    <div className="flex flex-col gap-5 pb-10">
+
+      {/* Page header */}
       <div>
-        <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
-          <ShoppingCart className="w-6 h-6 text-orange-500" />
-          <span>Order Management & Fulfillment</span>
-        </h1>
-        <p className="text-xs text-gray-400 mt-1">
-          Strict state machine lifecycle, courier tracking publisher, and refund processing
+        <h1 className="text-xl font-bold" style={{ color: 'var(--adm-text-1)' }}>Orders</h1>
+        <p className="text-sm mt-0.5" style={{ color: 'var(--adm-text-2)' }}>
+          Manage and fulfil customer orders
         </p>
       </div>
 
-      {/* Filters & Search */}
-      <div className="card p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+      {/* Filters */}
+      <div
+        className="adm-card p-4 flex flex-col sm:flex-row items-center gap-3"
+      >
+        <div className="relative w-full sm:w-72">
+          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--adm-text-3)' }} />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && fetchOrders()}
-            placeholder="Search by Order ID or customer email..."
-            className="input-field pl-9 py-2 text-xs w-full"
+            placeholder="Order ID or customer email..."
+            className="adm-input pl-8 py-2 text-xs"
+            aria-label="Search orders"
           />
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-          <span className="text-xs text-gray-400 shrink-0 font-semibold flex items-center gap-1">
-            <Filter className="w-3.5 h-3.5" /> Status:
-          </span>
+        <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto">
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="input-field text-xs py-1.5 px-3"
+            className="adm-select text-xs py-2 px-3 rounded-lg"
+            aria-label="Filter by status"
           >
             {STATUS_FILTERS.map((s) => (
-              <option key={s} value={s}>{s}</option>
+              <option key={s} value={s}>
+                {s === 'ALL' ? 'All statuses' : (STATUS_LABEL[s] || s)}
+                {s !== 'ALL' && statusCounts[s] ? ` (${statusCounts[s]})` : ''}
+              </option>
             ))}
           </select>
+          <button
+            onClick={fetchOrders}
+            className="px-3 py-2 rounded-lg text-xs font-semibold transition-colors"
+            style={{ background: 'var(--adm-accent)', color: '#fff' }}
+          >
+            Search
+          </button>
         </div>
       </div>
 
-      {/* Orders Table */}
-      <div className="card overflow-hidden">
+      {/* Orders table */}
+      <div className="adm-card overflow-hidden">
         {loading ? (
-          <div className="py-20 flex justify-center">
-            <FullPageSpinner />
-          </div>
+          <div className="py-20 flex justify-center"><FullPageSpinner /></div>
         ) : orders.length === 0 ? (
-          <div className="py-16 text-center text-gray-400 text-xs">
-            No orders found matching status filter "{selectedStatus}".
+          <div className="py-16 text-center">
+            <ShoppingCart className="w-10 h-10 mx-auto mb-3" style={{ color: 'var(--adm-text-3)' }} />
+            <p className="text-sm" style={{ color: 'var(--adm-text-2)' }}>No orders found</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--adm-text-3)' }}>
+              {selectedStatus !== 'ALL' ? `No "${STATUS_LABEL[selectedStatus] || selectedStatus}" orders` : 'No orders placed yet'}
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-gray-300">
-              <thead className="bg-navy-900/80 text-gray-400 font-bold uppercase text-[10px] tracking-wider border-b border-navy-700">
+            <table className="adm-table">
+              <thead>
                 <tr>
-                  <th className="py-3 px-4">Order ID</th>
-                  <th className="py-3 px-4">Customer</th>
-                  <th className="py-3 px-4 text-center">Items</th>
-                  <th className="py-3 px-4">Total</th>
-                  <th className="py-3 px-4 text-center">Status</th>
-                  <th className="py-3 px-4">Date</th>
-                  <th className="py-3 px-4 text-right">Action</th>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th className="num">Items</th>
+                  <th className="num">Total</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th style={{ width: 48 }} />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-navy-700/60">
+              <tbody>
                 {orders.map((o) => (
-                  <tr key={o.id} className="hover:bg-navy-700/40 transition-colors">
-                    <td className="py-3.5 px-4 font-mono font-bold text-white">
-                      #{o.id.slice(0, 8)}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <div className="font-semibold text-white">{o.full_name}</div>
-                      <div className="text-[11px] text-gray-400 font-mono">{o.email}</div>
-                    </td>
-                    <td className="py-3.5 px-4 text-center font-mono font-bold">
-                      {o.item_count}
-                    </td>
-                    <td className="py-3.5 px-4 font-mono font-bold text-white">
-                      {formatPaise(o.total_paise)}
-                    </td>
-                    <td className="py-3.5 px-4 text-center">
-                      <span className={`inline-block text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border ${STATUS_COLORS[o.status] || 'bg-gray-700 text-gray-300'}`}>
-                        {o.status.replace(/_/g, ' ')}
+                  <tr key={o.id}>
+                    <td>
+                      <span className="adm-mono font-semibold" style={{ color: 'var(--adm-text-1)' }}>
+                        #{o.id.slice(0, 8)}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 text-gray-400 text-[11px]">
+                    <td>
+                      <div className="font-medium text-xs" style={{ color: 'var(--adm-text-1)' }}>{o.full_name}</div>
+                      <div className="text-[11px]" style={{ color: 'var(--adm-text-3)' }}>{o.email}</div>
+                    </td>
+                    <td className="num">
+                      {o.item_count > 0 ? (
+                        <span className="font-semibold">{o.item_count}</span>
+                      ) : (
+                        <span
+                          title="No items recorded for this order"
+                          style={{ color: 'var(--adm-text-3)' }}
+                        >
+                          &mdash;
+                        </span>
+                      )}
+                    </td>
+                    <td className="num font-semibold">{formatPaise(o.total_paise)}</td>
+                    <td>
+                      <span className={statusBadgeClass(o.status)}>
+                        {STATUS_LABEL[o.status] || o.status.replace(/_/g, ' ')}
+                      </span>
+                    </td>
+                    <td style={{ color: 'var(--adm-text-3)' }} className="text-xs">
                       {formatDateTime(o.created_at)}
                     </td>
-                    <td className="py-3.5 px-4 text-right">
-                      <button
-                        onClick={() => handleOpenDetail(o.id)}
-                        className="btn-secondary py-1 px-3 text-[11px] inline-flex items-center gap-1"
-                      >
-                        <Eye className="w-3 h-3" />
-                        <span>View</span>
-                      </button>
+                    <td>
+                      <KebabMenu
+                        order={o}
+                        onView={() => handleOpenDetail(o.id)}
+                        onCancel={() => handleCancelOrder(o.id)}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -285,239 +375,290 @@ export function AdminOrders() {
         )}
       </div>
 
-      {/* Order Detail Drawer */}
+      {/* Order detail drawer */}
       {selectedOrderId && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex justify-end">
-          <div className="w-full max-w-2xl bg-navy-800 border-l border-navy-700 h-full overflow-y-auto p-6 flex flex-col gap-6 shadow-2xl relative">
+        <div
+          className="fixed inset-0 z-50 flex justify-end"
+          style={{ background: 'rgba(0,0,0,0.6)' }}
+          onClick={(e) => { if (e.target === e.currentTarget) setSelectedOrderId(null); }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Order details"
+        >
+          <div
+            className="w-full max-w-2xl h-full overflow-y-auto flex flex-col gap-5 p-6 relative"
+            style={{ background: 'var(--adm-surface)', borderLeft: '1px solid var(--adm-border)' }}
+          >
             <button
               onClick={() => setSelectedOrderId(null)}
-              className="absolute right-5 top-5 text-gray-400 hover:text-white"
+              aria-label="Close order details"
+              className="absolute right-5 top-5 p-1.5 rounded-lg transition-colors"
+              style={{ color: 'var(--adm-text-2)' }}
             >
               <X className="w-5 h-5" />
             </button>
 
             {detailLoading || !orderDetail ? (
-              <div className="py-32 flex justify-center">
-                <FullPageSpinner />
-              </div>
+              <div className="py-32 flex justify-center"><FullPageSpinner /></div>
             ) : (
               <>
                 {/* Header */}
-                <div className="border-b border-navy-700 pb-4">
+                <div style={{ borderBottom: '1px solid var(--adm-border)' }} className="pb-4">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-mono text-gray-400">Order</span>
-                    <span className="text-sm font-black font-mono text-white">#{orderDetail.id}</span>
-                    <span className={`ml-2 text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border ${STATUS_COLORS[orderDetail.status]}`}>
-                      {orderDetail.status.replace(/_/g, ' ')}
+                    <span className="adm-mono text-xs" style={{ color: 'var(--adm-text-3)' }}>Order</span>
+                    <span className="adm-mono font-bold text-sm" style={{ color: 'var(--adm-text-1)' }}>
+                      #{orderDetail.id}
+                    </span>
+                    <span className={statusBadgeClass(orderDetail.status)}>
+                      {STATUS_LABEL[orderDetail.status] || orderDetail.status.replace(/_/g, ' ')}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-400">
-                    Placed on {formatDateTime(orderDetail.created_at)}
+                  <p className="text-xs" style={{ color: 'var(--adm-text-3)' }}>
+                    Placed {formatDateTime(orderDetail.created_at)}
                   </p>
                 </div>
 
-                {/* State Machine Action Controls */}
-                <div className="card p-4 bg-navy-900/90 border-orange-500/30 flex flex-col gap-3">
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-orange-400" />
-                    <span>State Transition Actions</span>
+                {/* Actions */}
+                <div
+                  className="adm-card p-4 flex flex-col gap-3"
+                  style={{ borderColor: 'var(--adm-accent)', borderLeftWidth: 3 }}
+                >
+                  <h4 className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--adm-text-2)' }}>
+                    Actions
                   </h4>
-
                   <div className="flex flex-wrap items-center gap-2">
                     {orderDetail.status === 'PAID' && (
                       <>
                         <button
                           onClick={() => handleStatusTransition('PROCESSING')}
-                          className="btn-primary text-xs py-1.5 px-3"
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-colors"
+                          style={{ background: 'var(--adm-accent)' }}
                         >
-                          Mark Processing
+                          Mark processing
                         </button>
                         <button
-                          onClick={handleCancelOrder}
-                          className="btn-secondary text-xs py-1.5 px-3 text-red-400 hover:text-red-300"
+                          onClick={() => handleCancelOrder()}
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                          style={{ color: 'var(--adm-danger)', background: 'rgba(239,68,68,0.1)' }}
                         >
-                          Cancel & Release Stock
+                          Cancel &amp; release stock
                         </button>
                       </>
                     )}
-
                     {orderDetail.status === 'PROCESSING' && (
                       <>
                         <button
                           onClick={() => handleStatusTransition('SHIPPED')}
-                          className="btn-primary text-xs py-1.5 px-3"
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-colors"
+                          style={{ background: 'var(--adm-accent)' }}
                         >
-                          Mark Shipped
+                          Mark shipped
                         </button>
                         <button
-                          onClick={handleCancelOrder}
-                          className="btn-secondary text-xs py-1.5 px-3 text-red-400"
+                          onClick={() => handleCancelOrder()}
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                          style={{ color: 'var(--adm-danger)', background: 'rgba(239,68,68,0.1)' }}
                         >
-                          Cancel Order
+                          Cancel order
                         </button>
                       </>
                     )}
-
                     {orderDetail.status === 'SHIPPED' && (
                       <button
                         onClick={() => handleStatusTransition('OUT_FOR_DELIVERY')}
-                        className="btn-primary text-xs py-1.5 px-3"
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-colors"
+                        style={{ background: 'var(--adm-accent)' }}
                       >
-                        Mark Out For Delivery
+                        Mark out for delivery
                       </button>
                     )}
-
                     {orderDetail.status === 'OUT_FOR_DELIVERY' && (
                       <button
                         onClick={() => handleStatusTransition('DELIVERED')}
-                        className="btn-primary text-xs py-1.5 px-3 bg-green-600 hover:bg-green-700"
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-colors"
+                        style={{ background: 'var(--adm-success)' }}
                       >
-                        Mark Delivered
+                        Mark delivered
                       </button>
                     )}
-
                     {orderDetail.status === 'REFUND_REQUESTED' && (
                       <button
                         onClick={handleApproveRefund}
-                        className="btn-primary text-xs py-1.5 px-3 bg-rose-600 hover:bg-rose-700"
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-colors"
+                        style={{ background: '#be185d' }}
                       >
-                        Approve Refund & Restock Items
+                        Approve refund &amp; restock
                       </button>
                     )}
-
                     {['SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(orderDetail.status) && (
                       <button
                         onClick={() => setShowTrackingForm(!showTrackingForm)}
-                        className="btn-secondary text-xs py-1.5 px-3 flex items-center gap-1"
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                        style={{
+                          color: 'var(--adm-text-1)',
+                          background: 'var(--adm-raised)',
+                          border: '1px solid var(--adm-border)',
+                        }}
                       >
                         <Truck className="w-3.5 h-3.5" />
-                        <span>{showTrackingForm ? 'Hide Tracking Form' : 'Publish Tracking Event'}</span>
+                        {showTrackingForm ? 'Hide tracking form' : 'Add tracking event'}
                       </button>
                     )}
                   </div>
                 </div>
 
-                {/* Add Tracking Form */}
+                {/* Tracking form */}
                 {showTrackingForm && (
-                  <form onSubmit={handleAddTracking} className="card p-4 border-navy-600 flex flex-col gap-3">
-                    <h5 className="text-xs font-bold text-white">Publish Courier Milestone</h5>
-                    <div className="grid grid-cols-2 gap-2">
+                  <form
+                    onSubmit={handleAddTracking}
+                    className="adm-card p-4 flex flex-col gap-3"
+                    aria-label="Add tracking event"
+                  >
+                    <h5 className="text-xs font-semibold" style={{ color: 'var(--adm-text-1)' }}>Add tracking event</h5>
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="text-[11px] text-gray-400">Milestone Status</label>
+                        <label className="text-xs mb-1 block" style={{ color: 'var(--adm-text-2)' }}>
+                          Status
+                        </label>
                         <select
                           value={trackingStatus}
                           onChange={(e) => setTrackingStatus(e.target.value)}
-                          className="input-field text-xs w-full mt-1"
+                          className="adm-select text-xs"
                         >
-                          <option value="IN_TRANSIT">IN_TRANSIT</option>
-                          <option value="ARRIVED_AT_HUB">ARRIVED_AT_HUB</option>
-                          <option value="OUT_FOR_DELIVERY">OUT_FOR_DELIVERY</option>
-                          <option value="DELIVERED">DELIVERED</option>
+                          <option value="IN_TRANSIT">In transit</option>
+                          <option value="ARRIVED_AT_HUB">Arrived at hub</option>
+                          <option value="OUT_FOR_DELIVERY">Out for delivery</option>
+                          <option value="DELIVERED">Delivered</option>
                         </select>
                       </div>
                       <div>
-                        <label className="text-[11px] text-gray-400">Current Location</label>
+                        <label className="text-xs mb-1 block" style={{ color: 'var(--adm-text-2)' }}>
+                          Location
+                        </label>
                         <input
                           type="text"
                           required
                           value={trackingLocation}
                           onChange={(e) => setTrackingLocation(e.target.value)}
-                          placeholder="e.g. Bengaluru Central Hub"
-                          className="input-field text-xs w-full mt-1"
+                          placeholder="e.g. Bengaluru hub"
+                          className="adm-input text-xs"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="text-[11px] text-gray-400">Notes / Milestone Description</label>
+                      <label className="text-xs mb-1 block" style={{ color: 'var(--adm-text-2)' }}>
+                        Description
+                      </label>
                       <input
                         type="text"
                         required
                         value={trackingDescription}
                         onChange={(e) => setTrackingDescription(e.target.value)}
-                        placeholder="e.g. Package arrived at local distribution center"
-                        className="input-field text-xs w-full mt-1"
+                        placeholder="e.g. Package arrived at local hub"
+                        className="adm-input text-xs"
                       />
                     </div>
-                    <div className="flex justify-end gap-2 pt-1">
+                    <div className="flex justify-end gap-2">
                       <button
                         type="button"
                         onClick={() => setShowTrackingForm(false)}
-                        className="btn-secondary text-xs"
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                        style={{ color: 'var(--adm-text-2)', background: 'var(--adm-raised)', border: '1px solid var(--adm-border)' }}
                       >
                         Cancel
                       </button>
-                      <button type="submit" className="btn-primary text-xs">
-                        Publish Event
+                      <button
+                        type="submit"
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-colors"
+                        style={{ background: 'var(--adm-accent)' }}
+                      >
+                        Save event
                       </button>
                     </div>
                   </form>
                 )}
 
-                {/* Items Snapshot */}
+                {/* Items */}
                 <div>
-                  <h4 className="text-xs font-bold text-white mb-2 uppercase tracking-wider">
-                    Purchased Item Snapshots
+                  <h4 className="text-xs font-semibold mb-2" style={{ color: 'var(--adm-text-2)' }}>
+                    Items ordered
                   </h4>
-                  <div className="card divide-y divide-navy-700/60 p-3">
-                    {orderDetail.items?.map((item: any) => (
-                      <div key={item.id} className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between text-xs">
-                        <div>
-                          <p className="font-semibold text-white">{item.product_name}</p>
-                          <p className="text-[11px] text-gray-400">SKU: {item.sku || 'N/A'} | Qty: {item.quantity}</p>
-                        </div>
-                        <span className="font-mono font-bold text-white">
-                          {formatPaise(item.total_price_paise)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Shipping & Customer Info */}
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div className="card p-3">
-                    <h5 className="font-bold text-gray-400 mb-1.5 flex items-center gap-1.5">
-                      <User className="w-3.5 h-3.5 text-orange-400" />
-                      <span>Customer</span>
-                    </h5>
-                    <p className="font-semibold text-white">{orderDetail.full_name}</p>
-                    <p className="text-gray-400 font-mono">{orderDetail.email}</p>
-                  </div>
-
-                  <div className="card p-3">
-                    <h5 className="font-bold text-gray-400 mb-1.5 flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-orange-400" />
-                      <span>Shipping Address</span>
-                    </h5>
-                    <p className="text-gray-200">{orderDetail.shipping_name}</p>
-                    <p className="text-gray-400 text-[11px]">{orderDetail.line1}, {orderDetail.city}</p>
-                    <p className="text-gray-400 text-[11px]">{orderDetail.state} - {orderDetail.pincode}</p>
-                  </div>
-                </div>
-
-                {/* Tracking Stepper Timeline */}
-                <div>
-                  <h4 className="text-xs font-bold text-white mb-2 uppercase tracking-wider flex items-center gap-1.5">
-                    <Truck className="w-3.5 h-3.5 text-orange-400" />
-                    <span>Courier Tracking Timeline</span>
-                  </h4>
-                  <div className="card p-4 flex flex-col gap-3">
-                    {orderDetail.tracking?.length === 0 ? (
-                      <p className="text-xs text-gray-400 text-center py-2">No tracking events recorded yet.</p>
+                  <div className="adm-card divide-y" style={{ borderColor: 'var(--adm-border)' }}>
+                    {orderDetail.items?.length === 0 ? (
+                      <p className="p-4 text-xs text-center" style={{ color: 'var(--adm-text-3)' }}>
+                        No items recorded for this order.
+                      </p>
                     ) : (
-                      orderDetail.tracking?.map((ev: any, idx: number) => (
+                      orderDetail.items?.map((item: any) => (
+                        <div key={item.id} className="px-4 py-3 flex items-center justify-between text-xs">
+                          <div>
+                            <p className="font-medium" style={{ color: 'var(--adm-text-1)' }}>{item.product_name}</p>
+                            <p className="adm-mono text-[11px]" style={{ color: 'var(--adm-text-3)' }}>
+                              SKU: {item.sku || 'N/A'} &bull; Qty: {item.quantity}
+                            </p>
+                          </div>
+                          <span className="font-semibold" style={{ color: 'var(--adm-text-1)' }}>
+                            {formatPaise(item.total_price_paise)}
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Customer + address */}
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="adm-card p-3">
+                    <h5 className="font-semibold mb-1.5 flex items-center gap-1.5" style={{ color: 'var(--adm-text-2)' }}>
+                      <User className="w-3.5 h-3.5" style={{ color: 'var(--adm-accent)' }} />
+                      Customer
+                    </h5>
+                    <p className="font-medium" style={{ color: 'var(--adm-text-1)' }}>{orderDetail.full_name}</p>
+                    <p style={{ color: 'var(--adm-text-3)' }}>{orderDetail.email}</p>
+                  </div>
+                  <div className="adm-card p-3">
+                    <h5 className="font-semibold mb-1.5 flex items-center gap-1.5" style={{ color: 'var(--adm-text-2)' }}>
+                      <MapPin className="w-3.5 h-3.5" style={{ color: 'var(--adm-accent)' }} />
+                      Shipping address
+                    </h5>
+                    <p className="font-medium" style={{ color: 'var(--adm-text-1)' }}>{orderDetail.shipping_name}</p>
+                    <p style={{ color: 'var(--adm-text-3)' }}>{orderDetail.line1}, {orderDetail.city}</p>
+                    <p style={{ color: 'var(--adm-text-3)' }}>{orderDetail.state} &mdash; {orderDetail.pincode}</p>
+                  </div>
+                </div>
+
+                {/* Tracking timeline */}
+                <div>
+                  <h4 className="text-xs font-semibold mb-2 flex items-center gap-1.5" style={{ color: 'var(--adm-text-2)' }}>
+                    <Truck className="w-3.5 h-3.5" style={{ color: 'var(--adm-accent)' }} />
+                    Tracking history
+                  </h4>
+                  <div className="adm-card p-4 flex flex-col gap-3">
+                    {!orderDetail.tracking || orderDetail.tracking.length === 0 ? (
+                      <p className="text-xs text-center" style={{ color: 'var(--adm-text-3)' }}>
+                        No tracking events recorded yet.
+                      </p>
+                    ) : (
+                      orderDetail.tracking.map((ev: any) => (
                         <div key={ev.id} className="flex items-start gap-3 text-xs">
-                          <div className="w-2.5 h-2.5 rounded-full bg-orange-500 mt-1 shrink-0 ring-4 ring-orange-500/20" />
+                          <div
+                            className="w-2.5 h-2.5 rounded-full mt-1 shrink-0"
+                            style={{ background: 'var(--adm-accent)', boxShadow: '0 0 0 3px rgba(234,88,12,0.2)' }}
+                          />
                           <div className="flex-1">
                             <div className="flex items-center justify-between">
-                              <span className="font-bold text-white">{ev.status}</span>
-                              <span className="text-[10px] text-gray-500 font-mono">{formatDateTime(ev.created_at)}</span>
+                              <span className="font-semibold" style={{ color: 'var(--adm-text-1)' }}>
+                                {ev.status.replace(/_/g, ' ')}
+                              </span>
+                              <span className="adm-mono text-[10px]" style={{ color: 'var(--adm-text-3)' }}>
+                                {formatDateTime(ev.created_at)}
+                              </span>
                             </div>
-                            <p className="text-gray-300 text-[11px] mt-0.5">{ev.description}</p>
+                            <p className="mt-0.5" style={{ color: 'var(--adm-text-2)' }}>{ev.description}</p>
                             {ev.location && (
-                              <p className="text-gray-500 text-[10px] flex items-center gap-1 mt-0.5">
-                                <MapPin className="w-2.5 h-2.5 text-gray-400" />
-                                <span>{ev.location}</span>
+                              <p className="mt-0.5 flex items-center gap-1 text-[11px]" style={{ color: 'var(--adm-text-3)' }}>
+                                <MapPin className="w-2.5 h-2.5" />
+                                {ev.location}
                               </p>
                             )}
                           </div>
@@ -527,20 +668,24 @@ export function AdminOrders() {
                   </div>
                 </div>
 
-                {/* Audit Log Trail */}
+                {/* Audit log */}
                 <div>
-                  <h4 className="text-xs font-bold text-white mb-2 uppercase tracking-wider flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-blue-400" />
-                    <span>Immutable Audit Log</span>
+                  <h4 className="text-xs font-semibold mb-2 flex items-center gap-1.5" style={{ color: 'var(--adm-text-2)' }}>
+                    <Clock className="w-3.5 h-3.5" style={{ color: 'var(--adm-info)' }} />
+                    Audit log
                   </h4>
-                  <div className="card p-3 divide-y divide-navy-700/60 font-mono text-[11px] text-gray-400">
+                  <div className="adm-card p-3 flex flex-col divide-y" style={{ borderColor: 'var(--adm-border)' }}>
                     {orderDetail.audit?.map((a: any) => (
-                      <div key={a.id} className="py-2 first:pt-0 last:pb-0 flex items-center justify-between">
+                      <div key={a.id} className="py-2 first:pt-0 last:pb-0 flex items-center justify-between text-xs">
                         <div>
-                          <span className="font-bold text-white">{a.action}</span>
-                          <span className="text-gray-500 ml-2">by {a.actor_email || 'System'}</span>
+                          <span className="adm-mono font-semibold" style={{ color: 'var(--adm-text-1)' }}>{a.action}</span>
+                          <span className="ml-2" style={{ color: 'var(--adm-text-3)' }}>
+                            by {a.actor_email || 'System'}
+                          </span>
                         </div>
-                        <span className="text-gray-500 text-[10px]">{formatDateTime(a.created_at)}</span>
+                        <span className="adm-mono text-[10px]" style={{ color: 'var(--adm-text-3)' }}>
+                          {formatDateTime(a.created_at)}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -550,7 +695,6 @@ export function AdminOrders() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

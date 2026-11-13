@@ -13,7 +13,11 @@
     "seed": "tsx src/db/seed.ts",
     "test": "vitest run --config vitest.config.ts",
     "test:watch": "vitest --config vitest.config.ts",
-    "test:coverage": "vitest run --coverage --config vitest.config.ts"
+    "test:coverage": "vitest run --coverage --config vitest.config.ts",
+    "admin:list-empty-orders": "tsx src/scripts/listEmptyOrders.ts",
+    "admin:cancel-empty-orders": "tsx src/scripts/listEmptyOrders.ts",
+    "admin:audit-images": "tsx src/scripts/auditImages.ts"
+
   },
   "keywords": [],
   "author": "",

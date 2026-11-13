@@ -122,11 +122,11 @@ export function AdminCoupons() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
+          <h1 className="text-xl sm:text-2xl font-black text-[var(--adm-text-1)] tracking-tight flex items-center gap-2.5">
             <Ticket className="w-6 h-6 text-orange-500" />
             <span>Coupons & Promotion Engine</span>
           </h1>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-[var(--adm-text-2)] mt-1">
             Configure percentage and flat discount vouchers with strict server-side validation
           </p>
         </div>
@@ -141,19 +141,19 @@ export function AdminCoupons() {
       </div>
 
       {/* Coupons Table */}
-      <div className="card overflow-hidden">
+      <div className="adm-adm-card overflow-hidden">
         {loading ? (
           <div className="py-20 flex justify-center">
             <FullPageSpinner />
           </div>
         ) : coupons.length === 0 ? (
-          <div className="py-16 text-center text-gray-400 text-xs">
+          <div className="py-16 text-center text-[var(--adm-text-3)] text-xs">
             No discount coupons found. Click "Create Coupon" to add promotional codes.
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-gray-300">
-              <thead className="bg-navy-900/80 text-gray-400 font-bold uppercase text-[10px] tracking-wider border-b border-navy-700">
+            <table className="adm-table">
+              <thead className="">
                 <tr>
                   <th className="py-3 px-4">Coupon Code</th>
                   <th className="py-3 px-4">Type</th>
@@ -166,31 +166,31 @@ export function AdminCoupons() {
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-navy-700/60">
+              <tbody className="">
                 {coupons.map((c) => (
-                  <tr key={c.id} className="hover:bg-navy-700/40 transition-colors">
-                    <td className="py-3.5 px-4 font-mono font-black text-white text-sm">
-                      <span className="bg-navy-900 px-2.5 py-1 rounded-lg border border-navy-700 text-orange-400">
+                  <tr key={c.id} className="hover:bg-[var(--adm-row-hover)] transition-colors">
+                    <td className="py-3.5 px-4 font-mono font-black text-[var(--adm-text-1)] text-sm">
+                      <span className="bg-navy-900 px-2.5 py-1 rounded-lg border border-[var(--adm-border)] text-orange-400">
                         {c.code}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 font-semibold uppercase text-[11px] text-gray-300">
+                    <td className="py-3.5 px-4 font-semibold uppercase text-[11px] text-[var(--adm-text-2)]">
                       {c.type}
                     </td>
-                    <td className="py-3.5 px-4 font-bold text-white font-mono">
+                    <td className="py-3.5 px-4 font-bold text-[var(--adm-text-1)] font-mono">
                       {c.type === 'percent' ? `${c.value_paise / 100}%` : formatPaise(c.value_paise)}
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-gray-300">
+                    <td className="py-3.5 px-4 font-mono text-[var(--adm-text-2)]">
                       {formatPaise(c.min_order_paise)}
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-gray-300">
+                    <td className="py-3.5 px-4 font-mono text-[var(--adm-text-2)]">
                       {c.max_discount_paise ? formatPaise(c.max_discount_paise) : 'No Cap'}
                     </td>
                     <td className="py-3.5 px-4 text-center font-mono">
-                      <span className="font-bold text-white">{c.redemption_count || 0}</span>
+                      <span className="font-bold text-[var(--adm-text-1)]">{c.redemption_count || 0}</span>
                       {c.usage_limit && <span className="text-gray-500"> / {c.usage_limit}</span>}
                     </td>
-                    <td className="py-3.5 px-4 text-center font-mono font-bold text-gray-400">
+                    <td className="py-3.5 px-4 text-center font-mono font-bold text-[var(--adm-text-3)]">
                       {c.per_user_limit}
                     </td>
                     <td className="py-3.5 px-4 text-center">
@@ -225,25 +225,25 @@ export function AdminCoupons() {
       {/* Create Coupon Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="card w-full max-w-lg p-6 border-navy-600 shadow-2xl relative">
+          <div className="adm-card w-full max-w-lg p-6 border-navy-600 shadow-2xl relative">
             <button
               onClick={() => setShowModal(false)}
-              className="absolute right-4 top-4 text-gray-400 hover:text-white"
+              className="absolute right-4 top-4 text-[var(--adm-text-3)] hover:text-[var(--adm-text-1)]"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-base font-bold text-white mb-1">
+            <h3 className="text-base font-bold text-[var(--adm-text-1)] mb-1">
               Create New Promotion Coupon
             </h3>
-            <p className="text-xs text-gray-400 mb-4">
+            <p className="text-xs text-[var(--adm-text-2)] mb-4">
               Coupons apply to customer subtotals and respect minimum spend requirements
             </p>
 
             <form onSubmit={handleCreateCoupon} className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--adm-text-2)] mb-1">
                     Coupon Code
                   </label>
                   <input
@@ -252,18 +252,18 @@ export function AdminCoupons() {
                     value={code}
                     onChange={(e) => setCode(e.target.value.toUpperCase())}
                     placeholder="e.g. SUMMER25"
-                    className="input-field text-xs w-full uppercase font-mono font-bold"
+                    className="adm-input text-xs w-full uppercase font-mono font-bold"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--adm-text-2)] mb-1">
                     Discount Type
                   </label>
                   <select
                     value={type}
                     onChange={(e) => setType(e.target.value as any)}
-                    className="input-field text-xs w-full"
+                    className="adm-input text-xs w-full"
                   >
                     <option value="percent">Percentage (%)</option>
                     <option value="flat">Flat Amount (₹)</option>
@@ -273,7 +273,7 @@ export function AdminCoupons() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--adm-text-2)] mb-1">
                     Discount Value {type === 'percent' ? '(%)' : '(₹)'}
                   </label>
                   <input
@@ -283,12 +283,12 @@ export function AdminCoupons() {
                     value={valueInput}
                     onChange={(e) => setValueInput(e.target.value)}
                     placeholder={type === 'percent' ? '10' : '100'}
-                    className="input-field text-xs w-full"
+                    className="adm-input text-xs w-full"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--adm-text-2)] mb-1">
                     Min Order Value (₹)
                   </label>
                   <input
@@ -297,14 +297,14 @@ export function AdminCoupons() {
                     value={minOrderInput}
                     onChange={(e) => setMinOrderInput(e.target.value)}
                     placeholder="500"
-                    className="input-field text-xs w-full"
+                    className="adm-input text-xs w-full"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--adm-text-2)] mb-1">
                     Max Discount Cap (₹)
                   </label>
                   <input
@@ -313,12 +313,12 @@ export function AdminCoupons() {
                     value={maxDiscountInput}
                     onChange={(e) => setMaxDiscountInput(e.target.value)}
                     placeholder="Leave empty for no cap"
-                    className="input-field text-xs w-full"
+                    className="adm-input text-xs w-full"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  <label className="block text-xs font-semibold text-[var(--adm-text-2)] mb-1">
                     Per User Limit
                   </label>
                   <input
@@ -328,13 +328,13 @@ export function AdminCoupons() {
                     value={perUserLimit}
                     onChange={(e) => setPerUserLimit(e.target.value)}
                     placeholder="1"
-                    className="input-field text-xs w-full"
+                    className="adm-input text-xs w-full"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1">
+                <label className="block text-xs font-semibold text-[var(--adm-text-2)] mb-1">
                   Total Global Usage Limit (Optional)
                 </label>
                 <input
@@ -343,7 +343,7 @@ export function AdminCoupons() {
                   value={usageLimit}
                   onChange={(e) => setUsageLimit(e.target.value)}
                   placeholder="e.g. 500 total redemptions"
-                  className="input-field text-xs w-full"
+                  className="adm-input text-xs w-full"
                 />
               </div>
 
