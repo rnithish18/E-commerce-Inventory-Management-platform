@@ -13,6 +13,7 @@
 | 28fe146 | fix: link_crawler test — filter resource errors, use 'Create an account' button |
 | 85359d5 | fix: lower(uuid) SQL error in track-guest route + store_pages test selector fixes |
 | cb698ac | fix: track-order test — check error card div class not message text |
+| 6f2991d | fix: phases 1-5 — security hardening, theme tokens, auth redesign, content cleanup |
 
 ---
 
@@ -20,9 +21,9 @@
 
 ### Vitest (backend unit + integration)
 - **Test Files**: 10 failed | 9 passed (19 total)
-- **Tests**: 15 failed | **191 passed** | 42 skipped (248 total)
-- Improvement over ECONNREFUSED baseline: 102 → **191 passing** tests
-- Remaining failures: pre-existing integration tests (wishlist IDs, coupon validation edge cases)
+- **Tests**: 13 failed | **193 passed** | 42 skipped (248 total)
+- Improvement over ECONNREFUSED baseline: 102 → **193 passing** tests
+- Remaining failures: pre-existing DB-integration tests (wishlist requires seeded local PG)
 
 ### Playwright E2E
 
