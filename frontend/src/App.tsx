@@ -159,6 +159,8 @@ export default function App() {
                       />
                     } 
                   />
+                  {/* /admin/dashboard is a common deep-link — redirect to index */}
+                  <Route path="dashboard" element={<Navigate to="/admin" replace />} />
                 </Route>
 
                 {/* ── Safety-net redirect aliases (keeps returnUrl / search params) ── */}

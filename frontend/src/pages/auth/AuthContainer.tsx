@@ -244,7 +244,7 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
           : 'Logged in successfully! Welcome back to ShopNest.'
       );
       if (roleContext === 'ADMIN') {
-        navigate('/admin/dashboard');
+        navigate('/admin');
       } else {
         navigate(returnUrl);
       }
