@@ -1,19 +1,21 @@
-# ShopNest — Redesign Progress
+﻿# ShopNest â€” Redesign Progress
 
 ## Commits
 
 | Hash | Description |
 |------|-------------|
 | 24d43d3 | feat: deployment-safe CSRF/origin guard (26 tests pass) |
-| 1f0002c | feat: phases B+C — layout shell, design tokens, page rewrites, copy cleanup |
-| 521b7bd | feat: phases D+E+G — 152 products, real Pexels images, performance, compression |
-| 1bb3790 | fix: phase F — line-clamp, toast positioning, overflow, filter-sidebar, skeleton, dark flash |
+| 1f0002c | feat: phases B+C â€” layout shell, design tokens, page rewrites, copy cleanup |
+| 521b7bd | feat: phases D+E+G â€” 152 products, real Pexels images, performance, compression |
+| 1bb3790 | fix: phase F â€” line-clamp, toast positioning, overflow, filter-sidebar, skeleton, dark flash |
 | 2028635 | fix: broken sign-in links, route aliases, 404 page, Playwright link-crawler |
-| ce45212 | fix: pool.ts SSL — strip sslmode from DATABASE_URL, rejectUnauthorized:false for Supabase |
-| 28fe146 | fix: link_crawler test — filter resource errors, use 'Create an account' button |
+| ce45212 | fix: pool.ts SSL â€” strip sslmode from DATABASE_URL, rejectUnauthorized:false for Supabase |
+| 28fe146 | fix: link_crawler test â€” filter resource errors, use 'Create an account' button |
 | 85359d5 | fix: lower(uuid) SQL error in track-guest route + store_pages test selector fixes |
-| cb698ac | fix: track-order test — check error card div class not message text |
-| 6f2991d | fix: phases 1-5 — security hardening, theme tokens, auth redesign, content cleanup |
+| cb698ac | fix: track-order test â€” check error card div class not message text |
+| 8fce772 | fix: FaqPage syntax error (curly apostrophe broke TS build) + srcset |
+| c8a83dd | feat: phases 4+6+7 - srcset images, feature-status doc, a11y verified |
+| 6f2991d | fix: phases 1-5 â€” security hardening, theme tokens, auth redesign, content cleanup |
 
 ---
 
@@ -22,15 +24,15 @@
 ### Vitest (backend unit + integration)
 - **Test Files**: 10 failed | 9 passed (19 total)
 - **Tests**: 13 failed | **193 passed** | 42 skipped (248 total)
-- Improvement over ECONNREFUSED baseline: 102 → **193 passing** tests
+- Improvement over ECONNREFUSED baseline: 102 â†’ **193 passing** tests
 - Remaining failures: pre-existing DB-integration tests (wishlist requires seeded local PG)
 
 ### Playwright E2E
 
 | Spec | Result |
 |------|--------|
-| `link_crawler.spec.ts` (new) | **17 / 17 passed ✅** |
-| `store_pages.spec.ts` | **8 / 8 passed ✅** |
+| `link_crawler.spec.ts` (new) | **17 / 17 passed âœ…** |
+| `store_pages.spec.ts` | **8 / 8 passed âœ…** |
 
 ---
 
@@ -45,29 +47,29 @@
 
 ## Route Aliases Added (App.tsx)
 Redirect aliases preserve query string (including `?returnUrl=...`):
-- `/auth/login` → `/login`
-- `/auth/register` → `/register`
-- `/signin` → `/login`
-- `/signup` → `/register`
-- `/account` → `/profile`
-- `/account/profile` → `/profile`
-- `/account/orders` → `/orders`
-- `/account/*` → `/profile`
+- `/auth/login` â†’ `/login`
+- `/auth/register` â†’ `/register`
+- `/signin` â†’ `/login`
+- `/signup` â†’ `/register`
+- `/account` â†’ `/profile`
+- `/account/profile` â†’ `/profile`
+- `/account/orders` â†’ `/orders`
+- `/account/*` â†’ `/profile`
 
 ---
 
-## Phase F — Bug Fixes COMPLETE
+## Phase F â€” Bug Fixes COMPLETE
 
 | Task | Status |
 |------|--------|
 | `line-clamp-{1,2,3}` CSS utilities | done |
 | Toast positioned above mobile nav (calc 64px + 1rem) | done |
-| `overflow-x:hidden` on html/body — no horizontal scroll | done |
+| `overflow-x:hidden` on html/body â€” no horizontal scroll | done |
 | Filter sidebar: proper scroll, thin scrollbar, max-height | done |
 | Skeleton shimmer updated to brand palette | done |
 | Dark-mode flash prevention via prefers-color-scheme | done |
 
-## Phase B — Layout Shell + Design Tokens COMPLETE
+## Phase B â€” Layout Shell + Design Tokens COMPLETE
 
 | Task | Status |
 |------|--------|
@@ -75,13 +77,13 @@ Redirect aliases preserve query string (including `?returnUrl=...`):
 | index.css redesigned (CSS vars, light/dark, tnum) | done |
 | Light theme default in main.tsx | done |
 | Toast moved to bottom-right | done |
-| StorefrontLayout.tsx — no sidebar, no right panel | done |
-| Topbar.tsx — search, pincode, account, cart count, theme toggle | done |
-| CategoryBar.tsx created — sticky nav + mobile drawer | done |
-| MobileTabBar.tsx created — bottom fixed mobile nav | done |
+| StorefrontLayout.tsx â€” no sidebar, no right panel | done |
+| Topbar.tsx â€” search, pincode, account, cart count, theme toggle | done |
+| CategoryBar.tsx created â€” sticky nav + mobile drawer | done |
+| MobileTabBar.tsx created â€” bottom fixed mobile nav | done |
 | docs/design-system.md | done |
 
-## Phase C — Pages + Copy Cleanup COMPLETE
+## Phase C â€” Pages + Copy Cleanup COMPLETE
 
 | Task | Status |
 |------|--------|
@@ -89,12 +91,12 @@ Redirect aliases preserve query string (including `?returnUrl=...`):
 | HeroBanner.tsx fixed (no overlap) | done |
 | CategoryTiles.tsx fixed (no name clipping) | done |
 | ProductCard.tsx rewritten (chips, rating guard, persistent add-to-cart) | done |
-| ProductImage.tsx — grey+icon fallback | done |
-| ShopPage.tsx — left filters, numbered pagination, grid toggle | done |
-| Footer — fake claims removed | done |
-| StorefrontLayout — info strip factual only | done |
+| ProductImage.tsx â€” grey+icon fallback | done |
+| ShopPage.tsx â€” left filters, numbered pagination, grid toggle | done |
+| Footer â€” fake claims removed | done |
+| StorefrontLayout â€” info strip factual only | done |
 
-## Phase D — Catalog Expansion COMPLETE
+## Phase D â€” Catalog Expansion COMPLETE
 
 | Task | Status |
 |------|--------|
@@ -103,18 +105,18 @@ Redirect aliases preserve query string (including `?returnUrl=...`):
 | Added FLAT50 coupon alongside WELCOME10 | done |
 | Seed run successfully against Supabase | done |
 
-## Phase E — Image Credits COMPLETE
+## Phase E â€” Image Credits COMPLETE
 
 | Task | Status |
 |------|--------|
 | ImageCreditsPage.tsx rewritten with 42 photographer attributions | done |
 | Disclaimer: demonstration store notice | done |
 
-## Phase G — Performance COMPLETE
+## Phase G â€” Performance COMPLETE
 
 | Task | Status |
 |------|--------|
-| vite.config.ts: manual chunks (index 354KB → 41KB gzipped) | done |
+| vite.config.ts: manual chunks (index 354KB â†’ 41KB gzipped) | done |
 | Deterministic filenames for immutable caching | done |
 | index.html: Inter font preload + Pexels preconnect | done |
 | SEO meta description | done |
@@ -123,7 +125,7 @@ Redirect aliases preserve query string (including `?returnUrl=...`):
 | no-cache for index.html | done |
 | Vary: Accept-Encoding on all static responses | done |
 
-## Phase H — Final Verification
+## Phase H â€” Final Verification
 
 | Task | Status |
 |------|--------|
@@ -140,4 +142,4 @@ Redirect aliases preserve query string (including `?returnUrl=...`):
 - Admin:    admin@shopnest.com   / Admin@123!
 - Customer: customer1@shopnest.com / Customer@123!
 - Products: 152 across 7 categories
-- Coupons:  WELCOME10 (10% off, min ₹500, max ₹500), FLAT50 (₹50 off, min ₹299)
+- Coupons:  WELCOME10 (10% off, min â‚¹500, max â‚¹500), FLAT50 (â‚¹50 off, min â‚¹299)
