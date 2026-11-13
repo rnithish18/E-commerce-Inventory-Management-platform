@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   CheckCircle2,
   ArrowRight,
+  Sparkles,
   Eye,
   EyeOff,
   X,

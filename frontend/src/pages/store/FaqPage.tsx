@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { HelpCircle, ChevronDown, ChevronUp, Search, ShoppingBag, CreditCard, Truck, RotateCcw, ShieldCheck } from 'lucide-react';
 
 interface FaqItem {
@@ -31,7 +31,7 @@ const FAQS: FaqItem[] = [
   {
     category: 'payments',
     question: 'Is it safe to pay online on ShopNest?',
-    answer: 'Yes. All payments are processed via Razorpay in test mode. Card credentials are handled by Razorpay's PCI-DSS-compliant gateway; we never receive or store raw card numbers or CVVs.',
+    answer: "Yes. All payments use Razorpay in test mode. Card details are handled by the Razorpay PCI-DSS-compliant gateway \u2014 we never receive or store raw card numbers or CVVs.",
   },
   {
     category: 'shipping',
