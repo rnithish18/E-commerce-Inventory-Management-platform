@@ -1,71 +1,102 @@
-# ShopNest — Enterprise Security & Compliance Audit Report
+# ShopNest — Phase 1 Security Audit Report
 
-## 1. Executive Summary
-ShopNest incorporates defense-in-depth security principles across its entire stack. The platform enforces zero-trust parameter validation, cryptographic integrity verification on webhooks, strict origin-checking to block Cross-Site Request Forgery (CSRF), and ACID row-locking to eliminate race conditions and overselling.
-
----
-
-## 2. Authentication & Authorization Controls
-
-### A. Password Storage & Hashing
-- **Algorithm**: `bcryptjs` using 12 salt rounds (`bcrypt.hash(password, 12)`).
-- **Protection**: Defends against brute-force, dictionary, and rainbow table attacks. Plaintext passwords are never logged, stored, or returned in API responses.
-
-### B. Session & Token Management
-- **Transport**: JSON Web Tokens (JWT) signed with SHA-256 HMAC (`JWT_SECRET`).
-- **Cookie Security**:
-  - `httpOnly: true` (prevents JavaScript and XSS token extraction)
-  - `sameSite: 'strict'` (blocks cross-site cookie transmission)
-  - `secure: true` in production environments
-  - Expired tokens automatically invalidate access with `401 UNAUTHORIZED`.
-
-### C. Role-Based Access Control (RBAC)
-- Strict middleware enforcement via `requireAuth` and `requireRole('ADMIN')`.
-- All administrative routes (`/api/v1/admin/*`) immediately block unauthenticated requests with `401` and unauthorized customer requests with `403 FORBIDDEN`.
+**Date**: 2026-11-13  
+**Scope**: Credential hardening, secret management, seed guards, documentation
 
 ---
 
-## 3. Threat Mitigation & Defensive Architecture
+## 1. Audit Findings
 
-### A. SQL Injection Immunity
-- 100% of SQL database operations utilize parameterized queries with PostgreSQL parameter placeholders (`$1, $2, ...`) via `pg.Pool`.
-- Incoming query parameters (pagination, price bounds, sorting keys) are strictly parsed and sanitized through Zod schema validation before reaching query builders.
-- System error handler intercepts PostgreSQL error `22P02` (invalid UUID syntax) and returns a structured `400 BAD_REQUEST`, preventing internal stack leakage.
-
-### B. Cross-Site Request Forgery (CSRF) Prevention
-- Implemented in `backend/src/middleware/security.ts`.
-- All mutating HTTP methods (`POST`, `PUT`, `DELETE`, `PATCH`) verify the `Origin` or `Referer` headers against an explicit whitelist of trusted application domains.
-- Untrusted origins sending state-modifying payloads with authenticated cookies are immediately rejected with `403 CSRF_BLOCKED`.
-
-### C. Brute-Force & Denial of Service (DoS) Mitigation
-- **Auth Endpoint Rate Limiter**: Maximum 30 attempts per 15-minute window per IP on `/api/v1/auth/login` and `/api/v1/auth/register`. Exceeding limits returns `429 TOO_MANY_REQUESTS`.
-- **Coupon Code Brute-Force Limiter**: Maximum 40 coupon validation requests per 10-minute window per IP, blocking automated promo code scraping.
-
-### D. HTTP Security Headers (Helmet)
-- `Content-Security-Policy`: Restricts scripts, styles, and image origins.
-- `X-Content-Type-Options: nosniff`: Prevents MIME-sniffing.
-- `X-Frame-Options: SAMEORIGIN`: Defends against Clickjacking attacks.
-- `Cross-Origin-Resource-Policy: cross-origin`: Protects static assets.
-
-### E. File Upload Sanitization
-- Admin upload handler (`backend/src/routes/uploads.ts`) utilizes Multer configured with:
-  - Private storage directory (`uploads/`), excluded from Git tracking via `.gitignore`.
-  - MIME type filtering: Strictly accepts `image/jpeg`, `image/png`, and `image/webp`.
-  - File size cap: Enforced at 5 megabytes.
-  - Sanitized filenames generated using randomized UUIDs to prevent directory traversal (`../`) attacks.
+| ID | Finding | Severity | Location |
+|----|---------|----------|----------|
+| SEC-01 | `ADMIN_PASSWORD` hardcoded as bcrypt hash in seed script | **HIGH** | `backend/src/db/seed.ts` |
+| SEC-02 | Plaintext `Admin@123!` logged to stdout after every seed run | **HIGH** | `backend/src/db/seed.ts` |
+| SEC-03 | Admin email + password exposed in `README.md` demo table | **HIGH** | `README.md` |
+| SEC-04 | Supabase connection string with password appeared in chat/session logs | **HIGH** | External — rotate immediately |
+| SEC-05 | `docs/deployment.md` and other docs referenced demo credentials | **MEDIUM** | `docs/` |
+| SEC-06 | No `SEED_ALLOW_WIPE` guard — seed could truncate production DB silently | **HIGH** | `backend/src/db/seed.ts` |
+| SEC-07 | Demo customers always seeded regardless of environment | **MEDIUM** | `backend/src/db/seed.ts` |
 
 ---
 
-## 4. Financial & Payment Integrity Safeguards
+## 2. Mitigations Applied (Phase 1)
 
-### A. Monetary Calculations
-- 100% of prices, discounts, sub-totals, taxes, and final totals are calculated and stored in **integer minor units (paise)**. Floating-point currency math is banned.
-- Injected client prices are ignored during checkout; pricing is recomputed server-side directly against the database ledger.
+### 2.1 `seed.ts` Hardened
 
-### B. Concurrency & Overselling Prevention
-- Inventory reservation during checkout uses `SELECT ... FOR UPDATE` row-level locks on `product_variants`.
-- Concurrent checkouts are serialized; if stock drops to 0, subsequent transactions fail cleanly with `400 INSUFFICIENT_STOCK`. Stock can never reach negative values.
+| Change | Before | After |
+|--------|--------|-------|
+| Admin password source | Hardcoded `'Admin@123!'` | `process.env.ADMIN_PASSWORD` (throws in production if unset) |
+| Admin email source | Hardcoded `'admin@shopnest.com'` | `process.env.ADMIN_EMAIL \|\| 'admin@shopnest.com'` |
+| stdout password leak | `console.log('  Admin:    admin@shopnest.com   / Admin@123!')` | `console.log(\`  Admin:    ${adminEmail}   / [from ADMIN_PASSWORD env]\`)` |
+| Demo customers | Always inserted | Gated behind `DEMO_MODE=true` |
+| Production wipe guard | None | Throws if `NODE_ENV=production && SEED_ALLOW_WIPE !== 'true'` |
 
-### C. Webhook Signature Verification
-- Inbound Razorpay webhook events verify the HMAC SHA-256 signature against the raw body buffer using constant-time buffer comparison (`crypto.timingSafeEqual`) to prevent timing attacks.
-- Duplicate webhook notifications are handled idempotently via unique transaction IDs.
+### 2.2 README Cleaned
+
+Replaced the plaintext credentials table with a security-aware table that:
+- References `ADMIN_EMAIL` env var instead of printing the email
+- Shows demo customer credentials only under `DEMO_MODE=true` context
+- Links to `docs/deployment.md` for Render setup
+
+### 2.3 `.gitleaks.toml` Added
+
+Gitleaks secret-scanning configuration added to workspace root:
+- Extends the default ruleset
+- Custom rule detects Supabase connection strings with embedded passwords
+- Allowlist for `.env.example`, `docs/`, `README.md` where demo credentials are intentionally documented
+
+### 2.4 `.env.example` Updated
+
+Added documented entries for `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `DEMO_MODE`, `SEED_ALLOW_WIPE`, `SELLER_GSTIN`, SMTP, and `OPENAI_API_KEY`.
+
+### 2.5 `/health` Endpoint Refactored
+
+Moved inline health handler to `backend/src/routes/health.ts` with proper fields: `status`, `db`, `uptime`, `version`, `env`.
+
+---
+
+## 3. Action Required by Developer
+
+> These steps must be completed by the repository owner — they cannot be automated.
+
+| Action | Priority | Instructions |
+|--------|----------|-------------|
+| **Rotate Supabase DB password** | 🔴 CRITICAL | Supabase Dashboard → Settings → Database → Reset Password. Update `DATABASE_URL` in Render immediately. |
+| **Set `ADMIN_PASSWORD` on Render** | 🔴 CRITICAL | Render → Environment → Add `ADMIN_PASSWORD=<strong-password>`. Re-run seed. |
+| **Set `NODE_ENV=production` on Render** | 🔴 CRITICAL | Render → Environment → `NODE_ENV=production`. Without this, production guards are inactive. |
+| **Remove any exposed credentials from chat/commit history** | 🟠 HIGH | Use `git-filter-repo` or BFG to scrub secrets from git history if they were ever committed. |
+| **Enable Gitleaks in CI** | 🟡 MEDIUM | Add `gitleaks detect` step to GitHub Actions workflow. |
+
+---
+
+## 4. CSRF Protection Summary
+
+| Layer | Implementation |
+|-------|---------------|
+| Origin guard | `csrfProtection` middleware in `security.ts` checks `Origin`/`Referer` on all mutating methods |
+| Webhook exemption | `/api/v1/webhooks/**` bypasses origin guard; all payloads verified with HMAC-SHA256 |
+| Cookie flags | `sameSite: 'strict'`, `httpOnly: true`, `secure: true` (production) |
+| Trusted origins | `FRONTEND_URL`, `PUBLIC_URL`, `RENDER_EXTERNAL_URL`, `ALLOWED_ORIGINS` env vars |
+
+---
+
+## 5. Auth Security Summary
+
+| Control | Implementation |
+|---------|---------------|
+| Password hashing | `bcryptjs` with 12 salt rounds |
+| Session tokens | JWT signed with `JWT_SECRET` (HS256), stored in `httpOnly` `sameSite=strict` cookies |
+| Auth rate limiting | 30 attempts / 15 min / IP on login + register endpoints |
+| Coupon brute-force | 40 attempts / 10 min / IP on coupon validation |
+| RBAC | `requireAuth` + `requireRole('ADMIN')` middleware on all admin routes |
+| Token expiry | Configurable via `JWT_EXPIRES_IN` (default: `7d`) |
+
+---
+
+## 6. Remaining Recommendations (Phase 2)
+
+- [ ] Add Dependabot / `npm audit` to CI for dependency vulnerability scanning
+- [ ] Implement refresh token rotation to reduce JWT long-lived token risk
+- [ ] Add CSP `nonce`-based script execution (replace `'unsafe-inline'`)
+- [ ] Enable Supabase Row Level Security (RLS) as a defence-in-depth layer
+- [ ] Add SMTP-based email verification flow for new customer registrations

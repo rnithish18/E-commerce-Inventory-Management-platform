@@ -8,12 +8,7 @@ import {
   Phone,
   ShieldCheck,
   CheckCircle2,
-  Sparkles,
   ArrowRight,
-  Shield,
-  Truck,
-  RotateCcw,
-  Star,
   Eye,
   EyeOff,
   X,
@@ -21,14 +16,15 @@ import {
   AlertCircle,
   Loader2,
   Check,
+  Package,
+  Heart,
+  MapPin,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { authApi, productsApi } from '../../lib/api';
+import { authApi } from '../../lib/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { RunawayButton } from '../../components/auth/RunawayButton';
 import { PasswordStrengthMeter } from '../../components/auth/PasswordStrengthMeter';
-import { ProductImage } from '../../components/ui/ProductImage';
-import { formatPaise } from '../../lib/utils';
 
 interface AuthContainerProps {
   initialMode?: 'login' | 'register';
@@ -200,21 +196,6 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
     }
   };
 
-  // Showcase carousel index & dynamic DB query
-  const [showcaseProducts, setShowcaseProducts] = useState<any[]>([]);
-  const [showcaseIndex, setShowcaseIndex] = useState(0);
-
-  useEffect(() => {
-    productsApi
-      .featured()
-      .then((res) => {
-        if (res.data?.products && res.data.products.length > 0) {
-          setShowcaseProducts(res.data.products.slice(0, 5));
-        }
-      })
-      .catch(() => {});
-  }, []);
-
   // Sync mode with route
   useEffect(() => {
     if (location.pathname === '/register' && mode !== 'register') {
@@ -223,14 +204,6 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
       setMode('login');
     }
   }, [location.pathname]);
-
-  // Rotate showcase product every 5 seconds
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setShowcaseIndex((prev) => (prev + 1) % (showcaseProducts.length || 1));
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [showcaseProducts.length]);
 
   const switchMode = (newMode: 'login' | 'register') => {
     setMode(newMode);
@@ -438,50 +411,24 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
     setLoginPassword('Customer@123!');
   };
 
-  const rawProduct = showcaseProducts.length > 0
-    ? showcaseProducts[showcaseIndex % showcaseProducts.length]
-    : null;
-
-  const activeProduct = rawProduct
-    ? {
-        name: rawProduct.name,
-        price: formatPaise(rawProduct.price_paise),
-        image: rawProduct.image_url || '/products/photo-coming-soon.svg',
-        category: rawProduct.category_name || 'Featured Category',
-        rating: rawProduct.average_rating ? Number(rawProduct.average_rating).toFixed(1) : '4.8',
-        reviews: rawProduct.rating_count || 0,
-        badge: rawProduct.badge || 'Popular',
-      }
-    : {
-        name: 'Apple iPhone 15 128GB Blue',
-        price: '₹79,900',
-        image: '/products/apple-iphone-15-128gb-blue/image-0-640.webp',
-        category: 'Electronics',
-        rating: '4.8',
-        reviews: 24,
-        badge: 'Best Seller',
-      };
 
   return (
-    <div className="min-h-screen bg-navy-900 text-white flex flex-col justify-between selection:bg-orange-500 selection:text-white">
+    <div className="min-h-screen bg-white dark:bg-navy-900 text-neutral-900 dark:text-white flex flex-col justify-between selection:bg-orange-500 selection:text-white">
       {/* Top Navigation Bar */}
       <header className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between z-10">
         <Link to="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 rounded-2xl bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/25 group-hover:scale-105 transition-transform">
             <ShoppingBag className="w-5 h-5 text-white" />
           </div>
-          <div>
-            <span className="text-xl font-black text-white tracking-tight">
-              Shop<span className="text-orange-500">Nest</span>
-            </span>
-            <p className="text-[10px] text-gray-400 font-medium">India's Modern Superstore</p>
-          </div>
+          <span className="text-xl font-black text-neutral-900 dark:text-white tracking-tight">
+            Shop<span className="text-orange-500">Nest</span>
+          </span>
         </Link>
 
         <div className="flex items-center gap-4 text-xs font-semibold">
           <Link
             to="/"
-            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1.5"
+            className="text-neutral-500 dark:text-gray-400 hover:text-orange-500 dark:hover:text-white transition-colors flex items-center gap-1.5"
           >
             <span>Return to Store</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -490,124 +437,57 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
       </header>
 
       {/* Main Split-Screen Container */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        {/* LEFT COLUMN: Visual Product Showcase & Social Proof */}
-        <section className="lg:col-span-6 flex flex-col justify-center space-y-8 pr-0 lg:pr-8">
-          <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-bold tracking-wide">
-              <Sparkles className="w-3.5 h-3.5 text-orange-400" />
-              <span>Next-Gen Shopping Experience</span>
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-0 items-stretch">
+
+        {/* LEFT COLUMN: Flat brand panel (desktop only) */}
+        <section className="hidden lg:flex lg:col-span-5 flex-col justify-between bg-orange-500 rounded-3xl p-10 mr-8">
+          <div>
+            <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center mb-8">
+              <ShoppingBag className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-              Curated products. <br />
-              <span className="text-orange-500 font-display">
-                Delivered across India.
-              </span>
-            </h1>
-            <p className="text-sm text-gray-400 max-w-lg leading-relaxed">
-              Explore our verified catalog of genuine products, intelligent AI visual search,
-              instant refunds, and ultra-secure checkout.
+            <h2 className="text-3xl font-black text-white tracking-tight leading-tight">
+              {mode === 'login' ? 'Login' : 'Create your account'}
+            </h2>
+            <p className="text-orange-100 mt-3 text-sm leading-relaxed max-w-xs">
+              Get access to your orders, wishlist and saved addresses.
             </p>
           </div>
 
-          {/* Dynamic Showcase Card */}
-          <div className="relative rounded-3xl bg-navy-800/90 border border-navy-700 p-6 shadow-xl backdrop-blur-md overflow-hidden transition-all duration-300">
-            <div className="absolute top-0 right-0 -mr-12 -mt-12 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
-
-            <div className="flex flex-col sm:flex-row items-center gap-6">
-              <div className="w-40 h-40 rounded-2xl bg-navy-900/90 border border-navy-700/80 p-2 flex items-center justify-center shrink-0 group">
-                <ProductImage
-                  src={activeProduct.image}
-                  alt={activeProduct.name}
-                  aspectRatio="aspect-square"
-                  objectFit="contain"
-                  className="w-full h-full"
-                />
-              </div>
-
-              <div className="flex-1 space-y-2 text-center sm:text-left">
-                <div className="inline-block px-2.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 text-[10px] font-bold uppercase tracking-wider">
-                  {activeProduct.badge}
-                </div>
-                <h3 className="text-base font-bold text-white line-clamp-1">
-                  {activeProduct.name}
-                </h3>
-                <p className="text-xs text-gray-400">{activeProduct.category}</p>
-
-                <div className="flex items-center justify-center sm:justify-start gap-3 pt-1">
-                  <span className="text-lg font-black text-white">{activeProduct.price}</span>
-                  <div className="flex items-center gap-1 text-xs text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-lg border border-amber-400/20">
-                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                    <span className="font-bold">{activeProduct.rating}</span>
-                    <span className="text-gray-400 text-[10px]">({activeProduct.reviews})</span>
-                  </div>
-                </div>
-              </div>
+          <div className="space-y-5">
+            <div className="flex items-center gap-3 text-white/90">
+              <Package className="w-5 h-5 shrink-0" />
+              <span className="text-sm">Track all your orders in one place</span>
             </div>
-
-            {/* Carousel navigation pills */}
-            <div className="flex items-center justify-center sm:justify-start gap-1.5 mt-5 pt-4 border-t border-navy-700/60">
-              {(showcaseProducts.length > 0 ? showcaseProducts : [1, 2, 3]).map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setShowcaseIndex(idx)}
-                  aria-label={`View product ${idx + 1}`}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    idx === showcaseIndex ? 'w-6 bg-orange-500' : 'w-2 bg-navy-600 hover:bg-navy-500'
-                  }`}
-                />
-              ))}
+            <div className="flex items-center gap-3 text-white/90">
+              <Heart className="w-5 h-5 shrink-0" />
+              <span className="text-sm">Save products to your wishlist</span>
+            </div>
+            <div className="flex items-center gap-3 text-white/90">
+              <MapPin className="w-5 h-5 shrink-0" />
+              <span className="text-sm">Manage delivery addresses</span>
             </div>
           </div>
 
-          {/* Social Proof & Value Pillars */}
-          <div className="grid grid-cols-3 gap-4 pt-2">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400 shrink-0">
-                <Truck className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-white">Express Delivery</p>
-                <p className="text-[10px] text-gray-400">Same-day in 12 cities</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 shrink-0">
-                <Shield className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-white">100% Genuine</p>
-                <p className="text-[10px] text-gray-400">Verified inventory</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
-                <RotateCcw className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-white">Instant Refunds</p>
-                <p className="text-[10px] text-gray-400">Zero-hassle returns</p>
-              </div>
-            </div>
-          </div>
+          <p className="text-orange-200 text-xs">
+            ShopNest — demonstration project. Test-mode payments only.
+          </p>
         </section>
 
         {/* RIGHT COLUMN: The Auth Card */}
-        <section className="lg:col-span-6 flex justify-center">
-          <div className="w-full max-w-md bg-navy-800/95 border border-navy-700/80 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative transition-all duration-300">
+        <section className="lg:col-span-7 flex justify-center">
+          <div className="w-full max-w-md bg-white dark:bg-navy-800/95 border border-neutral-200 dark:border-navy-700/80 rounded-3xl p-6 sm:p-8 shadow-xl dark:shadow-2xl backdrop-blur-xl relative transition-all duration-300">
             
             {/* Role Switcher Pill (Customer / Store Admin) */}
             <div className="flex items-center justify-center mb-6">
-              <div className="p-1 rounded-2xl bg-navy-900/90 border border-navy-700/80 grid grid-cols-2 gap-1 w-full max-w-xs">
+              <div className="p-1 rounded-2xl bg-neutral-100 dark:bg-navy-900/90 border border-neutral-200 dark:border-navy-700/80 grid grid-cols-2 gap-1 w-full max-w-xs">
                 <button
                   type="button"
+                  data-testid="login-tab"
                   onClick={() => setRoleContext('CUSTOMER')}
                   className={`py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                     roleContext === 'CUSTOMER'
                       ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20'
-                      : 'text-gray-400 hover:text-gray-200'
+                      : 'text-neutral-500 dark:text-gray-400 hover:text-neutral-800 dark:hover:text-gray-200'
                   }`}
                 >
                   <User className="w-3.5 h-3.5" />
@@ -615,11 +495,12 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
                 </button>
                 <button
                   type="button"
+                  data-testid="register-tab"
                   onClick={() => setRoleContext('ADMIN')}
                   className={`py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                     roleContext === 'ADMIN'
                       ? 'bg-amber-500 text-navy-900 shadow-md shadow-amber-500/20 font-black'
-                      : 'text-gray-400 hover:text-gray-200'
+                      : 'text-neutral-500 dark:text-gray-400 hover:text-neutral-800 dark:hover:text-gray-200'
                   }`}
                 >
                   <ShieldCheck className="w-3.5 h-3.5" />
@@ -631,21 +512,21 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
             {/* Mode Header */}
             <div className="text-center mb-6">
               <div className="flex items-center justify-center gap-2">
-                <h2 className="text-2xl font-black text-white tracking-tight">
-                  {mode === 'login' ? 'Welcome Back' : 'Create an Account'}
+                <h2 className="text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
+                  {mode === 'login' ? 'Sign in' : 'Create account'}
                 </h2>
                 {roleContext === 'ADMIN' && (
-                  <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold">
-                    Admin Portal
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30 text-[10px] font-bold">
+                    Admin
                   </span>
                 )}
               </div>
-              <p className="text-xs text-gray-400 mt-1.5">
+              <p className="text-xs text-neutral-500 dark:text-gray-400 mt-1.5">
                 {mode === 'login'
                   ? roleContext === 'ADMIN'
-                    ? 'Enter your privileged credentials to manage store operations'
-                    : 'Sign in to access your orders, wishlist, and swift checkout'
-                  : 'Join 10,000+ happy shoppers & get 10% off with WELCOME10'}
+                    ? 'Enter your administrator credentials'
+                    : 'Sign in to access your orders, wishlist and addresses'
+                  : 'Get access to your orders, wishlist and saved addresses'}
               </p>
             </div>
 
@@ -1317,8 +1198,8 @@ export function AuthContainer({ initialMode = 'login' }: AuthContainerProps) {
       )}
 
       {/* Footer */}
-      <footer className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 text-center text-[11px] text-gray-500 border-t border-navy-800">
-        © 2026 ShopNest E-Commerce Platform. End-to-end encrypted & certified.
+      <footer className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 text-center text-[11px] text-neutral-400 dark:text-gray-500 border-t border-neutral-200 dark:border-navy-800">
+        ShopNest is a demonstration project. Payments use Razorpay test mode and do not process real money.
       </footer>
     </div>
   );

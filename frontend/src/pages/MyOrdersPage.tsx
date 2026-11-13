@@ -107,7 +107,7 @@ export function MyOrdersPage() {
           <Package className="w-12 h-12 text-gray-500 mb-3" />
           <h3 className="text-base font-bold text-white mb-1">No orders placed yet</h3>
           <p className="text-xs text-gray-400 mb-6 max-w-sm">
-            You haven't made any purchases yet. Explore our curated collections with express delivery!
+            You haven't placed any orders yet. Browse the catalog to get started.
           </p>
           <Link to="/shop" className="btn-primary text-xs">Explore Catalog</Link>
         </div>
@@ -285,3 +285,4 @@ export function MyOrdersPage() {
     </div>
   );
 }
+

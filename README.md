@@ -45,13 +45,16 @@
 
 ---
 
-## 👤 Demo Credentials
+## Demo Credentials
 
-| Role | Email | Password | Access Level |
-| :--- | :--- | :--- | :--- |
-| **Admin** | `admin@shopnest.com` | `Admin@123!` | Complete Admin Portal (`/admin/*`) & Storefront |
-| **Customer 1** | `customer1@shopnest.com` | `Customer@123!` | Storefront, Cart, Checkout, My Orders |
-| **Customer 2** | `customer2@shopnest.com` | `Customer@123!` | Storefront, Cart, Checkout, My Orders |
+> **Security note**: Never deploy with default credentials. The seed script reads `ADMIN_EMAIL` and `ADMIN_PASSWORD` from environment variables. Default credentials only apply in development.
+
+| Role | Default (dev only) | Configured by |
+|------|--------------------|---------------|
+| Admin | see `ADMIN_EMAIL` env var | Required in production |
+| Customer | `customer1@shopnest.com` / `Customer@123!` | Only when `DEMO_MODE=true` |
+
+See [docs/deployment.md](docs/deployment.md) for Render environment variable setup.
 
 ---
 

@@ -28,6 +28,7 @@ import adminDashboardRoutes from './routes/admin/dashboard';
 import adminAnalyticsRoutes from './routes/admin/analytics';
 import webhookRoutes from './routes/webhooks';
 import contactRoutes from './routes/contact';
+import healthRoutes from './routes/health';
 import {
   authLimiter,
   couponLimiter,
@@ -94,29 +95,8 @@ app.use(
   })
 );
 
-// Health check handler
-const healthHandler = async (_req: express.Request, res: express.Response) => {
-  try {
-    await query('SELECT 1');
-    res.json({
-      status: 'ok',
-      database: 'connected',
-      uptime_seconds: Math.floor(process.uptime()),
-      timestamp: new Date().toISOString(),
-      version: '1.0.0',
-    });
-  } catch (err: any) {
-    res.status(503).json({
-      status: 'degraded',
-      database: 'disconnected',
-      error: err.message,
-      timestamp: new Date().toISOString(),
-    });
-  }
-};
-
-app.get('/health', healthHandler);
-app.get('/api/v1/health', healthHandler);
+app.use('/health', healthRoutes);
+app.use('/api/v1/health', healthRoutes);
 
 // Dynamic sitemap.xml generated directly from PostgreSQL
 app.get('/sitemap.xml', async (_req: express.Request, res: express.Response) => {

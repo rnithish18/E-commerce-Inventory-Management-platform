@@ -81,7 +81,7 @@ export function ContactPage() {
                 <div>
                   <p className="font-semibold text-white">Fulfillment Hub & Headquarters</p>
                   <p className="text-gray-400 mt-0.5 leading-relaxed">
-                    ShopNest Technologies Pvt. Ltd.<br />
+                    ShopNest (demonstration project)<br />
                     Outer Ring Road, Bellandur,<br />
                     Bangalore, Karnataka 560103
                   </p>
@@ -204,3 +204,4 @@ export function ContactPage() {
     </div>
   );
 }
+

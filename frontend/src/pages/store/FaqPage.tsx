@@ -31,7 +31,7 @@ const FAQS: FaqItem[] = [
   {
     category: 'payments',
     question: 'Is it safe to pay online on ShopNest?',
-    answer: 'Yes. All transactions are encrypted with 256-bit TLS encryption. Card credentials are tokenized according to RBI guidelines. We never store raw card numbers or CVVs on our servers.',
+    answer: 'Yes. All payments are processed via Razorpay in test mode. Card credentials are handled by Razorpay's PCI-DSS-compliant gateway; we never receive or store raw card numbers or CVVs.',
   },
   {
     category: 'shipping',
@@ -164,3 +164,4 @@ export function FaqPage() {
     </div>
   );
 }
+

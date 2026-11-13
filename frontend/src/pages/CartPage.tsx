@@ -189,7 +189,7 @@ export function CartPage() {
 
           <div className="flex items-center gap-2 text-[11px] text-gray-400 px-2">
             <ShieldCheck className="w-4 h-4 text-green-400 shrink-0" />
-            <span>Safe and secure 256-bit SSL encrypted checkout.</span>
+            <span>Payments processed via Razorpay test mode.</span>
           </div>
         </div>
 
@@ -198,3 +198,4 @@ export function CartPage() {
     </div>
   );
 }
+

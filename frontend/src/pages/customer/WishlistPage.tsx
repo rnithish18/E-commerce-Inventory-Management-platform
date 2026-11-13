@@ -52,7 +52,7 @@ export function WishlistPage() {
             Your Wishlist is Empty
           </h2>
           <p className="text-xs text-gray-400 leading-relaxed mb-6">
-            Explore our curated catalog and tap the heart icon on any product to save it to your wishlist.
+            Browse the catalog and tap the heart icon on any product to save it to your wishlist.
           </p>
           <Link
             to="/shop"
@@ -75,3 +75,4 @@ export function WishlistPage() {
   );
 }
 export default WishlistPage;
+

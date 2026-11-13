@@ -1,0 +1,21 @@
+title = "ShopNest Gitleaks Config"
+
+[extend]
+useDefault = true
+
+[[rules]]
+description = "Supabase connection string with password"
+regex = '''postgresql://[^:]+:[^@]{8,}@[^/]*supabase'''
+tags = ["database", "supabase"]
+
+[allowlist]
+description = "Allowlist"
+regexes = [
+  '''Admin@123!''',
+  '''Customer@123!''',
+]
+paths = [
+  '''.env.example''',
+  '''docs/''',
+  '''README.md''',
+]

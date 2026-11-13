@@ -216,3 +216,21 @@ html, body { max-width: 100vw; overflow-x: hidden; }
 @media (prefers-color-scheme: dark) {
   html:not(.light) body { background-color: #090e1a; }
 }
+
+/* -- Autofill: preserve theme colours in both light and dark mode -- */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-text-fill-color: #111827 !important;
+  caret-color: #111827;
+}
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #0f1e35 inset !important;
+  -webkit-text-fill-color: #f9fafb !important;
+  caret-color: #f9fafb;
+}

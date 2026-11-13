@@ -193,6 +193,11 @@ const products: ProductSeed[] = [
 ];
 
 async function seed() {
+  // ── Production wipe guard ──
+  if (process.env.NODE_ENV === 'production' && process.env.SEED_ALLOW_WIPE !== 'true') {
+    throw new Error('[seed] Set SEED_ALLOW_WIPE=true to allow production wipe');
+  }
+
   const client = await pool.connect();
   try {
     console.log('🌱 Starting ShopNest seed...');
@@ -234,29 +239,38 @@ async function seed() {
     console.log(`✅ ${categoryDefs.length} categories seeded`);
 
     // ── ADMIN USER ──
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@shopnest.com';
+    const rawAdminPwd = process.env.ADMIN_PASSWORD;
+    if (!rawAdminPwd && process.env.NODE_ENV === 'production') {
+      throw new Error('[seed] ADMIN_PASSWORD env var required in production');
+    }
     const adminId = uuidv4();
-    const adminHash = await bcrypt.hash('Admin@123!', 12);
+    const adminHash = await bcrypt.hash(rawAdminPwd || 'Admin@123!', 12);
     await client.query(
       `INSERT INTO users (id, email, password_hash, full_name, phone, role)
        VALUES ($1, $2, $3, $4, $5, 'ADMIN')`,
-      [adminId, 'admin@shopnest.com', adminHash, 'ShopNest Admin', '9000000000']
+      [adminId, adminEmail, adminHash, 'ShopNest Admin', '9000000000']
     );
 
-    // ── CUSTOMER USERS ──
-    const customerNames = [
-      'Rahul Sharma', 'Priya Singh', 'Amit Kumar', 'Sneha Patel', 'Rohit Verma',
-      'Anjali Gupta', 'Vikas Joshi', 'Pooja Mehta', 'Karan Malhotra', 'Ritu Agarwal',
-    ];
-    const customerHash = await bcrypt.hash('Customer@123!', 12);
-    for (let i = 1; i <= 10; i++) {
-      const id = uuidv4();
-      await client.query(
-        `INSERT INTO users (id, email, password_hash, full_name, phone, role)
-         VALUES ($1, $2, $3, $4, $5, 'CUSTOMER')`,
-        [id, `customer${i}@shopnest.com`, customerHash, customerNames[i - 1], `900000000${i}`]
-      );
+    // ── CUSTOMER USERS (only in DEMO_MODE) ──
+    if (process.env.DEMO_MODE === 'true') {
+      const customerNames = [
+        'Rahul Sharma', 'Priya Singh', 'Amit Kumar', 'Sneha Patel', 'Rohit Verma',
+        'Anjali Gupta', 'Vikas Joshi', 'Pooja Mehta', 'Karan Malhotra', 'Ritu Agarwal',
+      ];
+      const customerHash = await bcrypt.hash('Customer@123!', 12);
+      for (let i = 1; i <= 10; i++) {
+        const id = uuidv4();
+        await client.query(
+          `INSERT INTO users (id, email, password_hash, full_name, phone, role)
+           VALUES ($1, $2, $3, $4, $5, 'CUSTOMER')`,
+          [id, `customer${i}@shopnest.com`, customerHash, customerNames[i - 1], `900000000${i}`]
+        );
+      }
+      console.log('✅ 1 admin + 10 demo customers seeded');
+    } else {
+      console.log('✅ 1 admin seeded (DEMO_MODE not set — demo customers skipped)');
     }
-    console.log('✅ 1 admin + 10 customers seeded');
 
     // ── PRODUCTS ──
     let productCount = 0;
@@ -314,9 +328,11 @@ async function seed() {
     await client.query('COMMIT');
     console.log('\n🎉 Seed completed successfully!');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('Demo credentials:');
-    console.log('  Admin:    admin@shopnest.com   / Admin@123!');
-    console.log('  Customer: customer1@shopnest.com / Customer@123!');
+    console.log('Credentials:');
+    console.log(`  Admin:    ${adminEmail}   / [from ADMIN_PASSWORD env]`);
+    if (process.env.DEMO_MODE === 'true') {
+      console.log('  Customer: customer1@shopnest.com / Customer@123!');
+    }
     console.log(`  Products: ${productCount} across 7 categories`);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   } catch (err) {
