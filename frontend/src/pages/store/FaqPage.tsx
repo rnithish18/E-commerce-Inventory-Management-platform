@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { HelpCircle, ChevronDown, ChevronUp, Search, ShoppingBag, CreditCard, Truck, RotateCcw, ShieldCheck } from 'lucide-react';
 
 interface FaqItem {
@@ -56,7 +56,7 @@ const FAQS: FaqItem[] = [
   {
     category: 'warranty',
     question: 'Are all products genuine with manufacturer warranty?',
-    answer: 'Yes. 100% of our inventory is sourced through official brand channels. All consumer electronics and branded merchandise include original manufacturer warranties honorably valid across all authorized Indian service centers.',
+    answer: 'ShopNest is a demonstration project. Product listings represent real-world catalogue data; actual warranty terms depend on the brand and are not provided by ShopNest.',
   },
 ];
 
