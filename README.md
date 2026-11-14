@@ -1,5 +1,12 @@
 # ShopNest — E-commerce & Inventory Management Platform
 
+**Live demo:** https://shopnest-zto8.onrender.com
+
+**Admin credentials:** `admin@example.com` / `adminPassword123`
+
+**Customer demo:** `customer1@shopnest.com` / `Customer@123!`
+
+
 > A production-grade, full-stack online retail and warehouse management platform featuring pessimistic database concurrency control, server-side monetary precision (integer paise), idempotent payment gateway integration, and real-time business analytics.
 
 ---
